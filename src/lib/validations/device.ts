@@ -3,8 +3,8 @@ import { DeviceType, DeviceStatus } from "@prisma/client";
 
 export const deviceSchema = z.object({
   name: z.string().min(2, "Tên thiết bị phải có ít nhất 2 ký tự").max(100),
-  type: z.nativeEnum(DeviceType, { required_error: "Vui lòng chọn loại thiết bị" }),
-  status: z.nativeEnum(DeviceStatus, { required_error: "Vui lòng chọn trạng thái" }),
+  type: z.nativeEnum(DeviceType),
+  status: z.nativeEnum(DeviceStatus),
   roomId: z.string().min(1, "Vui lòng chọn phòng máy"),
   manufacturer: z.string().max(100).optional().or(z.literal("")),
   model: z.string().max(100).optional().or(z.literal("")),
