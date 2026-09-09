@@ -19,7 +19,7 @@
 (Chưa có)
 
 ## Pending
-- [ ] Feature: Auth (login/register/phân quyền)
+- [x] Feature: Auth (login/register/phân quyền)
 - [ ] Feature: Quản lý phòng máy (CRUD)
 - [ ] Feature: Quản lý thiết bị (CRUD + QR code)
 - [ ] Feature: Quản lý phần mềm
