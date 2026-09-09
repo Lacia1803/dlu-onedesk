@@ -118,6 +118,7 @@ export async function addMaintenanceLog(deviceId: string, data: MaintenanceFormV
     data: {
       ...parsed.data,
       deviceId,
+      technicianId: session!.user.id,
       performedAt: new Date(parsed.data.performedAt),
     },
   });

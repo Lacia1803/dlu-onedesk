@@ -30,8 +30,8 @@ export function MaintenanceList({ deviceId, logs, canEdit }: MaintenanceListProp
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<MaintenanceFormValues>({
-    resolver: zodResolver(maintenanceSchema),
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<any>({
+    resolver: zodResolver(maintenanceSchema) as any,
     defaultValues: {
       type: "",
       description: "",
@@ -40,7 +40,7 @@ export function MaintenanceList({ deviceId, logs, canEdit }: MaintenanceListProp
     },
   });
 
-  async function onSubmit(data: MaintenanceFormValues) {
+  async function onSubmit(data: any) {
     setLoading(true);
     const res = await addMaintenanceLog(deviceId, data);
     setLoading(false);
@@ -60,11 +60,9 @@ export function MaintenanceList({ deviceId, logs, canEdit }: MaintenanceListProp
         <h3 className="text-lg font-medium">Lịch sử bảo trì & sửa chữa</h3>
         {canEdit && (
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Thêm lịch sử
-              </Button>
+            <DialogTrigger className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+              <Plus className="mr-2 h-4 w-4" />
+              Thêm lịch sử
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -74,13 +72,13 @@ export function MaintenanceList({ deviceId, logs, canEdit }: MaintenanceListProp
                 <div className="space-y-2">
                   <Label>Loại bảo trì * (VD: Sửa chữa, Vệ sinh, Nâng cấp)</Label>
                   <Input {...register("type")} />
-                  {errors.type && <p className="text-sm text-destructive">{errors.type.message}</p>}
+                  {errors.type && <p className="text-sm text-destructive">{errors.type?.message as string}</p>}
                 </div>
                 
                 <div className="space-y-2">
                   <Label>Mô tả chi tiết *</Label>
                   <Textarea {...register("description")} rows={3} />
-                  {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+                  {errors.description && <p className="text-sm text-destructive">{errors.description?.message as string}</p>}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -91,7 +89,7 @@ export function MaintenanceList({ deviceId, logs, canEdit }: MaintenanceListProp
                   <div className="space-y-2">
                     <Label>Ngày thực hiện *</Label>
                     <Input type="date" {...register("performedAt")} />
-                    {errors.performedAt && <p className="text-sm text-destructive">{errors.performedAt.message}</p>}
+                    {errors.performedAt && <p className="text-sm text-destructive">{errors.performedAt?.message as string}</p>}
                   </div>
                 </div>
 
