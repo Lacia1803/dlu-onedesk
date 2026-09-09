@@ -13,3 +13,4 @@
 - Không tự ý thêm dependency hoặc thay đổi kiến trúc
 - Không thêm feature ngoài scope
 - Cập nhật `context/progress.md` sau mỗi thay đổi quan trọng
+- `context/commit-convention.md` — Quy ước viết Git Commit

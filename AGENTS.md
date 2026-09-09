@@ -22,3 +22,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 4. **Tuân thủ code standards:** TypeScript strict, Server Components mặc định, shadcn/ui, Tailwind.
 5. **Giữ scope:** Không thêm feature ngoài đề cương.
 6. **Cập nhật progress:** Sau mỗi thay đổi quan trọng, cập nhật `context/progress.md`.
+- `context/commit-convention.md` — Quy ước viết Git Commit

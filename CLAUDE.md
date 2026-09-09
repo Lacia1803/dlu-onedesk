@@ -10,3 +10,4 @@
 5. **Tuân thủ code standards:** Theo đúng convention trong `context/code-standards.md`.
 6. **Không tự ý thay đổi kiến trúc:** Nếu cần thay đổi architecture, thảo luận trước.
 7. **Giữ scope nhỏ:** Không thêm feature ngoài đề cương trừ khi được yêu cầu.
+- `context/commit-convention.md` — Quy ước viết Git Commit
