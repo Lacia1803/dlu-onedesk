@@ -6,7 +6,7 @@ import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/sta
 import { TicketComments } from "@/components/tickets/ticket-comments";
 import { format } from "date-fns";
 import Link from "next/link";
-// import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
+import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
 
 export default async function TicketDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -52,7 +52,7 @@ export default async function TicketDetailPage({ params }: { params: { id: strin
         </div>
         
         {/* ACTION MENU PLACEHOLDER */}
-        {/* <TicketActionsMenu ticket={ticket} technicians={technicians} isTech={isTech} /> */}
+        <TicketActionsMenu ticket={ticket} technicians={technicians} isTech={isTech} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

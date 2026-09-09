@@ -85,6 +85,9 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
             </div>
             
             <div className="space-y-4 flex flex-col items-center">
+              <Link href={`/dashboard/tickets/new?deviceId=${device.id}`} className="w-full max-w-sm inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90">
+                Báo cáo sự cố thiết bị này
+              </Link>
               <QrCodeDisplay qrCode={device.qrCode} deviceName={device.name} />
             </div>
           </div>
