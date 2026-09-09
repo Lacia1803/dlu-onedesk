@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
+import { NotificationBell } from "./notification-bell";
 
 export function Header() {
   const { data: session } = useSession();
@@ -22,6 +23,7 @@ export function Header() {
         {/* Placeholder for Mobile Menu Toggle */}
       </div>
       <div className="flex items-center gap-4">
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary hover:bg-secondary/80">
