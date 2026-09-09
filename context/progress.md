@@ -27,11 +27,16 @@
 - (none)
 
 ## Pending
-- [ ] Kiểm thử & sửa lỗi
-- [ ] Viết tài liệu hướng dẫn sử dụng
-- [ ] Deploy
+- [ ] Deploy (Vercel/Render/Railway)
+- [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
 ## Recently Completed
+- [x] Feature: Quét mã QR bằng Camera — component `QrScanner`, tự động resolve `DEV-xxx` QR qua API `/api/devices/lookup`, bổ sung tùy chọn Xem thông tin / Tạo ticket ngay sau khi quét.
+- [x] Feature: In PDF phiếu sửa chữa Ticket — action `exportTicketPdf` (chữ ký 2 bên, ASCII safe), nút "In phiếu PDF" trên UI `/dashboard/tickets/[id]`.
+- [x] Feature: Tự động tạo ticket từ FAQ — nút "Tạo ticket từ FAQ" trong `FaqSearch`, tự động điều hướng sang `/dashboard/tickets/new` và điền sẵn tiêu đề/mô tả.
+- [x] Docs: Cập nhật file `README.md` với toàn bộ tech stack, danh sách tính năng tổng quát, và hướng dẫn chạy local.
+- [x] Docs: Viết tài liệu `docs/HuongDan.md` cho cả 3 vai trò (USER, TECHNICIAN, ADMIN).
+- [x] Feature: Cảnh báo quá hạn (Overdue) — Badge đỏ "Quá hạn" trong `BulkTicketTable` cho ticket >3 ngày chưa đóng, action `sendOverdueReminder` (dùng nodemailer), nút Gửi reminder trên `AdminDashboard`.
 - [x] Feature: Canned Replies + Rating/Reopen — model `CannedReply` + CRUD actions, tooltip "Chèn trả lời mẫu" trong khung bình luận; Rating 1-5 sao + feedback widget trên ticket CLOSED, nút "Mở lại" trong 7 ngày (reopenedAt audit).
 - [x] Feature: KPI kỹ thuật viên — action `getTechKPI(userId?)` (scoped per user), `TechKPIDashboard` (AdminDashboard) + trang `/dashboard/my-kpi` (MyKPI + link sidebar "KPI của tôi" cho ADMIN/TECH).
 - [x] Feature: Auto-assign + cảnh báo quá hạn — action `autoAssignTicket` (gán cho tech ít việc, audit + notify + toast), nút "Tự động gán" trong BulkTicketTable.
