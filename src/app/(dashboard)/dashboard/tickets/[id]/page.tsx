@@ -10,6 +10,7 @@ import { getCannedReplies } from "@/app/actions/canned-reply-actions";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
+import { ExportTicketPdfButton } from "@/components/tickets/export-ticket-pdf-button";
 
 export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -57,7 +58,10 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
           </div>
           <h1 className="text-xl font-semibold line-clamp-1">{ticket.title}</h1>
         </div>
-        <TicketActionsMenu ticket={ticket} technicians={technicians} isTech={isTech} />
+        <div className="flex items-start gap-2">
+          <ExportTicketPdfButton ticketId={ticket.id} />
+          <TicketActionsMenu ticket={ticket} technicians={technicians} isTech={isTech} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

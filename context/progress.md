@@ -32,6 +32,13 @@
 - [ ] Deploy
 
 ## Recently Completed
+- [x] Feature: Canned Replies + Rating/Reopen — model `CannedReply` + CRUD actions, tooltip "Chèn trả lời mẫu" trong khung bình luận; Rating 1-5 sao + feedback widget trên ticket CLOSED, nút "Mở lại" trong 7 ngày (reopenedAt audit).
+- [x] Feature: KPI kỹ thuật viên — action `getTechKPI(userId?)` (scoped per user), `TechKPIDashboard` (AdminDashboard) + trang `/dashboard/my-kpi` (MyKPI + link sidebar "KPI của tôi" cho ADMIN/TECH).
+- [x] Feature: Auto-assign + cảnh báo quá hạn — action `autoAssignTicket` (gán cho tech ít việc, audit + notify + toast), nút "Tự động gán" trong BulkTicketTable.
+- [x] Feature: Xuất PDF báo cáo KPI — action `exportKpiPdf` (jsPDF text table, ASCII-safe, chỉ ADMIN), nút "Xuất KPI PDF" trong AdminDashboard.
+- [x] Fix: khôi phục `getTicketsForTechnician` (bị ghi đè), Prisma `db push` thêm `rating`/`feedback`/`reopenedAt` + `CannedReply`; `tsc --noEmit` + `npm run build` pass.
+- [x] Task 5 Toast auto-assign/reopen: RatingWidget + BulkTicketTable hiển thị toast ngay khi hành động thành công.
+- [x] Task 4 Canned-reply picker: TicketComments nhận cannedReplies, title tooltip đầy đủ.
 - [x] Feature: Kéo-thả lên lịch Ticket — thêm `scheduledAt` vào Ticket, API `POST /api/tickets/schedule` + action `scheduleTicket` (chỉ ADMIN/TECH), `TechnicianTicketList` items draggable (HTML5 DnD), `MaintenanceCalendar` nhận drop vào ô ngày và hiển thị ticket đã lên lịch (badge vàng).
 - [x] Feature: Export CSV — nút "Xuất báo cáo" dạng dropdown (Excel / CSV); CSV sinh 2 file (Thiết bị, Tickets) có BOM UTF-8 để mở tiếng Việt đúng trong Excel.
 - [x] Feature: Lịch sử chat AI — model `ChatLog`, lưu fire-and-forget sau mỗi câu trả lời bot (user đã đăng nhập), trang `/dashboard/chat-history` + link sidebar.

@@ -2,6 +2,7 @@ import { getAdminStats } from "@/app/actions/dashboard-actions";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ExportButton } from "@/components/dashboard/export-button";
 import { ExportKpiButton } from "@/components/dashboard/export-kpi-button";
+import { OverdueReminderButton } from "@/components/dashboard/overdue-reminder-button";
 import { DevicePieChart } from "@/components/dashboard/device-pie-chart";
 import { TicketStatusBadge } from "@/components/tickets/status-badge";
 import Link from "next/link";
@@ -35,6 +36,7 @@ export async function AdminDashboard() {
       <div className="flex justify-end gap-2">
         <ExportButton />
         <ExportKpiButton />
+        <OverdueReminderButton />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

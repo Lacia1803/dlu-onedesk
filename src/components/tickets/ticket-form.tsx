@@ -115,6 +115,19 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground whitespace-pre-wrap">
                   {faq.answer}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    className="mt-2"
+                    onClick={() => {
+                      setValue("title", faq.question);
+                      setValue("description", `Không tự khắc phục được sau khi tham khảo cẩm nang:\n"${faq.question}"\n\nChi tiết: `);
+                      toast.info("Đã điền sẵn từ câu hỏi này — bạn bổ sung chi tiết rồi gửi nhé.");
+                    }}
+                  >
+                    Vẫn gặp sự cố — tạo ticket từ mục này
+                  </Button>
                 </AccordionContent>
               </AccordionItem>
             ))}

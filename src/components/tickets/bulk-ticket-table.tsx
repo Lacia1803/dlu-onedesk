@@ -223,6 +223,10 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                     </TableCell>
                     <TableCell>
                       <TicketStatusBadge status={ticket.status} />
+                {/* ponytail: overdue badge */}
+                {new Date().getTime() - new Date(ticket.createdAt).getTime() > 3 * 24 * 60 * 60 * 1000 && ticket.status !== "CLOSED" && (
+                  <span className="ml-2 inline-block px-2 py-0.5 text-xs font-mono bg-red-100 text-red-800 rounded-full">Quá hạn</span>
+                )}
                     </TableCell>
                     <TableCell>
                       <TicketPriorityBadge priority={ticket.priority} />
