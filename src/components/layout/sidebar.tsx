@@ -10,7 +10,8 @@ import {
   Server,
   BookOpen,
   Users,
-  Settings
+  Settings,
+  Disc
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,12 @@ export function Sidebar() {
       label: "Thiết bị",
       icon: Monitor,
       href: "/dashboard/devices",
+      show: true,
+    },
+    {
+      label: "Phần mềm",
+      icon: Disc,
+      href: "/dashboard/software",
       show: true,
     },
     {

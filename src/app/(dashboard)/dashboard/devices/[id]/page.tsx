@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCodeDisplay } from "@/components/devices/qr-code-display";
 import { MaintenanceList } from "@/components/devices/maintenance-list";
+import { DeviceSoftwareList } from "@/components/devices/device-software-list";
 import { Badge } from "@/components/ui/badge";
 
 export default async function DeviceDetailPage({ params }: { params: { id: string } }) {
@@ -29,6 +30,8 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
     where: { deviceId: params.id },
     orderBy: { performedAt: "desc" },
   });
+
+  const allSoftware = await db.software.findMany({ orderBy: { name: "asc" } });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -95,20 +98,12 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
         </TabsContent>
         
         <TabsContent value="software" className="pt-4">
-          <div className="border rounded-md divide-y">
-            {device.software.length === 0 ? (
-              <div className="p-6 text-center text-muted-foreground">Chưa có phần mềm nào được cài đặt.</div>
-            ) : (
-              device.software.map((ds) => (
-                <div key={ds.id} className="p-4 flex justify-between items-center">
-                  <div>
-                    <h4 className="font-medium">{ds.software.name}</h4>
-                    <p className="text-sm text-muted-foreground">Phiên bản: {ds.software.version || "-"}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          <DeviceSoftwareList
+            deviceId={device.id}
+            installedSoftware={device.software}
+            allSoftware={allSoftware}
+            canEdit={canEdit}
+          />
         </TabsContent>
         
         <TabsContent value="maintenance" className="pt-4">

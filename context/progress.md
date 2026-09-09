@@ -1,7 +1,7 @@
 # Progress Tracker - DLU OneDesk
 
 ## Trạng thái hiện tại
-**Phase:** Setup hoàn tất, chuẩn bị viết feature specs
+**Phase:** Đang phát triển feature
 **Ngày cập nhật:** 2026-09-09
 
 ## Completed
@@ -10,25 +10,23 @@
 - [x] Tạo context files (project-overview, code-standards, progress)
 - [x] Setup project Next.js (TypeScript, Tailwind, App Router)
 - [x] Cài dependencies (Prisma 6, NextAuth, Zod, React Hook Form, QR, Recharts)
-- [x] Setup shadcn/ui + components (button, card, input, label, dialog, table, badge, select, textarea, dropdown-menu, avatar, separator, sheet, tabs, sonner)
-- [x] Thiết kế database schema (8 models: User, Room, Device, Software, DeviceSoftware, Ticket, TicketComment, MaintenanceLog)
+- [x] Setup shadcn/ui + components
+- [x] Thiết kế database schema (8 models)
 - [x] Tạo Prisma client utility (src/lib/db.ts)
-- [x] Build test OK
-
-## In Progress
-(Chưa có)
-
-## Pending
 - [x] Feature: Auth (login/register/phân quyền)
 - [x] Feature: Quản lý phòng máy (CRUD)
 - [x] Feature: Quản lý thiết bị (CRUD + QR code)
-- [ ] Feature: Quản lý phần mềm
+- [x] Feature: Quản lý phần mềm (CRUD + gán/gỡ trên thiết bị)
 - [x] Feature: Hệ thống ticket
 - [x] Feature: Cẩm nang hỗ trợ (FAQ)
 - [x] Feature: Dashboard thống kê
 - [x] Feature: Live Notifications
+
+## In Progress
 - [ ] Feature: Lịch bảo trì (Calendar View)
-- [ ] Feature: AI Chatbot (Gemini) (có Export Excel)
+
+## Pending
+- [ ] Feature: AI Chatbot (Gemini) + Export Excel
 - [ ] Kiểm thử & sửa lỗi
 - [ ] Viết tài liệu hướng dẫn sử dụng
 - [ ] Deploy
