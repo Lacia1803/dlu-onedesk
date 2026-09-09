@@ -25,9 +25,9 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">{room.name}</h1>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/rooms">Quay lại</Link>
-        </Button>
+        <Link href="/dashboard/rooms" className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+          Quay lại
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

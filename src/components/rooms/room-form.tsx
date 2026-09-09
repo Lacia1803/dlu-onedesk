@@ -3,21 +3,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { roomSchema, RoomFormValues } from "@/lib/validations/room";
+import { roomSchema } from "@/lib/validations/room";
 import { createRoom, updateRoom } from "@/app/actions/room-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Room } from "@prisma/client";
 
 interface RoomFormProps {
@@ -28,7 +20,7 @@ export function RoomForm({ initialData }: RoomFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<RoomFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(roomSchema),
     defaultValues: initialData ? {
       name: initialData.name,
@@ -43,7 +35,7 @@ export function RoomForm({ initialData }: RoomFormProps) {
     },
   });
 
-  async function onSubmit(data: RoomFormValues) {
+  async function onSubmit(data: any) {
     setLoading(true);
     const result = initialData
       ? await updateRoom(initialData.id, data)
@@ -61,71 +53,37 @@ export function RoomForm({ initialData }: RoomFormProps) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên phòng máy</FormLabel>
-              <FormControl>
-                <Input placeholder="Lab CNTT 1" disabled={loading} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vị trí</FormLabel>
-                <FormControl>
-                  <Input placeholder="Tầng 1, Nhà A" disabled={loading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="capacity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sức chứa (Máy)</FormLabel>
-                <FormControl>
-                  <Input type="number" disabled={loading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
+      <div>
+        <label className="text-sm font-medium">Tên phòng máy</label>
+        <Input placeholder="Lab CNTT 1" disabled={loading} {...register("name")} />
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message as string}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium">Vị trí</label>
+          <Input placeholder="Tầng 1, Nhà A" disabled={loading} {...register("location")} />
+          {errors.location && <p className="text-sm text-destructive">{errors.location.message as string}</p>}
         </div>
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả chi tiết</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Ghi chú thêm về phòng máy này..." disabled={loading} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
-            Hủy
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Đang lưu..." : (initialData ? "Cập nhật" : "Tạo mới")}
-          </Button>
+        <div>
+          <label className="text-sm font-medium">Sức chứa (Máy)</label>
+          <Input type="number" disabled={loading} {...register("capacity")} />
+          {errors.capacity && <p className="text-sm text-destructive">{errors.capacity.message as string}</p>}
         </div>
-      </form>
-    </Form>
+      </div>
+      <div>
+        <label className="text-sm font-medium">Mô tả chi tiết</label>
+        <Textarea placeholder="Ghi chú thêm về phòng máy này..." disabled={loading} {...register("description")} />
+        {errors.description && <p className="text-sm text-destructive">{errors.description.message as string}</p>}
+      </div>
+      <div className="flex gap-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
+          Hủy
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Đang lưu..." : (initialData ? "Cập nhật" : "Tạo mới")}
+        </Button>
+      </div>
+    </form>
   );
 }

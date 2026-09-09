@@ -30,12 +30,10 @@ export default async function RoomsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Quản lý Phòng máy</h1>
         {canEdit && (
-          <Button asChild>
-            <Link href="/dashboard/rooms/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Thêm phòng máy
-            </Link>
-          </Button>
+          <Link href="/dashboard/rooms/new" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm phòng máy
+          </Link>
         )}
       </div>
 
@@ -68,11 +66,9 @@ export default async function RoomsPage() {
                   <TableCell>{room.capacity} máy</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Button variant="outline" size="icon" asChild title="Chỉnh sửa">
-                        <Link href={`/dashboard/rooms/${room.id}/edit`}>
-                          <Edit className="h-4 w-4" />
-                        </Link>
-                      </Button>
+                      <Link href={`/dashboard/rooms/${room.id}/edit`} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground" title="Chỉnh sửa">
+                        <Edit className="h-4 w-4" />
+                      </Link>
                     )}
                     {canDelete && <DeleteButton id={room.id} />}
                   </TableCell>

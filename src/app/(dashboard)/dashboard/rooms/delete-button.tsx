@@ -33,10 +33,8 @@ export function DeleteButton({ id }: { id: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="destructive" size="icon" title="Xóa phòng">
-          <Trash2 className="h-4 w-4" />
-        </Button>
+      <DialogTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90" title="Xóa phòng">
+        <Trash2 className="h-4 w-4" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
