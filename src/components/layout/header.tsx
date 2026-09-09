@@ -24,13 +24,13 @@ export function Header() {
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none">
-            <Button variant="secondary" size="icon" className="rounded-full">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary hover:bg-secondary/80">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
                 <AvatarFallback>{session?.user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
-            </Button>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
