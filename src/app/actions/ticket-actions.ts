@@ -5,6 +5,7 @@ import { ticketSchema, TicketFormValues, ticketCommentSchema, TicketCommentFormV
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 
 export async function createTicket(data: TicketFormValues) {
   const session = await getServerSession(authOptions);
@@ -21,6 +22,13 @@ export async function createTicket(data: TicketFormValues) {
       status: "OPEN",
     },
   });
+
+  // Notify Admins and Techs
+  await notifyAdminsAndTechs(
+    "Ticket mới",
+    `Ticket #${ticket.id.slice(-6).toUpperCase()}: ${ticket.title}`,
+    `/dashboard/tickets/${ticket.id}`
+  );
 
   revalidatePath("/dashboard/tickets");
   return { success: true, ticketId: ticket.id };
@@ -48,6 +56,24 @@ export async function addTicketComment(ticketId: string, data: TicketCommentForm
       authorId: session.user.id,
     },
   });
+
+  // Notifications
+  const notifyList = [];
+  if (session.user.id !== ticket.creatorId) {
+    notifyList.push(ticket.creatorId);
+  }
+  if (ticket.assigneeId && session.user.id !== ticket.assigneeId) {
+    notifyList.push(ticket.assigneeId);
+  }
+  
+  if (notifyList.length > 0) {
+    await notifyUsers(
+      notifyList,
+      "Bình luận mới",
+      `Có bình luận mới trong Ticket #${ticket.id.slice(-6).toUpperCase()}`,
+      `/dashboard/tickets/${ticket.id}`
+    );
+  }
 
   revalidatePath(`/dashboard/tickets/${ticketId}`);
   return { success: true };
@@ -95,6 +121,33 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     where: { id },
     data: updateData,
   });
+
+  // Notifications
+  const notifyList = [];
+  let title = "Cập nhật Ticket";
+  let message = `Ticket #${ticket.id.slice(-6).toUpperCase()} đã được cập nhật.`;
+
+  // Status changed
+  if (parsed.data.status && parsed.data.status !== ticket.status) {
+    if (session.user.id !== ticket.creatorId) notifyList.push(ticket.creatorId);
+    message = `Ticket #${ticket.id.slice(-6).toUpperCase()} chuyển sang trạng thái: ${parsed.data.status}.`;
+  }
+  
+  // Assignee changed
+  if (updateData.assigneeId && updateData.assigneeId !== ticket.assigneeId) {
+    if (session.user.id !== updateData.assigneeId) notifyList.push(updateData.assigneeId);
+    title = "Phân công Ticket";
+    message = `Bạn được phân công xử lý Ticket #${ticket.id.slice(-6).toUpperCase()}.`;
+  }
+
+  if (notifyList.length > 0) {
+    await notifyUsers(
+      [...new Set(notifyList)], // unique ids
+      title,
+      message,
+      `/dashboard/tickets/${ticket.id}`
+    );
+  }
 
   revalidatePath("/dashboard/tickets");
   revalidatePath(`/dashboard/tickets/${id}`);
