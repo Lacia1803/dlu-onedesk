@@ -59,7 +59,7 @@ export function FaqSearch({ faqs }: FaqSearchProps) {
           Object.keys(groupedFaqs).sort().map((category) => (
             <div key={category} className="space-y-4">
               <h2 className="text-xl font-semibold border-b pb-2">{category}</h2>
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion className="w-full">
                 {groupedFaqs[category].map((faq) => (
                   <AccordionItem key={faq.id} value={faq.id}>
                     <AccordionTrigger className="text-left font-medium">

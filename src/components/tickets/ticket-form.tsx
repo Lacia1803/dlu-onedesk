@@ -104,7 +104,7 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
             <Lightbulb className="h-5 w-5" />
             <span>Gợi ý cách tự khắc phục (Cẩm nang FAQ):</span>
           </div>
-          <Accordion type="single" collapsible className="w-full bg-white/50 rounded-md">
+          <Accordion className="w-full bg-white/50 rounded-md">
             {suggestedFaqs.map((faq) => (
               <AccordionItem key={faq.id} value={faq.id} className="border-b-blue-100 last:border-0 px-3">
                 <AccordionTrigger className="text-sm hover:no-underline hover:text-blue-800 text-left">

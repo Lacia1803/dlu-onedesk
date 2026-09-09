@@ -20,7 +20,7 @@ export async function createFaq(data: FaqFormValues) {
   await db.faq.create({
     data: {
       ...parsed.data,
-      authorId: session.user.id,
+      authorId: session!.user.id,
     },
   });
 
