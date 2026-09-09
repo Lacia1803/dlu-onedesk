@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
-import { bulkUpdateTickets, assignTicketToMe } from "@/app/actions/ticket-actions";
+import { bulkUpdateTickets, assignTicketToMe, autoAssignTicket } from "@/app/actions/ticket-actions";
 import { CheckCheck, XSquare } from "lucide-react";
 
 interface TicketItem {
@@ -134,6 +134,27 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
             >
               <XSquare className="h-3.5 w-3.5 mr-1" />
               Bỏ chọn
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs font-mono bg-primary/10 text-primary hover:bg-primary/20"
+              onClick={async () => {
+                setLoading(true);
+                let count = 0;
+                for (const id of selectedIds) {
+                  const res = await autoAssignTicket(id);
+                  if (res.success) count++;
+                }
+                setLoading(false);
+                toast.success(`Đã tự động gán ${count}/${selectedIds.length} ticket cho kỹ thuật viên ít việc nhất.`);
+                setSelectedIds([]);
+                router.refresh();
+              }}
+              disabled={loading}
+            >
+              Tự động gán ({selectedIds.length})
             </Button>
           </div>
         </div>

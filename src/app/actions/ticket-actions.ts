@@ -7,6 +7,8 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
+import { getCannedReplies } from "@/app/actions/canned-reply-actions";
+
 
 export async function createTicket(data: TicketFormValues) {
   const session = await getServerSession(authOptions);
@@ -211,6 +213,63 @@ export async function getTicketsForTechnician(userId: string) {
 
   return { success: true, tickets };
 }
+
+export async function rateTicket(ticketId: string, rating: number, feedback?: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+  // Only creator or tech can rate after closed
+  const ticket = await db.ticket.findUnique({ where: { id: ticketId } });
+  if (!ticket) return { success: false, error: "Ticket không tồn tại." };
+  const isCreator = ticket.creatorId === session.user.id;
+  const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
+  if (!isCreator && !isTech) return { success: false, error: "Không có quyền." };
+
+  await db.ticket.update({
+    where: { id: ticketId },
+    data: { rating, feedback: feedback?.trim() || null },
+  });
+
+  await logAudit({
+    action: "TICKET_RATING",
+    entity: "Ticket",
+    entityId: ticketId,
+    details: { rating, feedback },
+    userId: session.user.id,
+  });
+
+  revalidatePath(`/dashboard/tickets/${ticketId}`);
+  return { success: true };
+}
+
+export async function reopenTicket(ticketId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+  const ticket = await db.ticket.findUnique({ where: { id: ticketId } });
+  if (!ticket) return { success: false, error: "Ticket không tồn tại." };
+  const isCreator = ticket.creatorId === session.user.id;
+  const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
+  if (!isCreator && !isTech) return { success: false, error: "Không có quyền mở lại." };
+
+  if (ticket.status !== "CLOSED") return { success: false, error: "Ticket chưa đóng." };
+
+  await db.ticket.update({
+    where: { id: ticketId },
+    data: { status: "OPEN", reopenedAt: new Date() },
+  });
+
+  await logAudit({
+    action: "TICKET_REOPEN",
+    entity: "Ticket",
+    entityId: ticketId,
+    details: { reopenedAt: new Date() },
+    userId: session.user.id,
+  });
+
+  revalidatePath(`/dashboard/tickets/${ticketId}`);
+  return { success: true };
+}
+
+
 export async function assignTicketToMe(id: string) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
@@ -277,4 +336,46 @@ export async function scheduleTicket(id: string, scheduledAt: Date) {
   revalidatePath("/dashboard/maintenance");
   revalidatePath(`/dashboard/tickets/${id}`);
   return { success: true };
+}
+
+// Auto-assign ticket cho TECHNICIAN đang ít việc nhất
+export async function autoAssignTicket(ticketId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+    return { success: false, error: "Không có quyền." };
+  }
+
+  const techs = await db.user.findMany({
+    where: { role: "TECHNICIAN", deletedAt: null },
+    select: {
+      id: true,
+      name: true,
+      _count: { select: { ticketsAssigned: { where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } } } },
+    },
+  });
+
+  if (techs.length === 0) return { success: false, error: "Không có kỹ thuật viên nào." };
+
+  const target = techs.sort((a, b) => a._count.ticketsAssigned - b._count.ticketsAssigned)[0];
+
+  await db.ticket.update({ where: { id: ticketId }, data: { assigneeId: target.id } });
+
+  await logAudit({
+    action: "TICKET_AUTO_ASSIGN",
+    entity: "Ticket",
+    entityId: ticketId,
+    details: { assignee: target.name, activeTickets: target._count.ticketsAssigned },
+    userId: session.user.id,
+  });
+
+  await notifyUsers(
+    [target.id],
+    "Phân công Ticket",
+    `Bạn được phân công xử lý Ticket #${ticketId.slice(-6).toUpperCase()} (tự động).`,
+    `/dashboard/tickets/${ticketId}`
+  );
+
+  revalidatePath("/dashboard/tickets");
+  return { success: true, assignee: target.name };
 }

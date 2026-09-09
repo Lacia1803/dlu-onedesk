@@ -11,15 +11,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+interface CannedReply {
+  id: string;
+  title: string;
+  content: string;
+}
+
 interface TicketCommentsProps {
   ticketId: string;
   comments: any[];
   currentUserId: string;
+  cannedReplies?: CannedReply[];
 }
 
-export function TicketComments({ ticketId, comments, currentUserId }: TicketCommentsProps) {
+export function TicketComments({ ticketId, comments, currentUserId, cannedReplies = [] }: TicketCommentsProps) {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<any>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<any>({
     resolver: zodResolver(ticketCommentSchema) as any,
     defaultValues: { content: "" },
   });
@@ -39,7 +46,7 @@ export function TicketComments({ ticketId, comments, currentUserId }: TicketComm
   return (
     <div className="flex flex-col h-full bg-card border rounded-lg overflow-hidden">
       <div className="p-4 border-b bg-muted/50 font-medium">Thảo luận</div>
-      
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]">
         {comments.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">Chưa có bình luận nào.</div>
@@ -69,10 +76,26 @@ export function TicketComments({ ticketId, comments, currentUserId }: TicketComm
       </div>
 
       <div className="p-4 border-t bg-muted/20">
+        {cannedReplies.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {cannedReplies.map((r) => (
+              <Button
+                key={r.id}
+                variant="outline"
+                size="xs"
+                className="text-xs h-6"
+                title={`Chèn trả lời mẫu: "${r.content.slice(0, 50)}..."`}
+                onClick={() => setValue("content", r.content)}
+              >
+                {r.title}
+              </Button>
+            ))}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-          <Textarea 
-            {...register("content")} 
-            placeholder="Nhập bình luận của bạn..." 
+          <Textarea
+            {...register("content")}
+            placeholder="Nhập bình luận của bạn..."
             className="min-h-[80px] resize-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -92,3 +115,4 @@ export function TicketComments({ ticketId, comments, currentUserId }: TicketComm
     </div>
   );
 }
+

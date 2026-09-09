@@ -5,6 +5,8 @@ import { notFound, redirect } from "next/navigation";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
 import { TicketComments } from "@/components/tickets/ticket-comments";
 import { InternalNoteSection } from "@/components/tickets/internal-note-section";
+import { RatingWidget } from "@/components/tickets/rating-widget";
+import { getCannedReplies } from "@/app/actions/canned-reply-actions";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
@@ -39,6 +41,8 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
     where: { role: { in: ["ADMIN", "TECHNICIAN"] } },
     select: { id: true, name: true },
   }) : [];
+
+  const cannedReplies = isTech ? await getCannedReplies() : [];
 
   return (
     <div className="space-y-6">
@@ -123,6 +127,20 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
               />
             )}
 
+            {ticket.status === "CLOSED" && (
+              <div className="border-t pt-4 space-y-3">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  ĐÁNH GIÁ SAU KHI ĐÓNG
+                </h3>
+                <RatingWidget
+                  ticketId={ticket.id}
+                  rating={ticket.rating}
+                  feedback={ticket.feedback}
+                  canReopen={isCreator && !!ticket.closedAt && Date.now() - new Date(ticket.closedAt).getTime() < 7 * 24 * 3600 * 1000}
+                />
+              </div>
+            )}
+
             {(ticket.resolvedAt || ticket.closedAt) && (
               <div className="font-mono text-xs text-muted-foreground pt-4 border-t border-border flex gap-4">
                 {ticket.resolvedAt && <p>XỬ LÝ LÚC: {format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm")}</p>}
@@ -133,7 +151,12 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
         </div>
 
         <div className="lg:col-span-1">
-          <TicketComments ticketId={ticket.id} comments={ticket.comments} currentUserId={session.user.id} />
+          <TicketComments
+            ticketId={ticket.id}
+            comments={ticket.comments}
+            currentUserId={session.user.id}
+            cannedReplies={cannedReplies}
+          />
         </div>
       </div>
     </div>

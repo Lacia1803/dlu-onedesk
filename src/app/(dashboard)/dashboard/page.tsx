@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { UserDashboard } from "@/components/dashboard/user-dashboard";
 import { ExportSnapshot } from "@/components/dashboard/export-snapshot";
+import { TechKPIDashboard } from "@/components/dashboard/tech-kpi";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
       <h1 className="text-2xl font-bold tracking-tight">Tổng quan</h1>
       <ExportSnapshot>
         {isAdminOrTech ? <AdminDashboard /> : <UserDashboard />}
+        {isAdminOrTech && <TechKPIDashboard />}
       </ExportSnapshot>
     </div>
   );
