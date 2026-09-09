@@ -23,7 +23,7 @@ export function Header() {
       </div>
       <div className="flex items-center gap-4">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger className="rounded-full outline-none">
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
