@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Lightbulb } from "lucide-react";
 
 interface DeviceOption {
   id: string;
@@ -19,9 +21,16 @@ interface DeviceOption {
   qrCode: string;
 }
 
+interface FaqOption {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 interface TicketFormProps {
   devices: DeviceOption[];
   initialDeviceId?: string;
+  faqs?: FaqOption[];
 }
 
 const CATEGORY_OPTIONS = [
@@ -39,11 +48,11 @@ const PRIORITY_OPTIONS = [
   { value: "URGENT", label: "Khẩn cấp" },
 ];
 
-export function TicketForm({ devices, initialDeviceId }: TicketFormProps) {
+export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<any>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<any>({
     resolver: zodResolver(ticketSchema) as any,
     defaultValues: {
       title: "",
@@ -53,6 +62,19 @@ export function TicketForm({ devices, initialDeviceId }: TicketFormProps) {
       deviceId: initialDeviceId || "",
     },
   });
+
+  const title = watch("title");
+
+  // Suggest FAQs based on title input
+  const suggestedFaqs = useMemo(() => {
+    if (!title || title.length < 5) return [];
+    const keywords = title.toLowerCase().split(/\s+/).filter((k: string) => k.length > 2);
+    if (keywords.length === 0) return [];
+    
+    return faqs.filter(faq => 
+      keywords.some((k: string) => faq.question.toLowerCase().includes(k))
+    ).slice(0, 3); // Max 3 suggestions
+  }, [title, faqs]);
 
   async function onSubmit(data: any) {
     setLoading(true);
@@ -75,6 +97,27 @@ export function TicketForm({ devices, initialDeviceId }: TicketFormProps) {
         <Input id="title" {...register("title")} placeholder="VD: Máy tính không lên nguồn" />
         {errors.title && <p className="text-sm text-destructive">{errors.title?.message as string}</p>}
       </div>
+
+      {suggestedFaqs.length > 0 && (
+        <div className="bg-blue-50/50 border border-blue-200 rounded-md p-4">
+          <div className="flex items-center gap-2 text-blue-700 mb-2 font-medium">
+            <Lightbulb className="h-5 w-5" />
+            <span>Gợi ý cách tự khắc phục (Cẩm nang FAQ):</span>
+          </div>
+          <Accordion type="single" collapsible className="w-full bg-white/50 rounded-md">
+            {suggestedFaqs.map((faq) => (
+              <AccordionItem key={faq.id} value={faq.id} className="border-b-blue-100 last:border-0 px-3">
+                <AccordionTrigger className="text-sm hover:no-underline hover:text-blue-800 text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
