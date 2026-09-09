@@ -11,7 +11,8 @@ import {
   BookOpen,
   Users,
   Settings,
-  Disc
+  Disc,
+  CalendarDays
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +58,12 @@ export function Sidebar() {
       icon: Disc,
       href: "/dashboard/software",
       show: true,
+    },
+    {
+      label: "Lịch bảo trì",
+      icon: CalendarDays,
+      href: "/dashboard/maintenance",
+      show: role === "ADMIN" || role === "TECHNICIAN",
     },
     {
       label: "Người dùng",
