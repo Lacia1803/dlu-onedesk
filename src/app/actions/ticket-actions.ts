@@ -184,3 +184,27 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   revalidatePath(`/dashboard/tickets/${id}`);
   return { success: true };
 }
+
+export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdateFormValues>) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+    return { success: false, error: "Không có quyền thực hiện." };
+  }
+
+  await db.ticket.updateMany({
+    where: { id: { in: ids } },
+    data,
+  });
+
+  await logAudit({
+    action: "TICKET_BULK_UPDATE",
+    entity: "Ticket",
+    details: { ids, data },
+    userId: session.user.id,
+  });
+
+  revalidatePath("/dashboard/tickets");
+  return { success: true };
+}
