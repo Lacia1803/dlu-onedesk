@@ -8,12 +8,12 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
 
-export default async function TicketDetailPage({ params }: { params: { id: string } }) {
+export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) return redirect("/login");
 
   const ticket = await db.ticket.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
     include: {
       creator: { select: { name: true, id: true } },
       assignee: { select: { name: true, id: true } },
