@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { getExportData } from "@/app/actions/dashboard-actions";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,13 +90,14 @@ export function ExportButton() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
-          <Download className="mr-2 h-4 w-4" />
-          {loading ? "Đang xuất..." : "Xuất báo cáo"}
-          <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
-    </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        disabled={loading}
+        className="inline-flex h-9 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 outline-none"
+      >
+        <Download className="mr-2 h-4 w-4" />
+        {loading ? "Đang xuất..." : "Xuất báo cáo"}
+        <ChevronDown className="ml-2 h-4 w-4" />
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleExport("excel")}>
           <FileSpreadsheet className="mr-2 h-4 w-4" />
