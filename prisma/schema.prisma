@@ -73,6 +73,7 @@ model User {
   faqsCreated       Faq[]
   notifications     Notification[]
   auditLogs         AuditLog[]
+  chatLogs          ChatLog[]
 
   @@map("users")
 }
@@ -146,10 +147,12 @@ model Ticket {
   id            String          @id @default(cuid())
   title         String
   description   String
-  images        String[]        
+  internalNote  String?
+  images        String[]
   status        TicketStatus    @default(OPEN)
   priority      TicketPriority  @default(MEDIUM)
   category      TicketCategory
+  scheduledAt   DateTime?
   resolvedAt    DateTime?
   closedAt      DateTime?
   createdAt     DateTime        @default(now())
@@ -227,6 +230,17 @@ model Notification {
   user          User      @relation(fields: [userId], references: [id])
 
   @@map("notifications")
+}
+
+model ChatLog {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("chat_logs")
 }
 
 model AuditLog {

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
 import { NotificationBell } from "./notification-bell";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
   const { data: session } = useSession();
@@ -23,6 +24,7 @@ export function Header() {
         <span className="text-primary">●</span> OPERATIONS
       </div>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none">

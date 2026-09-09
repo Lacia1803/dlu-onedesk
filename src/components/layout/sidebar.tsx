@@ -13,7 +13,8 @@ import {
   Settings,
   Disc,
   CalendarDays,
-  ScrollText
+  ScrollText,
+  MessagesSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ export function Sidebar() {
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard", show: true },
     { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", show: true },
     { label: "FAQ", icon: BookOpen, href: "/dashboard/faq", show: true },
+    { label: "Lịch sử chat AI", icon: MessagesSquare, href: "/dashboard/chat-history", show: true },
     { label: "Phòng máy", icon: Server, href: "/dashboard/rooms", show: role === "ADMIN" || role === "TECHNICIAN" },
     { label: "Thiết bị", icon: Monitor, href: "/dashboard/devices", show: true },
     { label: "Phần mềm", icon: Disc, href: "/dashboard/software", show: true },

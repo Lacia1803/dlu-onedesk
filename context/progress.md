@@ -36,6 +36,8 @@
 - [x] Feature: Export Excel — nút "Xuất Excel" trên dashboard, export thiết bị + tickets ra .xlsx
 - [x] Feature: Khôi phục người dùng đã vô hiệu hóa (soft-delete restore) — action `restoreUser` + nút "Khôi phục" trong trang Quản lý Người dùng
 - [x] Feature: Bảo mật 2 lớp (2-FA) — cài `@otplib/preset-default` + `qrcode`, action `enableTwoFactor`/`verifyTwoFactor`/`disableTwoFactor`, UI QR/OTP trong Settings và xác thực trong `authorize` NextAuth.
+- [x] Feature: Nhật ký hệ thống (Audit Logs) — model `AuditLog`, helper `logAudit()`, ghi log cho các hành động user (đổi vai trò, vô hiệu hóa/khôi phục, 2FA) và ticket (tạo, cập nhật, bulk), trang `/admin/audit-logs` chỉ ADMIN xem được.
+- [x] Feature: Bulk Actions cho Tickets — `BulkTicketTable` với checkbox chọn nhiều, chọn tất cả, toolbar đổi hàng loạt status/priority, action `bulkUpdateTickets` + API route `/api/tickets/bulk-update` (chỉ ADMIN/TECHNICIAN), test `test-bulk-actions.js` pass.
 
 ## Known Issues
 - npm cần `legacy-peer-deps=true` (.npmrc) do peer dependency conflicts

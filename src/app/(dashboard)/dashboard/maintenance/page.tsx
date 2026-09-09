@@ -1,10 +1,22 @@
 import { getAllMaintenanceLogs } from "@/app/actions/maintenance-actions";
+import { getTicketsForTechnician } from "@/app/actions/ticket-actions";
 import { MaintenanceCalendar } from "@/components/maintenance/maintenance-calendar";
+import { TechnicianTicketList } from "@/components/maintenance/technician-ticket-list";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function MaintenancePage() {
+  const session = await getServerSession(authOptions);
+  const isTech = session?.user?.role === "ADMIN" || session?.user?.role === "TECHNICIAN";
   const logs = await getAllMaintenanceLogs();
+
+  // Active tickets for the logged-in technician
+  let myTickets: Awaited<ReturnType<typeof getTicketsForTechnician>> = { success: false, tickets: [] };
+  if (isTech && session?.user?.id) {
+    myTickets = await getTicketsForTechnician(session.user.id);
+  }
 
   return (
     <div className="space-y-4">
@@ -14,6 +26,11 @@ export default async function MaintenancePage() {
           Xem toàn bộ lịch sử bảo trì thiết bị theo tháng.
         </p>
       </div>
+
+      {isTech && myTickets.success && myTickets.tickets.length > 0 && (
+        <TechnicianTicketList tickets={myTickets.tickets} />
+      )}
+
       <MaintenanceCalendar initialLogs={logs} />
     </div>
   );

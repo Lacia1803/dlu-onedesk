@@ -185,6 +185,53 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   return { success: true };
 }
 
+export async function getTicketsForTechnician(userId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, tickets: [] };
+  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+    return { success: false, tickets: [] };
+  }
+
+  const tickets = await db.ticket.findMany({
+    where: {
+      assigneeId: userId,
+      status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] },
+    },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      priority: true,
+      createdAt: true,
+      device: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return { success: true, tickets };
+}
+export async function assignTicketToMe(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+    return { success: false, error: "Không có quyền gán ticket." };
+  }
+
+  const userId = session.user.id;
+  await db.ticket.update({ where: { id }, data: { assigneeId: userId } });
+
+  await logAudit({
+    action: "TICKET_ASSIGN_SELF",
+    entity: "Ticket",
+    entityId: id,
+    userId,
+  });
+
+  revalidatePath("/dashboard/tickets");
+  revalidatePath(`/dashboard/tickets/${id}`);
+  return { success: true };
+}
+
 export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdateFormValues>) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };

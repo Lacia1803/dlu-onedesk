@@ -25,6 +25,17 @@ interface ChatMessage {
   text: string;
 }
 
+export async function getMyChatLogs() {
+  const session = await getServerSession(authOptions);
+  if (!session) return [];
+
+  return db.chatLog.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+}
+
 export async function chatWithBot(
   messages: ChatMessage[]
 ): Promise<{ reply: string; shouldCreateTicket: boolean }> {
@@ -67,6 +78,14 @@ export async function chatWithBot(
       reply.toLowerCase().includes("gửi ticket") ||
       reply.toLowerCase().includes("liên hệ kỹ thuật") ||
       reply.toLowerCase().includes("nhân viên kỹ thuật");
+
+    // Persist last Q/A pair to chat history (logged-in users only)
+    const lastUserMsg = messages[messages.length - 1];
+    if (session?.user?.id && lastUserMsg?.role === "user") {
+      db.chatLog.create({
+        data: { userId: session.user.id, question: lastUserMsg.text, answer: reply },
+      }).catch(() => { /* ponytail: fire-and-forget; upgrade to queue if logging failures matter */ });
+    }
 
     return { reply, shouldCreateTicket };
   } catch (error) {

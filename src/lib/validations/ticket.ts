@@ -21,6 +21,7 @@ export type TicketCommentFormValues = z.infer<typeof ticketCommentSchema>;
 export const ticketUpdateSchema = z.object({
   status: z.nativeEnum(TicketStatus).optional(),
   priority: z.nativeEnum(TicketPriority).optional(),
+  internalNote: z.string().optional(),
   assigneeId: z.string().optional().or(z.literal("")),
 });
 

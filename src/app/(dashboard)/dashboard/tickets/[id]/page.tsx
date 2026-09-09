@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
 import { TicketComments } from "@/components/tickets/ticket-comments";
+import { InternalNoteSection } from "@/components/tickets/internal-note-section";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
@@ -113,6 +114,13 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                   ))}
                 </div>
               </div>
+            )}
+
+            {isTech && (
+              <InternalNoteSection
+                ticketId={ticket.id}
+                initialNote={ticket.internalNote || null}
+              />
             )}
 
             {(ticket.resolvedAt || ticket.closedAt) && (

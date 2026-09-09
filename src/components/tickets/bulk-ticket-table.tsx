@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
-import { bulkUpdateTickets } from "@/app/actions/ticket-actions";
+import { bulkUpdateTickets, assignTicketToMe } from "@/app/actions/ticket-actions";
 import { CheckCheck, XSquare } from "lucide-react";
 
 interface TicketItem {
@@ -161,12 +161,13 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
               {!isUser && <TableHead>Người tạo</TableHead>}
               <TableHead>Người xử lý</TableHead>
               <TableHead>Ngày tạo</TableHead>
+              {!isUser && <TableHead className="w-[110px]">Thao tác</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {tickets.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isUser ? 6 : 8} className="text-center py-6 text-muted-foreground font-mono text-xs">
+                <TableCell colSpan={isUser ? 6 : 9} className="text-center py-6 text-muted-foreground font-mono text-xs">
                   Không có dữ liệu ticket
                 </TableCell>
               </TableRow>
@@ -211,6 +212,28 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                         <span className="text-muted-foreground italic">Chưa phân công</span>
                       )}
                     </TableCell>
+                    {!isUser && (
+                      <TableCell>
+                        {!ticket.assignee && ticket.status !== "CLOSED" ? (
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            className="font-mono uppercase tracking-wider"
+                            onClick={async () => {
+                              const res = await assignTicketToMe(ticket.id);
+                              if (res.success) {
+                                toast.success("Đã nhận xử lý ticket.");
+                                router.refresh();
+                              } else {
+                                toast.error(res.error || "Không nhận được ticket.");
+                              }
+                            }}
+                          >
+                            Nhận xử lý
+                          </Button>
+                        ) : null}
+                      </TableCell>
+                    )}
                     <TableCell>
                       {format(new Date(ticket.createdAt), "dd/MM/yyyy")}
                     </TableCell>
