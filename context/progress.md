@@ -23,7 +23,7 @@
 - [x] Feature: Quản lý phòng máy (CRUD)
 - [x] Feature: Quản lý thiết bị (CRUD + QR code)
 - [ ] Feature: Quản lý phần mềm
-- [ ] Feature: Hệ thống ticket
+- [x] Feature: Hệ thống ticket
 - [ ] Feature: Cẩm nang hỗ trợ (FAQ)
 - [ ] Feature: Dashboard thống kê
 - [ ] Feature: Live Notifications
