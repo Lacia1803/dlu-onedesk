@@ -38,14 +38,10 @@ export function NotificationBell() {
   }
 
   useEffect(() => {
-    // Initial fetch
     fetchNotifications();
-
-    // Polling every 15s
     const interval = setInterval(() => {
       fetchNotifications();
     }, 15000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -55,15 +51,9 @@ export function NotificationBell() {
   }
 
   async function handleClick(notif: Notification) {
-    // Mark as read
     await markAsRead(notif.id);
-    
-    // Update local state
     setNotifications(prev => prev.filter(n => n.id !== notif.id));
-    
     setOpen(false);
-
-    // Navigate
     if (notif.linkUrl) {
       router.push(notif.linkUrl);
     }
@@ -71,16 +61,14 @@ export function NotificationBell() {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative outline-none">
-          <Bell className="h-5 w-5" />
-          {notifications.length > 0 && (
-            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-              {notifications.length > 9 ? "9+" : notifications.length}
-            </span>
-          )}
-          <span className="sr-only">Thông báo</span>
-        </Button>
+      <DropdownMenuTrigger className="relative outline-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9">
+        <Bell className="h-5 w-5" />
+        {notifications.length > 0 && (
+          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+            {notifications.length > 9 ? "9+" : notifications.length}
+          </span>
+        )}
+        <span className="sr-only">Thông báo</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <div className="flex items-center justify-between px-2 py-1.5">
