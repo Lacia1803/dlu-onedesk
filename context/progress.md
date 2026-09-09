@@ -32,6 +32,12 @@
 - [ ] Deploy
 
 ## Recently Completed
+- [x] Feature: Kéo-thả lên lịch Ticket — thêm `scheduledAt` vào Ticket, API `POST /api/tickets/schedule` + action `scheduleTicket` (chỉ ADMIN/TECH), `TechnicianTicketList` items draggable (HTML5 DnD), `MaintenanceCalendar` nhận drop vào ô ngày và hiển thị ticket đã lên lịch (badge vàng).
+- [x] Feature: Export CSV — nút "Xuất báo cáo" dạng dropdown (Excel / CSV); CSV sinh 2 file (Thiết bị, Tickets) có BOM UTF-8 để mở tiếng Việt đúng trong Excel.
+- [x] Feature: Lịch sử chat AI — model `ChatLog`, lưu fire-and-forget sau mỗi câu trả lời bot (user đã đăng nhập), trang `/dashboard/chat-history` + link sidebar.
+- [x] Feature: Phân quyền UI — `src/lib/permissions.ts` (`hasRole`/`isAdmin`/`isTechnicianOrAdmin`) + component `PermissionWrapper`.
+- [x] Feature: Internal Note + Quick Assign (Sprint 1) — trường `internalNote` chỉ Tech/Admin thấy, nút "Nhận xử lý" trong danh sách ticket.
+- [x] Feature: Export Dashboard PNG/PDF — `ExportSnapshot` dùng html2canvas + jspdf, nút "Xuất ảnh PNG" / "Xuất PDF" trên dashboard.
 - [x] Feature: AI Chatbot (Gemini) — widget chat góc phải, dùng FAQ context, gợi ý tạo ticket
 - [x] Feature: Export Excel — nút "Xuất Excel" trên dashboard, export thiết bị + tickets ra .xlsx
 - [x] Feature: Khôi phục người dùng đã vô hiệu hóa (soft-delete restore) — action `restoreUser` + nút "Khôi phục" trong trang Quản lý Người dùng

@@ -6,13 +6,14 @@ import { vi } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Wrench, DollarSign, User, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface LogItem {
   id: string;
@@ -25,13 +26,23 @@ interface LogItem {
   technician: { name: string | null };
 }
 
-interface MaintenanceCalendarProps {
-  initialLogs: LogItem[];
+interface TicketItem {
+  id: string;
+  title: string;
+  scheduledAt: Date | string | null;
+  device?: { name: string } | null;
+  status: string;
 }
 
-export function MaintenanceCalendar({ initialLogs }: MaintenanceCalendarProps) {
+interface MaintenanceCalendarProps {
+  initialLogs: LogItem[];
+  scheduledTickets?: TicketItem[];
+}
+
+export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: MaintenanceCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedLog, setSelectedLog] = useState<LogItem | null>(null);
+  const router = useRouter();
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -48,6 +59,38 @@ export function MaintenanceCalendar({ initialLogs }: MaintenanceCalendarProps) {
     return initialLogs.filter((log) =>
       isSameDay(new Date(log.performedAt), day)
     );
+  };
+
+  const getTicketsForDay = (day: Date) => {
+    return scheduledTickets.filter((t) =>
+      t.scheduledAt && isSameDay(new Date(t.scheduledAt), day)
+    );
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
+
+  const handleDrop = async (e: React.DragEvent, day: Date) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("application/json");
+    if (!data) return;
+
+    try {
+      const { id } = JSON.parse(data);
+      const res = await fetch("/api/tickets/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, scheduledAt: day.toISOString() })
+      });
+
+      if (!res.ok) throw new Error("API failed");
+      toast.success("Đã lên lịch ticket thành công");
+      router.refresh();
+    } catch (error) {
+      toast.error("Lỗi khi lên lịch ticket");
+      console.error(error);
+    }
   };
 
   const weekDays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -81,15 +124,19 @@ export function MaintenanceCalendar({ initialLogs }: MaintenanceCalendarProps) {
         <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y border-b">
           {days.map((day, idx) => {
             const dayLogs = getLogsForDay(day);
+            const dayTickets = getTicketsForDay(day);
             const isCurrentMonth = isSameMonth(day, monthStart);
             const isToday = isSameDay(day, new Date());
+            const totalItems = dayLogs.length + dayTickets.length;
 
             return (
               <div
                 key={day.toISOString()}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, day)}
                 className={`min-h-[100px] p-2 transition-colors flex flex-col justify-between ${
                   !isCurrentMonth ? "bg-muted/20 text-muted-foreground" : "bg-card"
-                } ${isToday ? "ring-2 ring-primary ring-inset" : ""}`}
+                } ${isToday ? "ring-2 ring-primary ring-inset" : ""} hover:bg-accent/50`}
               >
                 <div className="flex justify-between items-center mb-1">
                   <span
@@ -99,17 +146,26 @@ export function MaintenanceCalendar({ initialLogs }: MaintenanceCalendarProps) {
                   >
                     {format(day, "d")}
                   </span>
-                  {dayLogs.length > 0 && (
+                  {totalItems > 0 && (
                     <Badge variant="secondary" className="text-xs h-5 px-1.5">
-                      {dayLogs.length}
+                      {totalItems}
                     </Badge>
                   )}
                 </div>
 
                 <div className="space-y-1 overflow-y-auto max-h-[80px]">
-                  {dayLogs.slice(0, 3).map((log) => (
+                  {dayTickets.map((t) => (
+                    <div
+                      key={`ticket-${t.id}`}
+                      className="w-full text-left truncate text-xs p-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-500 transition-colors border border-amber-500/20 cursor-pointer"
+                      onClick={() => router.push(`/dashboard/tickets/${t.id}`)}
+                    >
+                      <span className="font-semibold">#{t.id.slice(-4).toUpperCase()}</span> {t.title}
+                    </div>
+                  ))}
+                  {dayLogs.map((log) => (
                     <button
-                      key={log.id}
+                      key={`log-${log.id}`}
                       onClick={() => setSelectedLog(log)}
                       className="w-full text-left truncate text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 text-foreground transition-colors flex items-center gap-1 border border-primary/20"
                     >
@@ -117,11 +173,6 @@ export function MaintenanceCalendar({ initialLogs }: MaintenanceCalendarProps) {
                       <span className="truncate">{log.device.name}: {log.type}</span>
                     </button>
                   ))}
-                  {dayLogs.length > 3 && (
-                    <p className="text-[10px] text-muted-foreground text-center">
-                      +{dayLogs.length - 3} khác
-                    </p>
-                  )}
                 </div>
               </div>
             );

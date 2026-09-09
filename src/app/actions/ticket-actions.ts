@@ -203,6 +203,7 @@ export async function getTicketsForTechnician(userId: string) {
       status: true,
       priority: true,
       createdAt: true,
+      scheduledAt: true,
       device: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
@@ -253,5 +254,27 @@ export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdat
   });
 
   revalidatePath("/dashboard/tickets");
+  return { success: true };
+}
+
+export async function scheduleTicket(id: string, scheduledAt: Date) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { success: false, error: "Vui lòng đăng nhập." };
+  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+    return { success: false, error: "Không có quyền lên lịch ticket." };
+  }
+
+  await db.ticket.update({ where: { id }, data: { scheduledAt } });
+
+  await logAudit({
+    action: "TICKET_SCHEDULE",
+    entity: "Ticket",
+    entityId: id,
+    details: { scheduledAt },
+    userId: session.user.id,
+  });
+
+  revalidatePath("/dashboard/maintenance");
+  revalidatePath(`/dashboard/tickets/${id}`);
   return { success: true };
 }

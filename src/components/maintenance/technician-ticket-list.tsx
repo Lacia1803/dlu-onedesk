@@ -18,7 +18,14 @@ export function TechnicianTicketList({ tickets }: { tickets: TechnicianTicket[] 
       </h2>
       <ul className="divide-y divide-border">
         {tickets.map((t) => (
-          <li key={t.id} className="py-2 flex items-center justify-between gap-4">
+          <li
+            key={t.id}
+            className="py-2 flex items-center justify-between gap-4"
+            draggable="true"
+            onDragStart={(e) => {
+              e.dataTransfer.setData("application/json", JSON.stringify({ id: t.id }));
+            }}
+          >
             <Link
               href={`/dashboard/tickets/${t.id}`}
               className="min-w-0 flex-1 truncate text-sm font-medium text-primary hover:underline"

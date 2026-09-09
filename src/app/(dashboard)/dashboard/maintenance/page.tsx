@@ -18,12 +18,15 @@ export default async function MaintenancePage() {
     myTickets = await getTicketsForTechnician(session.user.id);
   }
 
+  // Lọc ra các ticket đã được lên lịch
+  const scheduledTickets = myTickets.tickets?.filter(t => t.scheduledAt) || [];
+
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Lịch bảo trì</h1>
         <p className="text-sm text-muted-foreground">
-          Xem toàn bộ lịch sử bảo trì thiết bị theo tháng.
+          Xem toàn bộ lịch sử bảo trì thiết bị theo tháng. (Kéo ticket vào ngày để lên lịch)
         </p>
       </div>
 
@@ -31,7 +34,7 @@ export default async function MaintenancePage() {
         <TechnicianTicketList tickets={myTickets.tickets} />
       )}
 
-      <MaintenanceCalendar initialLogs={logs} />
+      <MaintenanceCalendar initialLogs={logs} scheduledTickets={scheduledTickets} />
     </div>
   );
 }
