@@ -88,7 +88,7 @@ export async function getExportData() {
       orderBy: { createdAt: "desc" }
     }),
     db.ticket.findMany({
-      include: { creator: true, assignee: true, device: true },
+      include: { creator: { select: { id: true, name: true, email: true } }, assignee: { select: { id: true, name: true, email: true } }, device: { select: { name: true, qrCode: true } } },
       orderBy: { createdAt: "desc" }
     })
   ]);

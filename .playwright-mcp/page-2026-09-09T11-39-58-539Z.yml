@@ -1,0 +1,88 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e29]:
+    - generic [ref=e31]:
+      - link "DLU OneDesk" [ref=e33] [cursor=pointer]:
+        - /url: /dashboard
+      - navigation [ref=e38]:
+        - link "Tổng quan" [ref=e39] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Hỗ trợ (Tickets)" [ref=e45] [cursor=pointer]:
+          - /url: /dashboard/tickets
+        - link "Cẩm nang (FAQ)" [ref=e48] [cursor=pointer]:
+          - /url: /dashboard/faq
+        - link "Phòng máy" [ref=e51] [cursor=pointer]:
+          - /url: /dashboard/rooms
+        - link "Thiết bị" [ref=e55] [cursor=pointer]:
+          - /url: /dashboard/devices
+        - link "Phần mềm" [ref=e58] [cursor=pointer]:
+          - /url: /dashboard/software
+        - link "Lịch bảo trì" [ref=e62] [cursor=pointer]:
+          - /url: /dashboard/maintenance
+        - link "Người dùng" [ref=e65] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Cài đặt" [ref=e71] [cursor=pointer]:
+          - /url: /settings
+    - generic [ref=e75]:
+      - banner [ref=e76]:
+        - generic [ref=e77]:
+          - button "Thông báo" [ref=e78]
+          - button "A Toggle user menu" [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]: A
+              - generic [ref=e87]: Toggle user menu
+      - main [ref=e88]:
+        - generic [ref=e89]:
+          - heading "Tổng quan" [level=1] [ref=e90]
+          - generic [ref=e91]:
+            - button "Xuất Excel" [ref=e93]
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - generic [ref=e96]: Tổng thiết bị
+                - generic [ref=e100]: "0"
+              - generic [ref=e102]:
+                - generic [ref=e103]: Thiết bị hỏng
+                - generic [ref=e107]: "0"
+              - generic [ref=e109]:
+                - generic [ref=e110]: Ticket mở
+                - generic [ref=e114]: "3"
+              - generic [ref=e116]:
+                - generic [ref=e117]: Ticket chưa xử lý xong
+                - generic [ref=e122]: "3"
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - heading "Trạng thái thiết bị" [level=3] [ref=e126]
+                - generic [ref=e127]: Chưa có dữ liệu thiết bị
+              - generic [ref=e129]:
+                - heading "Ticket mới nhất" [level=3] [ref=e130]
+                - generic [ref=e131]:
+                  - generic [ref=e132]:
+                    - generic [ref=e133]:
+                      - link "Màn hình bị giật lag liên tục" [ref=e134] [cursor=pointer]:
+                        - /url: /dashboard/tickets/cmttw5tx90005bo548gywk9oi
+                      - paragraph [ref=e135]: Tạo bởi Admin Test • 09/09 16:23
+                    - generic [ref=e136]: Mở
+                  - generic [ref=e138]:
+                    - generic [ref=e139]:
+                      - link "Màn hình bị giật lag liên tục" [ref=e140] [cursor=pointer]:
+                        - /url: /dashboard/tickets/cmttw42xf0003bo54t4x83zx1
+                      - paragraph [ref=e141]: Tạo bởi Admin Test • 09/09 16:22
+                    - generic [ref=e142]: Mở
+                  - generic [ref=e144]:
+                    - generic [ref=e145]:
+                      - link "Màn hình bị giật lag liên tục" [ref=e146] [cursor=pointer]:
+                        - /url: /dashboard/tickets/cmttw36rl0001bo540b8nzssi
+                      - paragraph [ref=e147]: Tạo bởi Admin Test • 09/09 16:21
+                    - generic [ref=e148]: Mở
+    - button [ref=e150]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e151]:
+        - generic [ref=e156]: Đăng nhập thành công!
+  - button "Open Next.js Dev Tools" [ref=e158] [cursor=pointer]:
+    - generic [ref=e161]:
+      - text: Rendering
+      - generic [ref=e162]:
+        - generic [ref=e163]: .
+        - generic [ref=e164]: .
+        - generic [ref=e165]: .
+  - alert [ref=e28]: Tổng quan

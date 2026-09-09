@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Lightbulb } from "lucide-react";
+import { TicketImageUploader } from "@/components/tickets/ticket-image-uploader";
 
 interface DeviceOption {
   id: string;
@@ -60,10 +61,12 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
       category: "OTHER",
       priority: "MEDIUM",
       deviceId: initialDeviceId || "",
+      images: [],
     },
   });
 
   const title = watch("title");
+  const images = watch("images") || [];
 
   // Suggest FAQs based on title input
   const suggestedFaqs = useMemo(() => {
@@ -170,6 +173,14 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
         <Label htmlFor="description">Mô tả chi tiết *</Label>
         <Textarea id="description" {...register("description")} rows={5} placeholder="Mô tả rõ tình trạng bạn đang gặp phải..." />
         {errors.description && <p className="text-sm text-destructive">{errors.description?.message as string}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label>Hình ảnh đính kèm (Tùy chọn)</Label>
+        <TicketImageUploader
+          value={images}
+          onChange={(urls) => setValue("images", urls)}
+        />
       </div>
 
       <div className="flex justify-end gap-2">

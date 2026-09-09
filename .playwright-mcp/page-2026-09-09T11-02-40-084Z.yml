@@ -1,0 +1,19 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: Đăng nhập
+      - generic [ref=e6]: Đăng nhập vào hệ thống DLU OneDesk
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]: Email
+        - textbox "Email" [ref=e11]:
+          - /placeholder: name@example.com
+      - generic [ref=e12]:
+        - generic [ref=e13]: Mật khẩu
+        - textbox "Mật khẩu" [ref=e14]
+      - button "Đăng nhập" [ref=e15]
+    - paragraph [ref=e17]:
+      - text: Chưa có tài khoản?
+      - link "Đăng ký ngay" [ref=e18] [cursor=pointer]:
+        - /url: /register
+  - region "Notifications alt+T"

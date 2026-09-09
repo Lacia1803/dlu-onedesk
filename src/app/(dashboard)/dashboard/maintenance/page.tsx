@@ -1,6 +1,8 @@
 import { getAllMaintenanceLogs } from "@/app/actions/maintenance-actions";
 import { MaintenanceCalendar } from "@/components/maintenance/maintenance-calendar";
 
+export const dynamic = "force-dynamic";
+
 export default async function MaintenancePage() {
   const logs = await getAllMaintenanceLogs();
 

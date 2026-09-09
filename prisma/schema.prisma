@@ -60,6 +60,8 @@ model User {
   role          Role      @default(USER)
   phone         String?
   avatar        String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
@@ -70,6 +72,7 @@ model User {
   maintenanceLogs   MaintenanceLog[]
   faqsCreated       Faq[]
   notifications     Notification[]
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
@@ -224,4 +227,17 @@ model Notification {
   user          User      @relation(fields: [userId], references: [id])
 
   @@map("notifications")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
 }

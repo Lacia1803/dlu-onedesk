@@ -7,6 +7,7 @@ export const ticketSchema = z.object({
   category: z.nativeEnum(TicketCategory),
   priority: z.nativeEnum(TicketPriority),
   deviceId: z.string().optional().or(z.literal("")),
+  images: z.array(z.string()).optional(),
 });
 
 export type TicketFormValues = z.infer<typeof ticketSchema>;

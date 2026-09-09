@@ -27,6 +27,8 @@ type FormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [needOtp, setNeedOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const form = useForm<FormData>({
     resolver: zodResolver(loginSchema),
@@ -40,14 +42,30 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      // Bước 1: kiểm tra xem tài khoản có bật 2FA không
+      if (!needOtp) {
+        const check = await fetch("/api/auth/check-2fa", {
+          method: "POST",
+          body: JSON.stringify({ email: data.email, password: data.password }),
+        });
+        const { twoFactorEnabled } = await check.json();
+
+        if (twoFactorEnabled) {
+          setNeedOtp(true);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const signInResult = await signIn("credentials", {
         email: data.email,
         password: data.password,
+        token: needOtp ? otp : undefined,
         redirect: false,
       });
 
       if (signInResult?.error) {
-        toast.error("Email hoặc mật khẩu không chính xác");
+        toast.error(needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác");
       } else {
         toast.success("Đăng nhập thành công!");
         router.push("/dashboard");
@@ -98,8 +116,26 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+              {needOtp && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Mã xác thực OTP</label>
+                  <Input
+                    type="text"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    className="font-mono text-center tracking-[0.3em] text-lg"
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Tài khoản này yêu cầu mã OTP từ ứng dụng Authenticator.
+                  </p>
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Đang xử lý..." : "Đăng nhập"}
+                {isLoading ? "Đang xử lý..." : needOtp ? "Xác thực & Đăng nhập" : "Đăng nhập"}
               </Button>
             </form>
           </Form>

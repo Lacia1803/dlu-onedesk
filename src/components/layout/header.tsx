@@ -18,24 +18,23 @@ export function Header() {
   const { data: session } = useSession();
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:h-[60px] lg:px-6">
-      <div className="flex flex-1 items-center gap-4">
-        {/* Placeholder for Mobile Menu Toggle */}
+    <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 lg:h-[60px] lg:px-6">
+      <div className="flex flex-1 items-center gap-4 font-mono text-xs text-muted-foreground">
+        <span className="text-primary">●</span> OPERATIONS
       </div>
       <div className="flex items-center gap-4">
         <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary hover:bg-secondary/80">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary border border-border hover:bg-secondary/80">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
-                <AvatarFallback>{session?.user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                <AvatarFallback className="font-mono">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
               </Avatar>
-              <span className="sr-only">Toggle user menu</span>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+            <DropdownMenuLabel className="font-mono text-xs">{session?.user?.email ?? "unknown"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />

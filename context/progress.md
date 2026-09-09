@@ -21,15 +21,21 @@
 - [x] Feature: Cẩm nang hỗ trợ (FAQ)
 - [x] Feature: Dashboard thống kê
 - [x] Feature: Live Notifications
+- [x] Feature: Lịch bảo trì (Calendar View)
 
 ## In Progress
-- [ ] Feature: Lịch bảo trì (Calendar View)
+- (none)
 
 ## Pending
-- [ ] Feature: AI Chatbot (Gemini) + Export Excel
 - [ ] Kiểm thử & sửa lỗi
 - [ ] Viết tài liệu hướng dẫn sử dụng
 - [ ] Deploy
+
+## Recently Completed
+- [x] Feature: AI Chatbot (Gemini) — widget chat góc phải, dùng FAQ context, gợi ý tạo ticket
+- [x] Feature: Export Excel — nút "Xuất Excel" trên dashboard, export thiết bị + tickets ra .xlsx
+- [x] Feature: Khôi phục người dùng đã vô hiệu hóa (soft-delete restore) — action `restoreUser` + nút "Khôi phục" trong trang Quản lý Người dùng
+- [x] Feature: Bảo mật 2 lớp (2-FA) — cài `@otplib/preset-default` + `qrcode`, action `enableTwoFactor`/`verifyTwoFactor`/`disableTwoFactor`, UI QR/OTP trong Settings và xác thực trong `authorize` NextAuth.
 
 ## Known Issues
 - npm cần `legacy-peer-deps=true` (.npmrc) do peer dependency conflicts

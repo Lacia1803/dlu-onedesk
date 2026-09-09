@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
+import { logAudit } from "@/lib/audit";
 
 export async function createTicket(data: TicketFormValues) {
   const session = await getServerSession(authOptions);
@@ -18,6 +19,7 @@ export async function createTicket(data: TicketFormValues) {
     data: {
       ...parsed.data,
       deviceId: parsed.data.deviceId || null,
+      images: parsed.data.images || [],
       creatorId: session.user.id,
       status: "OPEN",
     },
@@ -29,6 +31,14 @@ export async function createTicket(data: TicketFormValues) {
     `Ticket #${ticket.id.slice(-6).toUpperCase()}: ${ticket.title}`,
     `/dashboard/tickets/${ticket.id}`
   );
+
+  await logAudit({
+    action: "TICKET_CREATE",
+    entity: "Ticket",
+    entityId: ticket.id,
+    details: { title: ticket.title, priority: ticket.priority, category: ticket.category },
+    userId: session.user.id,
+  });
 
   revalidatePath("/dashboard/tickets");
   return { success: true, ticketId: ticket.id };
@@ -121,6 +131,27 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     where: { id },
     data: updateData,
   });
+
+  // Log audit trail for meaningful changes
+  const auditDetails: Record<string, string | { from: string; to: string } | null> = {};
+  if (parsed.data.status && parsed.data.status !== ticket.status) {
+    auditDetails.status = { from: ticket.status, to: parsed.data.status };
+  }
+  if (parsed.data.priority && parsed.data.priority !== ticket.priority) {
+    auditDetails.priority = { from: ticket.priority, to: parsed.data.priority };
+  }
+  if (parsed.data.assigneeId !== undefined && parsed.data.assigneeId !== (ticket.assigneeId || "")) {
+    auditDetails.assignee = parsed.data.assigneeId || null;
+  }
+  if (Object.keys(auditDetails).length > 0) {
+    await logAudit({
+      action: "TICKET_UPDATE",
+      entity: "Ticket",
+      entityId: id,
+      details: auditDetails,
+      userId: session.user.id,
+    });
+  }
 
   // Notifications
   const notifyList = [];

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
 import { format } from "date-fns";
+import { TicketStatusFilter } from "@/components/tickets/ticket-status-filter";
 import {
   Table,
   TableBody,
@@ -15,15 +16,36 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default async function TicketsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function TicketsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string; priority?: string }>;
+}) {
   const session = await getServerSession(authOptions);
   if (!session) return null;
 
   const role = session.user.role;
   const isUser = role === "USER";
 
+  const { q, status, priority } = await searchParams;
+  const keyword = q?.trim();
+
+  const where: any = isUser ? { creatorId: session.user.id } : {};
+
+  if (keyword) {
+    where.OR = [
+      { title: { contains: keyword, mode: "insensitive" } },
+      { description: { contains: keyword, mode: "insensitive" } },
+      { id: { contains: keyword, mode: "insensitive" } },
+    ];
+  }
+  if (status) where.status = status;
+  if (priority) where.priority = priority;
+
   const tickets = await db.ticket.findMany({
-    where: isUser ? { creatorId: session.user.id } : undefined,
+    where,
     include: {
       creator: { select: { name: true } },
       assignee: { select: { name: true } },
@@ -33,17 +55,22 @@ export default async function TicketsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {isUser ? "Ticket của tôi" : "Quản lý Tickets"}
-        </h1>
-        <Link href="/dashboard/tickets/new" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+      <div className="flex items-center justify-between border-b pb-4">
+        <div>
+          <h1 className="font-mono text-sm uppercase tracking-[0.2em] text-muted-foreground">
+            <span className="text-primary">▶</span> TICKETS.QUEUE
+          </h1>
+          <p className="mt-1 text-lg font-semibold">{isUser ? "Ticket của tôi" : "Quản lý Tickets"}</p>
+        </div>
+        <Link href="/dashboard/tickets/new" className="inline-flex h-9 items-center justify-center rounded-sm bg-primary px-4 py-2 font-mono text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90">
           <Plus className="mr-2 h-4 w-4" />
           Tạo Ticket
         </Link>
       </div>
 
-      <div className="rounded-md border bg-card">
+      <TicketStatusFilter currentStatus={status} currentPriority={priority} keyword={keyword} />
+
+      <div className="rounded-sm border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
