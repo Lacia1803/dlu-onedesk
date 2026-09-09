@@ -26,7 +26,7 @@
 - [x] Feature: Hệ thống ticket
 - [x] Feature: Cẩm nang hỗ trợ (FAQ)
 - [x] Feature: Dashboard thống kê
-- [ ] Feature: Live Notifications
+- [x] Feature: Live Notifications
 - [ ] Feature: Lịch bảo trì (Calendar View)
 - [ ] Feature: AI Chatbot (Gemini) (có Export Excel)
 - [ ] Kiểm thử & sửa lỗi
