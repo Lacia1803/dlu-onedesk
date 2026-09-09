@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+enum Role {
+  ADMIN
+  TECHNICIAN
+  USER
+}
+
+enum DeviceStatus {
+  ACTIVE
+  BROKEN
+  MAINTENANCE
+  RETIRED
+}
+
+enum DeviceType {
+  COMPUTER
+  NETWORK
+  PERIPHERAL
+  OTHER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_PARTS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  HARDWARE
+  SOFTWARE
+  NETWORK
+  PERIPHERAL
+  OTHER
+}
+
+// ==================== MODELS ====================
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  phone         String?
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  ticketsCreated    Ticket[]           @relation("TicketCreator")
+  ticketsAssigned   Ticket[]           @relation("TicketAssignee")
+  ticketComments    TicketComment[]
+  maintenanceLogs   MaintenanceLog[]
+  faqsCreated       Faq[]
+  notifications     Notification[]
+
+  @@map("users")
+}
+
+model Room {
+  id            String    @id @default(cuid())
+  name          String    
+  location      String    
+  capacity      Int       
+  description   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  devices       Device[]
+  @@map("rooms")
+}
+
+model Device {
+  id            String        @id @default(cuid())
+  name          String        
+  type          DeviceType
+  status        DeviceStatus  @default(ACTIVE)
+  qrCode        String        @unique 
+  manufacturer  String?       
+  model         String?       
+  serialNumber  String?       @unique
+  purchaseDate  DateTime?     
+  warrantyEnd   DateTime?     
+  specifications Json?        
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  roomId        String
+  room          Room          @relation(fields: [roomId], references: [id])
+  software      DeviceSoftware[]
+  tickets       Ticket[]
+  maintenanceLogs MaintenanceLog[]
+
+  @@map("devices")
+}
+
+model Software {
+  id            String    @id @default(cuid())
+  name          String    
+  version       String?
+  license       String?   
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  devices       DeviceSoftware[]
+  @@map("software")
+}
+
+model DeviceSoftware {
+  id            String    @id @default(cuid())
+  installedAt   DateTime  @default(now())
+
+  deviceId      String
+  device        Device    @relation(fields: [deviceId], references: [id])
+  softwareId    String
+  software      Software  @relation(fields: [softwareId], references: [id])
+
+  @@unique([deviceId, softwareId])
+  @@map("device_software")
+}
+
+model Ticket {
+  id            String          @id @default(cuid())
+  title         String
+  description   String
+  images        String[]        
+  status        TicketStatus    @default(OPEN)
+  priority      TicketPriority  @default(MEDIUM)
+  category      TicketCategory
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  creatorId     String
+  creator       User            @relation("TicketCreator", fields: [creatorId], references: [id])
+  assigneeId    String?
+  assignee      User?           @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  deviceId      String?
+  device        Device?         @relation(fields: [deviceId], references: [id])
+  comments      TicketComment[]
+
+  @@map("tickets")
+}
+
+model TicketComment {
+  id            String    @id @default(cuid())
+  content       String
+  images        String[]  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ticketId      String
+  ticket        Ticket    @relation(fields: [ticketId], references: [id])
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id])
+
+  @@map("ticket_comments")
+}
+
+model MaintenanceLog {
+  id            String    @id @default(cuid())
+  type          String    
+  description   String
+  cost          Float?
+  performedAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  deviceId      String
+  device        Device    @relation(fields: [deviceId], references: [id])
+  technicianId  String
+  technician    User      @relation(fields: [technicianId], references: [id])
+
+  @@map("maintenance_logs")
+}
+
+model Faq {
+  id            String    @id @default(cuid())
+  question      String    
+  answer        String    
+  category      String    
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id])
+
+  @@map("faqs")
+}
+
+// Bảng mới: Lưu trữ thông báo trong hệ thống
+model Notification {
+  id            String    @id @default(cuid())
+  title         String
+  message       String
+  isRead        Boolean   @default(false)
+  linkUrl       String?   // Link tới Ticket hoặc màn hình liên quan
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
