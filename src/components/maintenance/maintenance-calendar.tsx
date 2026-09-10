@@ -122,7 +122,7 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
         </div>
 
         <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y border-b">
-          {days.map((day, idx) => {
+          {days.map((day) => {
             const dayLogs = getLogsForDay(day);
             const dayTickets = getTicketsForDay(day);
             const isCurrentMonth = isSameMonth(day, monthStart);

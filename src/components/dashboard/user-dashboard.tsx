@@ -28,7 +28,7 @@ export async function UserDashboard() {
         <div className="divide-y divide-border pt-2">
           {stats.recentTickets.length === 0 ? (
             <p className="py-4 font-mono text-sm text-muted-foreground">
-              // Bạn chưa tạo báo cáo sự cố nào.
+              {"// Bạn chưa tạo báo cáo sự cố nào."}
             </p>
           ) : (
             stats.recentTickets.map(ticket => (

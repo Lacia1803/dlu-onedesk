@@ -4,7 +4,7 @@ import { logAudit } from "@/lib/audit";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { sendAlert } from "@/lib/webhook";
 import { computeSlaDeadline, computeResponseDeadline, periodForCycle } from "@/lib/ticket-actions";
-import { MaintenanceCycle, TicketStatus } from "@prisma/client";
+import { MaintenanceCycle } from "@prisma/client";
 
 /**
  * Cron hàng ngày (gọi qua VPS crontab với Bearer CRON_SECRET):

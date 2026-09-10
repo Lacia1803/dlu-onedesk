@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Info, LockKeyhole, Menu, X, Loader2 } from "lucide-react";
+import { ArrowUpRight, LockKeyhole, Menu, X, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -96,15 +96,8 @@ export function Header({ onLogin }: { onLogin: () => void }) {
 
 /* ---------- Modal đăng nhập ---------- */
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     if (!open) return;
-    setError(null);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -117,6 +110,42 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
   }, [open, onClose]);
 
   if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-pine-950/55 p-4 backdrop-blur-md"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Đăng nhập DLU OneDesk"
+    >
+      <div
+        className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-pine-950/10 bg-paper shadow-lift"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-pine-800 via-gold-400 to-pine-800" />
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Đóng cửa sổ đăng nhập"
+          className="absolute top-4 right-4 grid size-11 place-items-center rounded-full border border-pine-950/10 bg-white text-pine-900 transition hover:bg-pine-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-600"
+        >
+          <X className="size-5" />
+        </button>
+
+        <LoginForm onClose={onClose} />
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Login form (separate component resets state on mount) ---------- */
+function LoginForm({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -144,101 +173,78 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-pine-950/55 p-4 backdrop-blur-md"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Đăng nhập DLU OneDesk"
-    >
-      <div
-        className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-pine-950/10 bg-paper shadow-lift"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-pine-800 via-gold-400 to-pine-800" />
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Đóng cửa sổ đăng nhập"
-          className="absolute top-4 right-4 grid size-11 place-items-center rounded-full border border-pine-950/10 bg-white text-pine-900 transition hover:bg-pine-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-600"
-        >
-          <X className="size-5" />
-        </button>
-
-        <div className="p-7 sm:p-9">
-          <div className="flex items-center gap-3">
-            <LogoChip className="size-11 rounded-2xl" />
-            <div>
-              <p className="text-lg leading-tight font-extrabold tracking-tight text-pine-950">
-                Đăng nhập DLU OneDesk
-              </p>
-              <p className="text-[12px] text-ink/55">Hệ thống hỗ trợ kỹ thuật phòng máy</p>
-            </div>
-          </div>
-
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-            <label className="block">
-              <span className="mb-1.5 block text-[11px] font-bold tracking-wide text-pine-900 uppercase">
-                Email
-              </span>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@dlu.edu.vn"
-                className="w-full rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-sm text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-[11px] font-bold tracking-wide text-pine-900 uppercase">
-                Mật khẩu
-              </span>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-sm text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
-              />
-            </label>
-
-            {error && (
-              <p className="rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-600 border border-red-200">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-pine-800 px-4 py-3.5 text-sm font-bold text-ivory shadow-soft transition hover:bg-pine-700 disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <LockKeyhole className="size-4 text-gold-300" />
-              )}
-              {loading ? "Đang đăng nhập..." : "Đăng nhập hệ thống"}
-            </button>
-          </form>
-
-          <div className="mt-5 flex flex-col items-center gap-2 text-center text-[12px] text-ink/60">
-            <p>
-              Tài khoản demo:{" "}
-              <span className="font-mono font-semibold text-pine-900">admin@dlu.edu.vn</span> /{" "}
-              <span className="font-mono font-semibold text-pine-900">admin</span>
-            </p>
-            <Link
-              href="/login"
-              onClick={onClose}
-              className="font-bold text-pine-700 underline underline-offset-4 hover:text-pine-900"
-            >
-              Mở trang đăng nhập chi tiết & đăng ký →
-            </Link>
-          </div>
+    <div className="p-7 sm:p-9">
+      <div className="flex items-center gap-3">
+        <LogoChip className="size-11 rounded-2xl" />
+        <div>
+          <p className="text-lg leading-tight font-extrabold tracking-tight text-pine-950">
+            Đăng nhập DLU OneDesk
+          </p>
+          <p className="text-[12px] text-ink/55">Hệ thống hỗ trợ kỹ thuật phòng máy</p>
         </div>
+      </div>
+
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <label className="block">
+          <span className="mb-1.5 block text-[11px] font-bold tracking-wide text-pine-900 uppercase">
+            Email
+          </span>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@dlu.edu.vn"
+            className="w-full rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-sm text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-[11px] font-bold tracking-wide text-pine-900 uppercase">
+            Mật khẩu
+          </span>
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-sm text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
+          />
+        </label>
+
+        {error && (
+          <p className="rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-600 border border-red-200">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-pine-800 px-4 py-3.5 text-sm font-bold text-ivory shadow-soft transition hover:bg-pine-700 disabled:opacity-50"
+        >
+          {loading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <LockKeyhole className="size-4 text-gold-300" />
+          )}
+          {loading ? "Đang đăng nhập..." : "Đăng nhập hệ thống"}
+        </button>
+      </form>
+
+      <div className="mt-5 flex flex-col items-center gap-2 text-center text-[12px] text-ink/60">
+        <p>
+          Tài khoản demo:{" "}
+          <span className="font-mono font-semibold text-pine-900">admin@dlu.edu.vn</span> /{" "}
+          <span className="font-mono font-semibold text-pine-900">admin</span>
+        </p>
+        <Link
+          href="/login"
+          onClick={onClose}
+          className="font-bold text-pine-700 underline underline-offset-4 hover:text-pine-900"
+        >
+          Mở trang đăng nhập chi tiết & đăng ký →
+        </Link>
       </div>
     </div>
   );

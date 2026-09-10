@@ -54,10 +54,29 @@ export default function NotificationCenter() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [stats, setStats] = useState<{ unread: number; openTickets: number; pendingFaqs: number } | null>(null);
 
+  async function fetchNotificationsData(filterValue: string, pageValue: number) {
+    const res = await fetch(`/api/notifications?filter=${filterValue}&page=${pageValue}&stats=true`);
+    if (!res.ok) return null;
+    return res.json();
+  }
+
   async function fetchNotifications() {
-    const res = await fetch(`/api/notifications?filter=${filter}&page=${page}&stats=true`);
-    if (res.ok) {
-      const data = await res.json();
+    const data = await fetchNotificationsData(filter, page);
+    if (!data) return;
+    if (Array.isArray(data)) {
+      setNotifications(data);
+      setTotalPages(0);
+    } else {
+      setNotifications(data.items);
+      setTotalPages(data.totalPages);
+      if (data.stats) setStats(data.stats);
+    }
+  }
+
+  useEffect(() => {
+    let ignore = false;
+    fetchNotificationsData(filter, page).then((data) => {
+      if (!data || ignore) return;
       if (Array.isArray(data)) {
         setNotifications(data);
         setTotalPages(0);
@@ -66,12 +85,10 @@ export default function NotificationCenter() {
         setTotalPages(data.totalPages);
         if (data.stats) setStats(data.stats);
       }
-    }
-  }
-
-  useEffect(() => {
-    fetchNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    });
+    return () => {
+      ignore = true;
+    };
   }, [filter, page]);
 
   function changeFilter(f: string) {

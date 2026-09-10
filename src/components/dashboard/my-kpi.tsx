@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { getTechKPI } from "@/app/actions/kpi-actions";
+import { getTechKPI, TechKPIResult } from "@/app/actions/kpi-actions";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 
 export function MyKPIDashboard() {
   const { data: session } = useSession();
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<TechKPIResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import { db } from "./db";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db) as any,
+  adapter: PrismaAdapter(db) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.twoFactorEnabled = (user as any).twoFactorEnabled ?? false;
+        token.twoFactorEnabled = user.twoFactorEnabled ?? false;
       }
       return token;
     },
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        (session.user as any).twoFactorEnabled = token.twoFactorEnabled as boolean;
+        session.user.twoFactorEnabled = Boolean(token.twoFactorEnabled);
       }
       return session;
     },

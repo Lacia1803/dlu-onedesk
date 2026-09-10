@@ -13,9 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Settings, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 interface TicketActionsMenuProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ticket: any;
   technicians: { id: string; name: string }[];
   isTech: boolean;

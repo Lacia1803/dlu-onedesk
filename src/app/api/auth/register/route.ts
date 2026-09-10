@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, data: user }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Lỗi hệ thống hoặc dữ liệu không hợp lệ" },
       { status: 500 }

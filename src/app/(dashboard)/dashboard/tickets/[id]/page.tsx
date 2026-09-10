@@ -40,9 +40,11 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
   const isCreator = ticket.creatorId === session.user.id;
   const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
 
-  const slaOverdue = ticket.status !== "CLOSED" && ticket.slaDeadline && new Date() > ticket.slaDeadline;
+  // eslint-disable-next-line react-hooks/purity -- server component, Date.now() is stable per-request
+  const now = Date.now();
+  const slaOverdue = ticket.status !== "CLOSED" && ticket.slaDeadline && now > ticket.slaDeadline.getTime();
   const slaRemaining = ticket.status !== "CLOSED" && ticket.slaDeadline
-    ? Math.max(0, Math.ceil((new Date(ticket.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60)))
+    ? Math.max(0, Math.ceil((ticket.slaDeadline.getTime() - now) / (1000 * 60 * 60)))
     : null;
 
   if (!isCreator && !isTech) {
@@ -164,7 +166,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                   ticketId={ticket.id}
                   rating={ticket.rating}
                   feedback={ticket.feedback}
-                  canReopen={isCreator && !!ticket.closedAt && Date.now() - new Date(ticket.closedAt).getTime() < 7 * 24 * 3600 * 1000}
+                  canReopen={isCreator && !!ticket.closedAt && now - new Date(ticket.closedAt).getTime() < 7 * 24 * 3600 * 1000}
                 />
               </div>
             )}

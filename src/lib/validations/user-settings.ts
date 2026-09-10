@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { Role } from "@prisma/client";
 
 export const userSettingsSchema = z.object({
   name: z.string().min(2, "Tên ít nhất 2 ký tự"),

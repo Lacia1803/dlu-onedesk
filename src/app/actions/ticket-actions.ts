@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
-import { getCannedReplies } from "@/app/actions/canned-reply-actions";
+import { Prisma } from "@prisma/client";
 
 
 import { computeSlaDeadline, isValidTransition, VALID_TRANSITIONS } from "@/lib/ticket-actions";
@@ -82,7 +82,7 @@ export async function addTicketComment(ticketId: string, data: TicketCommentForm
   }
 
   // Notifications
-  const notifyList = [];
+  const notifyList: string[] = [];
   if (session.user.id !== ticket.creatorId) {
     notifyList.push(ticket.creatorId);
   }
@@ -131,7 +131,12 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     delete parsed.data.assigneeId;
   }
 
-  const updateData: any = { ...parsed.data };
+  const updateData: Prisma.TicketUncheckedUpdateInput & {
+    slaPausedAt?: Date | null;
+    slaDeadline?: Date | null;
+    resolvedAt?: Date;
+    closedAt?: Date;
+  } = { ...parsed.data };
 
   if (updateData.assigneeId === "") updateData.assigneeId = null;
 
@@ -212,19 +217,19 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   }
 
   // Notifications
-  const notifyList = [];
+  const notifyList: string[] = [];
   let title = "Cập nhật Ticket";
   let message = `Ticket #${ticket.id.slice(-6).toUpperCase()} đã được cập nhật.`;
 
   // Status changed
   if (parsed.data.status && parsed.data.status !== ticket.status) {
-    if (session.user.id !== ticket.creatorId) notifyList.push(ticket.creatorId);
+    if (session.user.id !== ticket.creatorId) notifyList.push(String(ticket.creatorId));
     message = `Ticket #${ticket.id.slice(-6).toUpperCase()} chuyển sang trạng thái: ${parsed.data.status}.`;
   }
   
   // Assignee changed
   if (updateData.assigneeId && updateData.assigneeId !== ticket.assigneeId) {
-    if (session.user.id !== updateData.assigneeId) notifyList.push(updateData.assigneeId);
+    if (session.user.id !== updateData.assigneeId) notifyList.push(String(updateData.assigneeId));
     title = "Phân công Ticket";
     message = `Bạn được phân công xử lý Ticket #${ticket.id.slice(-6).toUpperCase()}.`;
   }

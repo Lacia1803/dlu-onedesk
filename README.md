@@ -110,7 +110,31 @@ npm run start
 ```
 Truy cập ứng dụng tại: `http://localhost:3000`
 
-### 6. Deploy (Docker)
+### 6. Kích hoạt Bảo mật 2 lớp (2-FA)
+
+Bảo mật 2 lớp tăng cường an toàn tài khoản bằng yêu cầu mã OTP từ ứng dụng authenticator (Google Authenticator / Authy) bên cạnh mật khẩu.
+
+**Bước 1 – Truy cập trang Cài đặt**
+Đăng nhập → dropdown avatar góc phải → chọn **Hồ sơ / Cài đặt** → mở mục **Bảo mật hai lớp (2-FA)**.
+
+**Bước 2 – Kích hoạt**
+Nhấn **Kích hoạt 2-FA** → ứng dụng sẽ hiển thị mã QR.
+
+**Bước 3 – Quét mã QR**
+Mở ứng dụng Google Authenticator (hoặc Authy) trên điện thoại → nhấn **+** → chọn **Quét mã QR** → quét mã trên màn hình.
+> Nếu không quét được, nhập thủ công mã bí mật (secret key) hiển thị dưới mã QR.
+
+**Bước 4 – Xác nhận**
+Nhập mã OTP 6 chữ số hiện trên ứng dụng → nhấn **Xác nhận & Kích hoạt**.
+
+**Bước 5 – Kiểm tra**
+Đăng xuất → đăng nhập lại → sau khi nhập email + mật khẩu, hệ thống sẽ yêu cầu mã OTP → mở ứng dụng authenticator → nhập mã 6 chữ số.
+
+> ⚠️ **Lưu ý quan trọng**: Sau khi kích hoạt 2-FA, mỗi lần đăng nhập sẽ cần mã OTP. Nếu mất điện thoại, liên hệ Admin để tắt 2-FA.
+
+---
+
+### 7. Deploy (Docker)
 
 ```bash
 # Copy env mẫu và điền giá trị thật

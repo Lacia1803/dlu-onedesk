@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
-import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
-import Image from "next/image";
+import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 
 interface TicketImageUploaderProps {
   value: string[];
@@ -57,7 +55,7 @@ export function TicketImageUploader({
       } else {
         toast.error(data.error || "Tải ảnh thất bại.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Lỗi khi kết nối tải ảnh.");
     } finally {
       setUploading(false);

@@ -54,8 +54,8 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<any>({
-    resolver: zodResolver(ticketSchema) as any,
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<TicketFormValues>({
+    resolver: zodResolver(ticketSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -87,7 +87,7 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
     ).slice(0, 3); // Max 3 suggestions
   }, [title, faqs]);
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: TicketFormValues) {
     setLoading(true);
     const res = await createTicket(data);
     setLoading(false);
@@ -147,7 +147,10 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="category">Danh mục *</Label>
-          <Select defaultValue="OTHER" onValueChange={(val: any) => setValue("category", val, { shouldValidate: true })}>
+          <Select defaultValue="OTHER" onValueChange={(val) => {
+            if (val) setValue("category", val as TicketFormValues["category"], { shouldValidate: true });
+          }}>
+
             <SelectTrigger>
               <SelectValue placeholder="Chọn danh mục" />
             </SelectTrigger>
@@ -162,7 +165,9 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
 
         <div className="space-y-2">
           <Label htmlFor="priority">Mức độ ưu tiên *</Label>
-          <Select defaultValue="MEDIUM" onValueChange={(val: any) => setValue("priority", val, { shouldValidate: true })}>
+          <Select defaultValue="MEDIUM" onValueChange={(val) => {
+            if (val) setValue("priority", val as TicketFormValues["priority"], { shouldValidate: true });
+          }}>
             <SelectTrigger>
               <SelectValue placeholder="Chọn mức độ" />
             </SelectTrigger>
@@ -178,7 +183,7 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
 
       <div className="space-y-2">
         <Label htmlFor="deviceId">Thiết bị liên quan (Tùy chọn)</Label>
-        <Select defaultValue={initialDeviceId || ""} onValueChange={(val) => setValue("deviceId", val)}>
+        <Select defaultValue={initialDeviceId || ""} onValueChange={(val) => setValue("deviceId", val ?? "")}>
           <SelectTrigger>
             <SelectValue placeholder="Không chọn thiết bị" />
           </SelectTrigger>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { faqSchema, FaqFormValues } from "@/lib/validations/faq";
+import { faqSchema, type FaqFormValues } from "@/lib/validations/faq";
 import { createFaq, updateFaq } from "@/app/actions/faq-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,15 +21,15 @@ import {
 import { Plus, Edit } from "lucide-react";
 
 interface FaqFormProps {
-  initialData?: any;
+  initialData?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export function FaqForm({ initialData }: FaqFormProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<any>({
-    resolver: zodResolver(faqSchema) as any,
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FaqFormValues>({
+    resolver: zodResolver(faqSchema) as Resolver<FaqFormValues>,
     defaultValues: {
       question: initialData?.question || "",
       answer: initialData?.answer || "",
@@ -40,7 +40,7 @@ export function FaqForm({ initialData }: FaqFormProps) {
 
   const isActive = watch("isActive");
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: FaqFormValues) {
     setLoading(true);
     let res;
     if (initialData) {

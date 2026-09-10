@@ -27,7 +27,7 @@ export default async function TicketsPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where: any = isUser ? { creatorId: session.user.id } : {};
+  const where: any = isUser ? { creatorId: session.user.id } : {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   if (keyword) {
     where.OR = [

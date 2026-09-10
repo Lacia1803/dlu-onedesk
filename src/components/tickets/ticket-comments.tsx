@@ -4,7 +4,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ticketCommentSchema } from "@/lib/validations/ticket";
+import { ticketCommentSchema, TicketCommentFormValues } from "@/lib/validations/ticket";
 import { addTicketComment } from "@/app/actions/ticket-actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,7 @@ interface CannedReply {
 
 interface TicketCommentsProps {
   ticketId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   comments: any[];
   currentUserId: string;
   cannedReplies?: CannedReply[];
@@ -26,12 +27,13 @@ interface TicketCommentsProps {
 
 export function TicketComments({ ticketId, comments, currentUserId, cannedReplies = [] }: TicketCommentsProps) {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<any>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<TicketCommentFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(ticketCommentSchema) as any,
     defaultValues: { content: "" },
   });
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: TicketCommentFormValues) {
     setLoading(true);
     const res = await addTicketComment(ticketId, data);
     setLoading(false);

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       try {
         const url = await saveUpload(file, "tickets");
         urls.push(url);
-      } catch (err: any) {
+      } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         return NextResponse.json(
           { success: false, error: err.message || "Lỗi lưu file." },
           { status: 400 }

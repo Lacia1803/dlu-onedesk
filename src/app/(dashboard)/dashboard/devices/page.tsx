@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import { Plus, Edit, QrCode } from "lucide-react";
 import { DeleteDeviceButton } from "@/components/devices/delete-device-button";
 import { ImportButton } from "@/components/import-button";
@@ -39,7 +38,7 @@ export default async function DevicesPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where: any = { deletedAt: null };
+  const where: any = { deletedAt: null }; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (keyword) {
     where.OR = [
       { name: { contains: keyword, mode: "insensitive" } },

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { roomSchema } from "@/lib/validations/room";
+import { roomSchema, type RoomFormValues } from "@/lib/validations/room";
 import { createRoom, updateRoom } from "@/app/actions/room-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ export function RoomForm({ initialData }: RoomFormProps) {
     },
   });
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: RoomFormValues) {
     setLoading(true);
     const result = initialData
       ? await updateRoom(initialData.id, data)

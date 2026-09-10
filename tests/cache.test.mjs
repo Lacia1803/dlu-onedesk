@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { cached, rateLimit, cache } from "../src/lib/cache.ts";
+import { cached, rateLimit } from "../src/lib/cache.ts";
 
 describe("In-memory cache", () => {
   it("returns cached value without recomputing", async () => {

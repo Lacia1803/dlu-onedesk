@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,8 @@ interface Props {
 }
 
 export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
-  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const router = useRouter();
+  const [, setIsEditing] = useState<string | null>(null);
 
   // Sort newest first
   const sortedLogs = [...logs].sort((a, b) => new Date(b.performedAt).getTime() - new Date(a.performedAt).getTime());
@@ -34,7 +36,7 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg border-b pb-2">Lịch sử bảo trì</h3>
         {canEdit && (
-          <Button variant="outline" size="sm" onClick={() => window.location.href = `/dashboard/maintenance/new?deviceId=${deviceId}`}>
+          <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/maintenance/new?deviceId=${deviceId}`)}>
             <Plus className="h-4 w-4 mr-1" />
             Thêm mới
           </Button>

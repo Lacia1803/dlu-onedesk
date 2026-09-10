@@ -6,7 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { enableTwoFactor, verifyTwoFactor, disableTwoFactor } from "@/app/actions/user-actions";
-import { ShieldCheck, ShieldAlert, KeyRound } from "lucide-react";
+import { ShieldCheck, ShieldAlert, KeyRound, HelpCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Image from "next/image";
 
 export function TwoFactorForm({
@@ -81,6 +89,42 @@ export function TwoFactorForm({
           <CardTitle className="text-base font-mono uppercase tracking-wider">
             Bảo mật hai lớp (2-FA)
           </CardTitle>
+          <Dialog>
+            <DialogTrigger
+              className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              title="Hướng dẫn kích hoạt 2FA"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Hướng dẫn kích hoạt Bảo mật 2 lớp</DialogTitle>
+                <DialogDescription>
+                  Bảo mật 2 lớp yêu cầu mã OTP từ ứng dụng authenticator ngoài mật khẩu, giúp tài khoản an toàn hơn.
+                </DialogDescription>
+              </DialogHeader>
+              <ol className="space-y-3 text-sm text-muted-foreground list-decimal pl-5">
+                <li>
+                  <strong className="text-foreground">Cài đặt ứng dụng authenticator</strong> — Tải Google Authenticator hoặc Authy trên điện thoại (iOS / Android).
+                </li>
+                <li>
+                  <strong className="text-foreground">Nhấn &ldquo;Kích hoạt 2-FA&rdquo;</strong> — Hệ thống sẽ hiển thị mã QR.
+                </li>
+                <li>
+                  <strong className="text-foreground">Quét mã QR</strong> — Mở ứng dụng → nhấn <span className="font-mono text-xs bg-muted px-1 rounded">+</span> → chọn <em>Quét mã QR</em> → quét mã trên màn hình. Nếu không quét được, nhập thủ công mã bí mật (secret key) hiển thị dưới QR.
+                </li>
+                <li>
+                  <strong className="text-foreground">Xác nhận</strong> — Nhập mã OTP 6 chữ số hiện trên ứng dụng → nhấn <em>Xác nhận &amp; Kích hoạt</em>.
+                </li>
+                <li>
+                  <strong className="text-foreground">Đăng nhập lần sau</strong> — Sau khi nhập email + mật khẩu, hệ thống sẽ yêu cầu mã OTP → mở ứng dụng → nhập mã 6 chữ số.
+                </li>
+              </ol>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                ⚠️ Nếu mất điện thoại, liên hệ Admin để tắt 2-FA.
+              </p>
+            </DialogContent>
+          </Dialog>
         </div>
         <CardDescription>
           {isEnabled

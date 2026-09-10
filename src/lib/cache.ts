@@ -1,4 +1,4 @@
-export const cache = new Map<string, { value: any; expires: number }>();
+export const cache = new Map<string, { value: unknown; expires: number }>();
 
 /**
  * In-memory cache with TTL (ms) + Upstash Redis REST fallback.

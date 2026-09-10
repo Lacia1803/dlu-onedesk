@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   try {
     const url = await saveUpload(file, "avatars");
     return NextResponse.json({ success: true, url });
-  } catch (err: any) {
+  } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     return NextResponse.json({ success: false, error: err.message || "Lỗi lưu ảnh đại diện." }, { status: 400 });
   }
 }

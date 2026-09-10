@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const puppeteer = require('puppeteer');
 (async () => {
   const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox','--disable-dev-shm-usage'] });

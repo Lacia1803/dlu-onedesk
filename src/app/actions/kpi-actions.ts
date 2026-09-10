@@ -3,6 +3,15 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
+
+export interface TechKPIResult {
+  id: string;
+  name: string;
+  ticketCount: number;
+  avgResolutionHours: number | null;
+  overdueRatio: number;
+}
 
 /**
  * KPI stats per technician, or for a single technician if userId is provided.
@@ -15,7 +24,7 @@ export async function getTechKPI(userId?: string) {
   // If specific userId requested, non-admin can only view their own
   const targetId = userId ?? (session.user.role === "USER" ? session.user.id : undefined);
 
-  const whereClause: any = { role: { in: ["ADMIN", "TECHNICIAN"] }, deletedAt: null };
+  const whereClause: Prisma.UserWhereInput = { role: { in: ["ADMIN", "TECHNICIAN"] }, deletedAt: null };
   if (targetId) {
     whereClause.id = targetId;
   }
@@ -27,7 +36,7 @@ export async function getTechKPI(userId?: string) {
   });
 
   const now = new Date();
-  const results: any[] = [];
+  const results: TechKPIResult[] = [];
 
   for (const tech of techs) {
     // Tickets assigned to this tech (any status)

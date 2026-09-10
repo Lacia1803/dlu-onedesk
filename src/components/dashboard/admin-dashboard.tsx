@@ -59,7 +59,7 @@ export async function AdminDashboard() {
           <div className="flex-1 overflow-y-auto divide-y divide-border pt-2">
             {stats.recentTickets.length === 0 ? (
               <p className="py-4 font-mono text-sm text-muted-foreground">
-                // Chưa có ticket nào.
+                {"// Chưa có ticket nào."}
               </p>
             ) : (
               stats.recentTickets.map(ticket => (

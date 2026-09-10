@@ -5,7 +5,6 @@ import {
   Server,
   BookOpen,
   Users,
-  Settings,
   Disc,
   CalendarDays,
   ScrollText,

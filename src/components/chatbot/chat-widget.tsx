@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MessageCircle, Send, X, Bot, User, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ function renderBotText(text: string) {
 }
 
 export function ChatWidget() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -148,7 +150,7 @@ export function ChatWidget() {
                 variant="outline"
                 size="sm"
                 className="w-full text-xs"
-                onClick={() => window.location.href = "/dashboard/tickets/new"}
+                onClick={() => router.push("/dashboard/tickets/new")}
               >
                 <Ticket className="h-3.5 w-3.5 mr-1.5" />
                 Tạo ticket hỗ trợ

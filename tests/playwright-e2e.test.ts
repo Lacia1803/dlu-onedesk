@@ -27,7 +27,7 @@ test("notification bell opens center and shows stats", async ({ page }) => {
     page.waitForResponse((resp) => resp.url().includes("/api/notifications") && resp.status() === 200),
     page.click("button[aria-label='Thông báo']"), // bell button selector
   ]);
-  const data = await response.json();
+  await response.json();
   // Open center page
   await page.goto("/dashboard/notifications");
   await expect(page.locator("text=Thông báo")).toBeVisible();
@@ -102,7 +102,6 @@ test("faq draft creation and approval", async ({ page }) => {
   await page.selectOption("select[name='category']", "OTHER");
   await page.selectOption("select[name='priority']", "MEDIUM");
   await page.click("text=Gửi báo cáo");
-  const ticketId = page.url().split("/").pop() || "";
   // Add a technician comment (to be used as solution)
   await page.fill("textarea[name='content']", "Solution steps");
   await page.click("text=Thêm bình luận");

@@ -17,7 +17,7 @@ await page.click('button[type="submit"]');
 try {
   await page.waitForURL(`${BASE}/dashboard`, { timeout: 20000 });
   console.log('Login OK:', page.url());
-} catch (e) {
+} catch {
   console.log('Login failed, current URL:', page.url());
   const body = await page.textContent('body');
   console.log('Body:', body?.slice(0, 500));

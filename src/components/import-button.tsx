@@ -27,7 +27,7 @@ export function ImportButton({ label, subdir }: ImportButtonProps) {
       } else {
         toast.error(`${label} lỗi: ${result.errors?.[0]?.message || "Không xác định"}`);
       }
-    } catch (err) {
+    } catch {
       toast.error(`${label} thất bại`);
     } finally {
       setLoading(false);

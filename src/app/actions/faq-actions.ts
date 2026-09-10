@@ -6,8 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-function checkAdminOrTech(session: any) {
-  return session && (session.user.role === "ADMIN" || session.user.role === "TECHNICIAN");
+function checkAdminOrTech(session: { user: { role: string } } | null) {
+  return session !== null && (session.user.role === "ADMIN" || session.user.role === "TECHNICIAN");
 }
 
 export async function createFaq(data: FaqFormValues) {

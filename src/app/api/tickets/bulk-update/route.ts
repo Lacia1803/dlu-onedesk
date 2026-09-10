@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     const { ids, data } = await req.json();
     const res = await bulkUpdateTickets(ids, data);
     return NextResponse.json(res);
-  } catch (err) {
-    return NextResponse.json({ success: false, error: "Lỗi server" });
+  } catch {
+    return NextResponse.json({ success: false, error: "Lỗi server" }, { status: 500 });
   }
 }

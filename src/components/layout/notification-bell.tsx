@@ -50,7 +50,7 @@ export function NotificationBell() {
   }
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotifications(); // eslint-disable-line react-hooks/set-state-in-effect
 
     // SSE connection cho tin nhắn realtime ngay lập tức
     let es: EventSource | null = null;
@@ -60,7 +60,7 @@ export function NotificationBell() {
         fetchNotifications();
         toast.info("Thông báo mới");
       };
-    } catch (e) {
+    } catch {
       // EventSource fail gracefully
     }
 

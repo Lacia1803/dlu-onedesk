@@ -57,17 +57,15 @@ export default async function AdminAuditLogsPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where = keyword
-    ? {
-        OR: [
-          { action: { contains: keyword, mode: "insensitive" as const } },
-          { entity: { contains: keyword, mode: "insensitive" as const } },
-          { entityId: { contains: keyword, mode: "insensitive" as const } },
-          { user: { name: { contains: keyword, mode: "insensitive" as const } } },
-          { user: { email: { contains: keyword, mode: "insensitive" as const } } },
-        ],
-      }
-    : undefined;
+  const where: any = keyword ? { // eslint-disable-line @typescript-eslint/no-explicit-any
+    OR: [
+      { action: { contains: keyword, mode: "insensitive" as const } },
+      { entity: { contains: keyword, mode: "insensitive" as const } },
+      { entityId: { contains: keyword, mode: "insensitive" as const } },
+      { user: { name: { contains: keyword, mode: "insensitive" as const } } },
+      { user: { email: { contains: keyword, mode: "insensitive" as const } } },
+    ],
+  } : undefined;
 
   const [logs, total] = await Promise.all([
     db.auditLog.findMany({

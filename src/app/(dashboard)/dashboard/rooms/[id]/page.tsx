@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Server, MapPin, Users } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default async function RoomDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;

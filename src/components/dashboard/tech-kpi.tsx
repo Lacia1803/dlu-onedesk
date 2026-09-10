@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { getTechKPI } from "@/app/actions/kpi-actions";
+import { getTechKPI, TechKPIResult } from "@/app/actions/kpi-actions";
 
 export function TechKPIDashboard() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<TechKPIResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

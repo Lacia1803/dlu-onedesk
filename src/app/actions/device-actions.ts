@@ -20,7 +20,7 @@ export type MaintenanceLogWithDetails = {
   technician: { name: string };
 };
 
-function checkPermission(session: any) {
+function checkPermission(session: { user: { role: string } } | null) {
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     return false;
   }
@@ -40,8 +40,8 @@ export async function createDevice(data: DeviceFormValues) {
   }
 
   // Handle optional dates safely
-  let purchaseDate = parsed.data.purchaseDate ? new Date(parsed.data.purchaseDate) : null;
-  let warrantyEnd = parsed.data.warrantyEnd ? new Date(parsed.data.warrantyEnd) : null;
+  const purchaseDate = parsed.data.purchaseDate ? new Date(parsed.data.purchaseDate) : null;
+  const warrantyEnd = parsed.data.warrantyEnd ? new Date(parsed.data.warrantyEnd) : null;
 
   // Handle JSON specifications
   let specsObj = null;
@@ -84,8 +84,8 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
   const before = await db.device.findUnique({ where: { id } });
   if (!before) return { success: false, error: "Thiết bị không tồn tại." };
 
-  let purchaseDate = parsed.data.purchaseDate ? new Date(parsed.data.purchaseDate) : null;
-  let warrantyEnd = parsed.data.warrantyEnd ? new Date(parsed.data.warrantyEnd) : null;
+  const purchaseDate = parsed.data.purchaseDate ? new Date(parsed.data.purchaseDate) : null;
+  const warrantyEnd = parsed.data.warrantyEnd ? new Date(parsed.data.warrantyEnd) : null;
 
   let specsObj = null;
   if (parsed.data.specifications) {

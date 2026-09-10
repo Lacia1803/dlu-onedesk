@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { DeviceType, DeviceStatus } from "@prisma/client";
+import { Device } from "@prisma/client";
 
 interface Room {
   id: string;
@@ -20,7 +20,7 @@ interface Room {
 }
 
 interface DeviceFormProps {
-  initialData?: any;
+  initialData?: Device | null;
   rooms: Room[];
 }
 
@@ -98,7 +98,7 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Room */}
         <div className="space-y-2">
           <Label htmlFor="roomId">Phòng máy *</Label>
-          <Select defaultValue={initialData?.roomId} onValueChange={(val) => setValue("roomId", val, { shouldValidate: true })}>
+          <Select defaultValue={initialData?.roomId ?? ""} onValueChange={(val) => setValue("roomId", val ?? "", { shouldValidate: true })}>
             <SelectTrigger>
               <SelectValue placeholder="Chọn phòng" />
             </SelectTrigger>
@@ -114,7 +114,7 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Type */}
         <div className="space-y-2">
           <Label htmlFor="type">Loại thiết bị *</Label>
-          <Select defaultValue={initialData?.type || "COMPUTER"} onValueChange={(val: any) => setValue("type", val, { shouldValidate: true })}>
+          <Select defaultValue={initialData?.type || "COMPUTER"} onValueChange={(val) => setValue("type", val as DeviceFormValues["type"], { shouldValidate: true })}>
             <SelectTrigger>
               <SelectValue placeholder="Chọn loại" />
             </SelectTrigger>
@@ -130,7 +130,7 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Status */}
         <div className="space-y-2">
           <Label htmlFor="status">Trạng thái *</Label>
-          <Select defaultValue={initialData?.status || "ACTIVE"} onValueChange={(val: any) => setValue("status", val, { shouldValidate: true })}>
+          <Select defaultValue={initialData?.status || "ACTIVE"} onValueChange={(val) => setValue("status", val as DeviceFormValues["status"], { shouldValidate: true })}>
             <SelectTrigger>
               <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>

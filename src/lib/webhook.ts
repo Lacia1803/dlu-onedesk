@@ -16,7 +16,7 @@ export async function sendSlack(text: string) {
     }
     return { success: true };
   } catch (e) {
-    return { success: false, error: (e as any).message };
+    return { success: false, error: (e instanceof Error ? e.message : String(e)) };
   }
 }
 
@@ -39,7 +39,7 @@ async function sendAlertEmail(subject: string, text: string) {
     });
     return { success: true };
   } catch (e) {
-    return { success: false, error: (e as any).message };
+    return { success: false, error: (e instanceof Error ? e.message : String(e)) };
   }
 }
 

@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
+import { DeviceSoftware, Software } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -23,8 +24,8 @@ import {
 
 interface DeviceSoftwareListProps {
   deviceId: string;
-  installedSoftware: any[];
-  allSoftware: any[];
+  installedSoftware: (DeviceSoftware & { software: Software })[];
+  allSoftware: Software[];
   canEdit: boolean;
 }
 
@@ -95,7 +96,7 @@ export function DeviceSoftwareList({
                       Tất cả phần mềm có sẵn đã được gán cho thiết bị này hoặc chưa có phần mềm trong hệ thống.
                     </p>
                   ) : (
-                    <Select value={selectedSoftwareId} onValueChange={(val: any) => setSelectedSoftwareId(val)}>
+                    <Select value={selectedSoftwareId} onValueChange={(val) => setSelectedSoftwareId(val ?? "")}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn phần mềm..." />
                       </SelectTrigger>

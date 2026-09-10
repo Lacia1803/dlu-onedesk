@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { FaqSearch } from "@/components/faq/faq-search";
 

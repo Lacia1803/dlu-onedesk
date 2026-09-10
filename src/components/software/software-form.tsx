@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { softwareSchema } from "@/lib/validations/software";
+import { softwareSchema, type SoftwareFormValues } from "@/lib/validations/software";
 import { createSoftware, updateSoftware } from "@/app/actions/software-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ export function SoftwareForm({ initialData }: SoftwareFormProps) {
     },
   });
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: SoftwareFormValues) {
     setLoading(true);
     const result = initialData
       ? await updateSoftware(initialData.id, data)

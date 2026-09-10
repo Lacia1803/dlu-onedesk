@@ -30,6 +30,15 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt Code Quality — 2026-09-11)
+- [x] Loại bỏ `any` trong `src/app/actions/*`: thay thế bằng `Prisma.UserWhereInput`, `Prisma.DeviceUncheckedCreateInput`, `Prisma.TicketUncheckedUpdateInput`, `Record<string, string>`, helper `cellStr()`/`errorMessage()`, exported interfaces `TechKPIResult`; bảo hành type-check strict.
+- [x] Server actions trả plain objects (`{ success, error }`) thay vì `NextResponse.json` — loại bỏ `import { NextResponse }` khỏi tất cả action files; `NextResponse.json` chỉ dùng trong `src/app/api/*/route.ts` (bulk-update route đã thêm `{ status: 500 }`).
+- [x] Thêm test tự động: 16 tests mới trong `tests/actions.test.mjs` — schema validation (register, password), rate limiter (chatbot 10/min, register 5/min), chatbot integration, PDF export jsPDF smoke test → tổng 37/37 pass.
+- [x] Tài liệu 2FA: hướng dẫn kích hoạt 5 bước trong README (section 6); modal trợ giúp Dialog trong `two-factor-form.tsx` với GuideCircle icon + 5 bước + cảnh báo mất phone.
+- [x] Xem xét Redis: `cache.ts` đã hỗ trợ Upstash REST fallback khi set env `UPSTASH_REDIS_REST_URL`/`TOKEN`; `sse.ts` ghi chú multi-instance cần Redis pub/sub — hiện tại đủ cho single-instance deploy.
+- [x] ESLint clean-up: `npm run lint --fix` + fix thủ công → từ 97 problems (45 errors) xuống **0 errors**; fix unused imports, `any` types (eslint-disable cho Prisma dynamic queries + React Hook Form generics), `react-hooks/purity` (Date.now→const), `react-hooks/set-state-in-effect` (mount detection, initial fetch), `window.location.href`→`useRouter().push()`, bare JSX comments→`{/* */}`.
+- [x] Type-check: `npx tsc --noEmit` pass 0 errors; `npm run build` pass; `npm run test:unit` 37/37 pass.
+
 ## Recently Completed (đợt Enterprise Improvements + UX bổ sung — 2026-09-11)
 - [x] Nhóm 1 (Security & RBAC): `src/proxy.ts` — Next.js 16 Proxy bảo vệ route theo role (ADMIN_ONLY, STAFF_WRITE, redirect login kèm callbackUrl); cron endpoints (`/api/cron/daily`, `/api/cron/overdue`) chuyển sang fail-closed (401 khi thiếu/sai `CRON_SECRET`); CSAT rating chỉ creator của ticket được gửi.
 - [x] Nhóm 2 (Account Lifecycle & Self-service): form đổi mật khẩu trong `/settings` (`changePassword` action + `password.ts` schema); Admin reset mật khẩu trong `/admin/users` (`adminResetPassword`, sinh mật khẩu tạm, set `mustChangePassword`); banner `FirstLoginBanner` cảnh báo trên dashboard khi tài khoản còn dùng mật khẩu mặc định/import.
