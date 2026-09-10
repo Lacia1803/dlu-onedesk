@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
 import { NotificationBell } from "./notification-bell";
+import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
@@ -23,6 +24,7 @@ export function Header() {
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 lg:h-[60px] lg:px-6">
       <div className="flex flex-1 items-center gap-4 font-mono text-xs text-muted-foreground">
+        <MobileNav />
         <span className="text-primary">●</span> OPERATIONS
       </div>
       <div className="flex items-center gap-4">

@@ -17,17 +17,49 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default async function DevicesPage() {
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 20;
+
+export default async function DevicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
   const session = await getServerSession(authOptions);
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "TECHNICIAN";
   const canDelete = role === "ADMIN";
 
-  const devices = await db.device.findMany({
-    where: { deletedAt: null },
-    include: { room: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const { q, page: pageParam } = await searchParams;
+  const keyword = q?.trim();
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
+
+  const where: any = { deletedAt: null };
+  if (keyword) {
+    where.OR = [
+      { name: { contains: keyword, mode: "insensitive" } },
+      { serialNumber: { contains: keyword, mode: "insensitive" } },
+      { qrCode: { contains: keyword, mode: "insensitive" } },
+    ];
+  }
+
+  const [devices, total] = await Promise.all([
+    db.device.findMany({
+      where,
+      include: { room: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.device.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -66,6 +98,16 @@ export default async function DevicesPage() {
           {canEdit && <ImportButton label="Nhập dữ liệu thiết bị" subdir="devices" />}
         </div>
       </div>
+
+      <form className="relative max-w-sm" action="/dashboard/devices">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          name="q"
+          defaultValue={keyword}
+          placeholder="Tìm theo tên, serial, mã QR..."
+          className="pl-9"
+        />
+      </form>
 
       <div className="rounded-md border bg-card">
         <Table>
@@ -114,6 +156,12 @@ export default async function DevicesPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        baseUrl="/dashboard/devices"
+        searchParams={{ q }}
+      />
     </div>
   );
 }

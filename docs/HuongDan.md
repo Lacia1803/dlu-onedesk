@@ -10,8 +10,11 @@ Hệ thống hỗ trợ kỹ thuật và quản lý thiết bị phòng máy –
 - Truy cập trang chủ `/login` hoặc `/register`.
 - Nhập Email (tên miền `@dlu.edu.vn`) và Mật khẩu.
 
-### 2. Gửi Báo cáo Sự cố (Ticket)
-- Vào menu **Tickets** → Chọn **Tạo Ticket mới** (`/dashboard/tickets/new`).
+### 2. Gửi Báo cáo Sự cố (Ticket) & Điều hướng Mobile
+- **Điều hướng trên di động**: Khi truy cập bằng điện thoại, nhấn vào biểu tượng **Menu (3 gạch)** ở góc trên bên trái Header để mở menu trượt.
+- **Tạo ticket mới**: Vào menu **Tickets** → Chọn **Tạo Ticket mới** (`/dashboard/tickets/new`).
+- **Phân trang & Tìm kiếm**: Trang Tickets và Thiết bị hỗ trợ tìm kiếm theo tên/serial/Mã QR và phân trang URL (`?page=...`).
+- **Thông báo Realtime**: Khi có cập nhật mới về ticket hoặc phản hồi từ KTV, chuông thông báo ở Header sẽ "nảy số" đỏ ngay lập tức mà không cần tải lại trang.
 - Điền tiêu đề, mô tả sự cố, danh mục (Phần cứng, Phần mềm, Mạng...) và chọn mức độ ưu tiên.
 - **Có thể chọn thiết bị liên quan** (hoặc dùng tính năng quét QR).
 - Xem các gợi ý FAQ hiển thị tự động khi gõ tiêu đề. Nếu FAQ chưa giải quyết được, bấm **"Vẫn gặp sự cố — tạo ticket từ mục này"** để điền sẵn thông tin.
@@ -80,8 +83,8 @@ Toàn bộ quyền của Technician, bổ sung các tính năng quản trị cao
 - Các ticket quá hạn >3 ngày cũng sẽ có badge **"Quá hạn"** màu đỏ nổi bật trong bảng Ticket.
 
 ### 3. Quản lý Người dùng & Nhật ký Hệ thống (Audit Logs)
-- **Quản lý người dùng** (`/admin/users`): Đổi vai trò (USER, TECHNICIAN, ADMIN), vô hiệu hóa (soft-delete), hoặc khôi phục người dùng đã bị xóa.
-- **Nhật ký hệ thống** (`/admin/audit-logs`): Ghi lại toàn bộ lịch sử hành động quan trọng (tạo/sửa/xóa ticket, phân công, 2FA, xuất báo cáo...) kèm thời gian, người thực hiện và IP/chi tiết.
+- **Quản lý người dùng** (`/admin/users`): Đổi vai trò (USER, TECHNICIAN, ADMIN), vô hiệu hóa (soft-delete), hoặc khôi phục người dùng đã bị xóa. Hỗ trợ nút **"Nhập dữ liệu"** để tải lên hàng loạt danh sách người dùng từ file Excel/CSV.
+- **Nhật ký hệ thống** (`/admin/audit-logs`): Ghi lại toàn bộ lịch sử hành động quan trọng (tạo/sửa/xóa ticket, phân công, 2FA, xuất báo cáo, import file...) kèm thời gian, người thực hiện và IP/chi tiết.
 
 ### 4. Cài đặt Bảo mật 2 Lớp (2-FA)
 - Vào mục **Cài đặt** (`/settings`).

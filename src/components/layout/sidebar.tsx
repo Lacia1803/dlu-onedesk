@@ -1,24 +1,10 @@
 "use client";
 
+import { getNavRoutes } from "@/lib/nav-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  LayoutDashboard,
-  Ticket,
-  Monitor,
-  Server,
-  BookOpen,
-  Users,
-  Settings,
-  Disc,
-  CalendarDays,
-  ScrollText,
-  MessagesSquare,
-  Gauge,
-  Bell,
-  Trees,
-} from "lucide-react";
+import { Trees } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
@@ -27,21 +13,7 @@ export function Sidebar() {
 
   const role = session?.user?.role || "USER";
 
-  const routes = [
-    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard", show: true },
-    { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", show: true },
-    { label: "FAQ", icon: BookOpen, href: "/dashboard/faq", show: true },
-    { label: "Lịch sử chat AI", icon: MessagesSquare, href: "/dashboard/chat-history", show: true },
-    { label: "Phòng máy", icon: Server, href: "/dashboard/rooms", show: role === "ADMIN" || role === "TECHNICIAN" },
-    { label: "Thiết bị", icon: Monitor, href: "/dashboard/devices", show: true },
-    { label: "Phần mềm", icon: Disc, href: "/dashboard/software", show: true },
-    { label: "KPI của tôi", icon: Gauge, href: "/dashboard/my-kpi", show: role === "ADMIN" || role === "TECHNICIAN" },
-    { label: "Bảo trì", icon: CalendarDays, href: "/dashboard/maintenance", show: role === "ADMIN" || role === "TECHNICIAN" },
-    { label: "Người dùng", icon: Users, href: "/admin/users", show: role === "ADMIN" },
-    { label: "Nhật ký hệ thống", icon: ScrollText, href: "/admin/audit-logs", show: role === "ADMIN" },
-    { label: "Thông báo", icon: Bell, href: "/dashboard/notifications", show: true },
-
-  ];
+  const routes = getNavRoutes(role);
 
   return (
     <div className="hidden border-r border-sidebar-border bg-sidebar md:block md:w-60">

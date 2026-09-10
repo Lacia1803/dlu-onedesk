@@ -50,13 +50,27 @@ export function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    // ponytail: polling 15s — chỉ gọi khi tab đang hiển thị để tránh request thừa
+
+    // SSE connection cho tin nhắn realtime ngay lập tức
+    let es: EventSource | null = null;
+    try {
+      es = new EventSource("/api/notifications/sse");
+      es.onmessage = () => {
+        fetchNotifications();
+      };
+    } catch (e) {
+      // EventSource fail gracefully
+    }
+
+    // Polling 15s làm fallback khi tab hien thi
     const onVisible = () => {
       if (document.visibilityState === "visible") fetchNotifications();
     };
     const interval = setInterval(onVisible, 15000);
     document.addEventListener("visibilitychange", onVisible);
+
     return () => {
+      if (es) es.close();
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
     };

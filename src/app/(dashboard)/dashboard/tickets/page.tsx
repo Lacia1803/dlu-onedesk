@@ -6,12 +6,16 @@ import { Plus } from "lucide-react";
 import { TicketStatusFilter } from "@/components/tickets/ticket-status-filter";
 import { BulkTicketTable } from "@/components/tickets/bulk-ticket-table";
 
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
 export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 20;
 
 export default async function TicketsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; priority?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; priority?: string; page?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session) return null;
@@ -19,8 +23,9 @@ export default async function TicketsPage({
   const role = session.user.role;
   const isUser = role === "USER";
 
-  const { q, status, priority } = await searchParams;
+  const { q, status, priority, page: pageParam } = await searchParams;
   const keyword = q?.trim();
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
 
   const where: any = isUser ? { creatorId: session.user.id } : {};
 
@@ -34,14 +39,21 @@ export default async function TicketsPage({
   if (status) where.status = status;
   if (priority) where.priority = priority;
 
-  const tickets = await db.ticket.findMany({
-    where,
-    include: {
-      creator: { select: { name: true } },
-      assignee: { select: { name: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [tickets, total] = await Promise.all([
+    db.ticket.findMany({
+      where,
+      include: {
+        creator: { select: { name: true } },
+        assignee: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.ticket.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="space-y-4">
@@ -66,6 +78,12 @@ export default async function TicketsPage({
       <TicketStatusFilter currentStatus={status} currentPriority={priority} keyword={keyword} />
 
       <BulkTicketTable tickets={tickets} isUser={isUser} />
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        baseUrl="/dashboard/tickets"
+        searchParams={{ q, status, priority }}
+      />
     </div>
   );
 }

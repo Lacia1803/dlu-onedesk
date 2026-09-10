@@ -13,7 +13,11 @@ Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại họ
 
 ### 📱 1. Tiếp nhận & Quản lý Ticket
 - **Tạo ticket sự cố**: Phân loại theo danh mục, mức độ ưu tiên, đính kèm hình ảnh và liên kết thiết bị.
+- **Mobile Navigation Drawer**: Hỗ trợ giao diện responsive tối ưu trên điện thoại di động với Hamburger menu trượt (Sheet drawer) đầy đủ phân quyền.
+- **Phân trang Server-side & URL Query State**: Phân trang chuẩn 20 mục/trang cho cả bảng Tickets và Devices, bảo toàn bộ lọc và tìm kiếm trực tiếp trên URL (`?page=1&q=...`).
+- **Thông báo Realtime tức thì (SSE)**: Kết nối Server-Sent Events tại `/api/notifications/sse` phát chuông đỏ lập tức khi có ticket/bình luận mới, kết hợp polling 15s fallback khi tab active.
 - **Quét mã QR bằng Camera**: Quét mã QR dán trên thiết bị để tạo báo cáo sự cố hoặc xem thông tin tức thì (`/dashboard/devices/scan`).
+- **Nhập dữ liệu hàng loạt (Excel/CSV Bulk Import)**: Hỗ trợ import nhanh danh sách thiết bị và danh sách người dùng từ file Excel/CSV.
 - **Gợi ý tự động từ FAQ**: Tự động gợi ý câu trả lời từ cẩm nang khi nhập tiêu đề ticket, hoặc tạo ticket 1-click từ FAQ.
 - **Đánh giá & Mở lại ticket**: Đánh giá 1-5 sao sau khi hoàn thành. Người tạo có quyền mở lại (Reopen) ticket trong vòng 7 ngày nếu lỗi tái phát.
 - **Xử lý hàng loạt (Bulk Actions)**: Chọn nhiều ticket để đổi trạng thái, mức độ ưu tiên hoặc tự động gán.
