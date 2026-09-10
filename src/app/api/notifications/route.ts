@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllNotifications, getNotificationStats, NOTIFICATION_PAGE_SIZE } from "@/app/actions/notification-actions";
+import { getAllNotifications, getNotificationStats } from "@/app/actions/notification-actions";
+import { NOTIFICATION_PAGE_SIZE } from "@/lib/notification-utils";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);

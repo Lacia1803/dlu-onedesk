@@ -30,6 +30,15 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt nâng cấp chất lượng — 2026-09-10)
+- [x] Pagination cho Notification Center: 20 mục/trang, prev/next + đếm trang, `getAllNotifications` trả `{items, total, totalPages}`, API nhận `?page=`.
+- [x] Cache in-memory (`src/lib/cache.ts`): `cached(key, ttl, fn)` + `rateLimit(key, limit, window)` — áp cache 5 phút cho API `/api/rooms`, rate limit 10 req/phút/user cho transfer/merge/FAQ-draft.
+- [x] Device Transfer Modal: dropdown chọn phòng (fetch `/api/rooms`), disable phòng hiện tại.
+- [x] Slack webhook (`src/lib/webhook.ts`): `sendSlack()` no-op khi chưa set `SLACK_WEBHOOK_URL`; cron daily đẩy cảnh báo SLA quá hạn + đến hạn bảo trì.
+- [x] Notification UI polish: label tiếng Việt theo loại + tooltip, toast khi mark-all-read/xóa, nút xóa từng thông báo, stat cards (Chưa đọc / Ticket chờ xử lý / FAQ chờ duyệt) qua `?stats=true`.
+- [x] Fix build: tách `NOTIFICATION_PAGE_SIZE`/`notificationPageSkip` sang `src/lib/notification-utils.ts` (file "use server" chỉ được export async function).
+- [x] Test cache/rate-limit: 5 case mới (17/17 pass tổng). Docs: `docs/HuongDan.md` bổ sung hướng dẫn gộp ticket, FAQ draft + duyệt, điều chuyển thiết bị, Slack.
+
 ## Recently Completed (đợt 4 tính năng nâng cao — 2026-09-10)
 - [x] F1: Trung tâm thông báo toàn diện
   - Schema: trường `type` trên Notification (TICKET_ASSIGNED | TICKET_STATUS | TICKET_COMMENT | SLA_WARNING | MAINTENANCE | FAQ | GENERAL).

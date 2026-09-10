@@ -3,14 +3,7 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
-export const NOTIFICATION_PAGE_SIZE = 20;
-
-// Pure helper — dễ kiểm thử, không đụng DB.
-export function notificationPageSkip(page: number, pageSize = NOTIFICATION_PAGE_SIZE) {
-  const p = Math.max(1, Math.floor(page) || 1);
-  return (p - 1) * pageSize;
-}
+import { NOTIFICATION_PAGE_SIZE, notificationPageSkip } from "@/lib/notification-utils";
 
 export async function getUnreadNotifications() {
   const session = await getServerSession(authOptions);

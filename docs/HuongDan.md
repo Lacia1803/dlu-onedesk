@@ -45,6 +45,9 @@ Hệ thống hỗ trợ kỹ thuật và quản lý thiết bị phòng máy –
 - Menu thao tác trên từng ticket: Đổi trạng thái (`OPEN`, `IN_PROGRESS`, `WAITING_PARTS`, `RESOLVED`, `CLOSED`), đổi mức độ ưu tiên, hoặc chuyển người xử lý.
 - **Ghi chú nội bộ (Internal Note)**: Nhập ghi chú kỹ thuật (chỉ Tech/Admin mới nhìn thấy).
 - **Chèn câu trả lời mẫu (Canned Replies)**: Sử dụng các câu phản hồi nhanh đã soạn sẵn khi bình luận.
+- **Gộp ticket trùng (Incident Merge)**: Trên trang chi tiết ticket, bấm **"Gộp Ticket trùng"** và nhập danh sách mã ID của các ticket trùng lặp. Các ticket đó sẽ tự động đóng, người tạo nhận thông báo chuyển hướng về ticket gốc để xử lý chung.
+- **Tạo FAQ từ ticket**: Với ticket đã xử lý (`RESOLVED`) hoặc đã đóng (`CLOSED`), bấm **"Tạo FAQ từ ticket"**. Hệ thống tự động trích xuất nội dung xử lý thành bản nháp FAQ (trạng thái ẩn) và gửi duyệt cho Admin.
+- **SLA nâng cao**: Ticket được đếm ngược hạn xử lý theo mức ưu tiên. Khi chuyển sang `WAITING_PARTS` (chờ linh kiện), đồng hồ SLA tự động tạm dừng và cộng bù khi xử lý tiếp.
 
 ### 2. Kéo - thả Lịch Bảo trì (Drag & Drop Scheduling)
 - Vào menu **Bảo trì** (`/dashboard/maintenance`).
@@ -84,3 +87,10 @@ Toàn bộ quyền của Technician, bổ sung các tính năng quản trị cao
 - Vào mục **Cài đặt** (`/settings`).
 - Bật **Bảo mật hai lớp (2-FA)**: Quét mã QR bằng ứng dụng Authenticator (Google Authenticator, Authy...) và nhập mã 6 chữ số để xác nhận.
 - Khi đăng nhập, tài khoản đã bật 2-FA sẽ yêu cầu nhập OTP.
+
+### 5. Trung tâm thông báo & cảnh báo
+- **Trung tâm thông báo** (`/dashboard/notifications`): Liệt kê toàn bộ thông báo theo loại (Phân công, Trạng thái, Bình luận, Cảnh báo SLA, Bảo trì, FAQ...), hỗ trợ lọc và phân trang (20 mục/trang).
+- **Bộ đếm nhanh**: Đầu trang hiển thị số **thông báo chưa đọc**, **ticket chờ xử lý**, và **FAQ chờ duyệt**.
+- **Duyệt FAQ nháp**: Trang Quản lý FAQ hiển thị trạng thái "Chờ duyệt" kèm nút ✓ (duyệt) / ✗ (từ chối). Chỉ bản nháp được duyệt mới xuất hiện trong cẩm nang cho người dùng.
+- **Điều chuyển thiết bị**: Trên trang chi tiết thiết bị, dùng dropdown chọn phòng mới để bàn giao thiết bị. Hành động được ghi vào lịch sử thiết bị (RELOCATION) và thông báo cho Tech/Admin.
+- **Cảnh báo Slack (tuỳ chọn)**: Nếu cấu hình biến `SLACK_WEBHOOK_URL`, hệ thống sẽ đẩy cảnh báo **SLA quá hạn** và **đến hạn bảo trì định kỳ** sang kênh Slack của đội ngũ.
