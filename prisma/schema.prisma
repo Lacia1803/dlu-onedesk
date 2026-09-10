@@ -75,6 +75,7 @@ model User {
   avatar        String?
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret  String?
+  mustChangePassword Boolean @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
@@ -152,6 +153,9 @@ model Device {
   history       DeviceHistory[]
   nextMaintenanceAt DateTime?
 
+  @@index([roomId])
+  @@index([status])
+  @@index([deletedAt])
   @@map("devices")
 }
 
@@ -226,6 +230,11 @@ model Ticket {
   firstResponseAt   DateTime?
   slaPausedAt       DateTime?
 
+  @@index([creatorId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([slaDeadline])
   @@map("tickets")
 }
 
@@ -305,6 +314,8 @@ model Notification {
   userId        String
   user          User      @relation(fields: [userId], references: [id])
 
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
   @@map("notifications")
 }
 
@@ -329,6 +340,8 @@ model AuditLog {
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 
+  @@index([userId])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 

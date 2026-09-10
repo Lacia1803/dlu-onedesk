@@ -2,9 +2,11 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { DeleteButton } from "@/components/software/delete-button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import {
   Table,
   TableBody,
@@ -14,16 +16,46 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default async function SoftwarePage() {
+export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 20;
+
+export default async function SoftwarePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
   const session = await getServerSession(authOptions);
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "TECHNICIAN";
   const canDelete = role === "ADMIN";
 
-  const softwareList = await db.software.findMany({
-    orderBy: { name: "asc" },
-    include: { _count: { select: { devices: true } } },
-  });
+  const { q, page: pageParam } = await searchParams;
+  const keyword = q?.trim();
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
+
+  const where = keyword
+    ? {
+        OR: [
+          { name: { contains: keyword, mode: "insensitive" as const } },
+          { version: { contains: keyword, mode: "insensitive" as const } },
+          { license: { contains: keyword, mode: "insensitive" as const } },
+        ],
+      }
+    : undefined;
+
+  const [softwareList, total] = await Promise.all([
+    db.software.findMany({
+      where,
+      orderBy: { name: "asc" },
+      include: { _count: { select: { devices: true } } },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.software.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="space-y-4">
@@ -36,6 +68,16 @@ export default async function SoftwarePage() {
           </Link>
         )}
       </div>
+
+      <form className="relative max-w-sm" action="/dashboard/software">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          name="q"
+          defaultValue={keyword}
+          placeholder="Tìm theo tên, phiên bản, license..."
+          className="pl-9"
+        />
+      </form>
 
       <div className="rounded-md border bg-card">
         <Table>
@@ -80,6 +122,13 @@ export default async function SoftwarePage() {
           </TableBody>
         </Table>
       </div>
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        baseUrl="/dashboard/software"
+        searchParams={{ q }}
+      />
     </div>
   );
 }

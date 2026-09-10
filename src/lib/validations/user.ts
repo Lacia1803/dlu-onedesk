@@ -6,8 +6,8 @@ export const userRoleUpdateSchema = z.object({
   role: z.nativeEnum(Role),
 });
 
-export type UserRoleUpdateValues = z.infer<typeof userRoleUpdateSchema>;
-
-export const userSearchSchema = z.object({
-  q: z.string().max(100).optional(),
+// Đánh dấu người dùng mới được import hoặc tạo bằng mật khẩu mặc định để buộc đổi mật khẩu
+export const userCreationSchema = z.object({
+  id: z.string().min(1),
+  mustChangePassword: z.boolean().optional().default(true),
 });

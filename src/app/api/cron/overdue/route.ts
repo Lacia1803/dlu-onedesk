@@ -4,12 +4,13 @@ import { TicketStatus } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { logAudit } from "@/lib/audit";
 
+// Fail-Closed: chỉ chấp nhận khi CRON_SECRET được cấu hình và Bearer khớp.
 // ponytail: Basic bearer token check for cron. Upgrade to HMAC signature or provider-specific headers if on AWS/GCP.
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

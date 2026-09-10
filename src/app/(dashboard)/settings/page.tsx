@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { TwoFactorForm } from "@/components/settings/two-factor-form";
+import { ChangePasswordForm } from "@/components/settings/change-password-form";
+import { Accordion } from "@/components/ui/accordion";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +23,11 @@ export default async function SettingsPage() {
         <span className="text-primary">▶</span> CÀI ĐẶT CÁ NHÂN
       </h1>
       {user && (
-        <>
+        <Accordion defaultValue={["profile"]} className="w-full">
           <ProfileForm initialData={user} />
-          {/* 2FA */}
+          <ChangePasswordForm />
           <TwoFactorForm userId={user.id} twoFactorEnabled={user.twoFactorEnabled ?? false} />
-        </>
+        </Accordion>
       )}
     </div>
   );

@@ -1,35 +1,55 @@
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export default withAuth(
-  function middleware(req) {
-    const { token } = req.nextauth;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/register");
+/**
+ * Proxy (Next.js 16 — thay thế middleware.ts đã deprecated).
+ * Chạy trên Node.js runtime, bảo vệ RBAC ngay trước khi request tới trang:
+ * - Chưa đăng nhập → /login?callbackUrl=...
+ * - USER thường chặn các trang quản trị (/admin) và trang tạo/sửa phòng máy, thiết bị.
+ */
 
-    if (isAuthPage) {
-      if (isAuth) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
-      }
-      return null;
-    }
+// Các trang chỉ dành cho ADMIN
+const ADMIN_ONLY = [/^\/admin(\/.*)?$/];
 
-    if (!isAuth) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+// Các trang tạo/sửa resource kỹ thuật — TECHNICIAN + ADMIN
+const STAFF_WRITE = [
+  /^\/dashboard\/rooms\/(new|[^/]+\/edit)$/,
+  /^\/dashboard\/devices\/new$/,
+  /^\/dashboard\/devices\/[^/]+\/edit$/,
+  /^\/dashboard\/software(\/.*)?$/,
+];
 
-    // Role check for admin routes
-    if (req.nextUrl.pathname.startsWith("/admin") && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-  },
-  {
-    callbacks: {
-      authorized: () => true, // Middleware always runs, logic inside function handles redirects
-    },
+function matches(patterns: RegExp[], pathname: string) {
+  return patterns.some((re) => re.test(pathname));
+}
+
+export async function proxy(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
+  const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
+
+  // 1. Chưa đăng nhập → về login kèm callbackUrl
+  if (!session) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname + search);
+    return NextResponse.redirect(loginUrl);
   }
-);
+
+  // 2. RBAC tầng Edge: chặn theo vai trò
+  if (role === "ADMIN" && matches(ADMIN_ONLY, pathname)) {
+    return NextResponse.next();
+  }
+  if (matches(ADMIN_ONLY, pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+  if (matches(STAFF_WRITE, pathname) && role !== "ADMIN" && role !== "TECHNICIAN") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/settings/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/settings/:path*"],
 };

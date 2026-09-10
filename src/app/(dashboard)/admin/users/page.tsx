@@ -34,34 +34,46 @@ const ROLE_LABELS: Record<Role, string> = {
   USER: "Người dùng",
 };
 
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
+const PAGE_SIZE = 20;
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
     redirect("/dashboard");
   }
 
-  const { q } = await searchParams;
+  const { q, page: pageParam } = await searchParams;
   const keyword = q?.trim();
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const users = await db.user.findMany({
-    where: {
-      ...(keyword
-        ? {
-            OR: [
-              { name: { contains: keyword, mode: "insensitive" } },
-              { email: { contains: keyword, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    },
-    orderBy: [{ role: "asc" }, { createdAt: "desc" }],
-  });
+  const where = keyword
+    ? {
+        OR: [
+          { name: { contains: keyword, mode: "insensitive" as const } },
+          { email: { contains: keyword, mode: "insensitive" as const } },
+        ],
+      }
+    : {};
+
+  const [users, total] = await Promise.all([
+    db.user.findMany({
+      where,
+      orderBy: [{ role: "asc" }, { createdAt: "desc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.user.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="space-y-4">
@@ -149,6 +161,12 @@ export default async function AdminUsersPage({
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        baseUrl="/admin/users"
+        searchParams={{ q }}
+      />
     </div>
   );
 }

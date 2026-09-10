@@ -17,7 +17,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
 export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 30;
 
 const ACTION_LABELS: Record<string, string> = {
   USER_ROLE_UPDATE: "Đổi vai trò",
@@ -42,34 +46,43 @@ const ACTION_STYLES: Record<string, string> = {
 export default async function AdminAuditLogsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
     redirect("/dashboard");
   }
 
-  const { q } = await searchParams;
+  const { q, page: pageParam } = await searchParams;
   const keyword = q?.trim();
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const logs = await db.auditLog.findMany({
-    where: keyword
-      ? {
-          OR: [
-            { action: { contains: keyword, mode: "insensitive" } },
-            { entity: { contains: keyword, mode: "insensitive" } },
-            { entityId: { contains: keyword, mode: "insensitive" } },
-            { user: { name: { contains: keyword, mode: "insensitive" } } },
-            { user: { email: { contains: keyword, mode: "insensitive" } } },
-          ],
-        }
-      : undefined,
-    include: {
-      user: { select: { name: true, email: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const where = keyword
+    ? {
+        OR: [
+          { action: { contains: keyword, mode: "insensitive" as const } },
+          { entity: { contains: keyword, mode: "insensitive" as const } },
+          { entityId: { contains: keyword, mode: "insensitive" as const } },
+          { user: { name: { contains: keyword, mode: "insensitive" as const } } },
+          { user: { email: { contains: keyword, mode: "insensitive" as const } } },
+        ],
+      }
+    : undefined;
+
+  const [logs, total] = await Promise.all([
+    db.auditLog.findMany({
+      where,
+      include: {
+        user: { select: { name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.auditLog.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="space-y-4">
@@ -140,6 +153,12 @@ export default async function AdminAuditLogsPage({
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        baseUrl="/admin/audit-logs"
+        searchParams={{ q }}
+      />
     </div>
   );
 }

@@ -13,7 +13,10 @@ import { MaintenanceCycle, TicketStatus } from "@prisma/client";
  * 3. Thông báo admin khi ticket đã quá hạn SLA.
  */
 export async function GET(req: NextRequest) {
-  if (process.env.CRON_SECRET && req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
+  // Fail-Closed: thiếu secret hoặc sai bearer → từ chối mặc định
+  const secret = process.env.CRON_SECRET;
+  const authHeader = req.headers.get("authorization");
+  if (!secret || authHeader !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -173,6 +173,7 @@ export async function importUsers(formData: FormData): Promise<{
           password,
           role,
           phone: String(raw.phone ?? "").trim() || null,
+          mustChangePassword: true,
         },
       });
       inserted++;

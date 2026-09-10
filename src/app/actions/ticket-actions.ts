@@ -274,12 +274,12 @@ export async function getTicketsForTechnician(userId: string) {
 export async function rateTicket(ticketId: string, rating: number, feedback?: string) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
-  // Only creator or tech can rate after closed
+  // CSAT: chỉ người tạo ticket (người được phục vụ) được phép đánh giá hài lòng
   const ticket = await db.ticket.findUnique({ where: { id: ticketId } });
   if (!ticket) return { success: false, error: "Ticket không tồn tại." };
-  const isCreator = ticket.creatorId === session.user.id;
-  const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
-  if (!isCreator && !isTech) return { success: false, error: "Không có quyền." };
+  if (ticket.creatorId !== session.user.id) {
+    return { success: false, error: "Chỉ người tạo ticket mới được đánh giá mức độ hài lòng." };
+  }
 
   await db.ticket.update({
     where: { id: ticketId },

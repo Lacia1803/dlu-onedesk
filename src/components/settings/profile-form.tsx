@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 interface ProfileFormProps {
   initialData: {
@@ -82,7 +82,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
   }
 
   return (
-    <Accordion defaultValue={["profile"]} className="w-full">
       <AccordionItem value="profile">
         <AccordionTrigger className="font-mono text-sm uppercase">Thông tin cá nhân</AccordionTrigger>
         <AccordionContent>
@@ -130,6 +129,5 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
           </form>
         </AccordionContent>
       </AccordionItem>
-    </Accordion>
   );
 }

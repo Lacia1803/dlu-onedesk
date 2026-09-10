@@ -1,7 +1,6 @@
 import { MaintenanceCycle, TicketStatus, TicketPriority } from "@prisma/client";
 
-// SLA thresholds theo priority (giờ) — quy ước nghiệp vụ đồ án
-// DEFAULT: cần thống nhất với phụ trách kỹ thuật trước khi dùng thật (xem specs/13)
+// SLA thresholds theo priority (giờ làm việc) — quy ước nghiệp vụ đồ án
 export const SLA_HOURS: Record<TicketPriority, number> = {
   URGENT: 4,
   HIGH: 8,
@@ -9,7 +8,7 @@ export const SLA_HOURS: Record<TicketPriority, number> = {
   LOW: 72,
 };
 
-// SLA thời gian phản hồi lần đầu theo priority (giờ)
+// SLA thời gian phản hồi lần đầu theo priority (giờ làm việc)
 export const RESPONSE_SLA_HOURS: Record<TicketPriority, number> = {
   URGENT: 1,
   HIGH: 2,
@@ -17,14 +16,83 @@ export const RESPONSE_SLA_HOURS: Record<TicketPriority, number> = {
   LOW: 24,
 };
 
-/** Tính SLA deadline giải quyết dựa trên priority */
-export function computeSlaDeadline(priority: TicketPriority, from: Date = new Date()): Date {
-  return new Date(from.getTime() + SLA_HOURS[priority] * 60 * 60 * 1000);
+/**
+ * Giờ làm việc Trung tâm CNTT ĐH Đà Lạt:
+ * Sáng: 07:30 -> 11:30 (4h / 240m)
+ * Chiều: 13:00 -> 17:00 (4h / 240m)
+ * Làm từ Thứ 2 đến Thứ 6 (1 -> 5). Thứ 7 (6) và CN (0) nghỉ.
+ */
+function addWorkingHours(startDate: Date, hoursToAdd: number): Date {
+  const current = new Date(startDate);
+  let minutesRemaining = hoursToAdd * 60;
+
+  while (minutesRemaining > 0) {
+    const day = current.getDay(); // 0 = CN, 6 = T7
+    const h = current.getHours();
+    const m = current.getMinutes();
+    const currentMinutesFromMidnight = h * 60 + m;
+
+    // Nếu rơi vào cuối tuần → nhảy tới 07:30 sáng Thứ 2 kế tiếp
+    if (day === 0 || day === 6) {
+      const daysToAdd = day === 0 ? 1 : 2;
+      current.setDate(current.getDate() + daysToAdd);
+      current.setHours(7, 30, 0, 0);
+      continue;
+    }
+
+    // Buổi sáng: 450 (07:30) -> 690 (11:30)
+    // Buổi chiều: 780 (13:00) -> 1020 (17:00)
+    const morningStart = 7 * 60 + 30; // 450
+    const morningEnd = 11 * 60 + 30;  // 690
+    const afternoonStart = 13 * 60;   // 780
+    const afternoonEnd = 17 * 60;     // 1020
+
+    if (currentMinutesFromMidnight < morningStart) {
+      // Trước 7:30 sáng → nhảy tới 7:30 sáng cùng ngày
+      current.setHours(7, 30, 0, 0);
+    } else if (currentMinutesFromMidnight >= morningStart && currentMinutesFromMidnight < morningEnd) {
+      // Đang trong ca sáng
+      const availableInMorning = morningEnd - currentMinutesFromMidnight;
+      if (minutesRemaining <= availableInMorning) {
+        current.setMinutes(current.getMinutes() + minutesRemaining);
+        minutesRemaining = 0;
+      } else {
+        minutesRemaining -= availableInMorning;
+        current.setHours(13, 0, 0, 0); // Nhảy sang đầu ca chiều
+      }
+    } else if (currentMinutesFromMidnight >= morningEnd && currentMinutesFromMidnight < afternoonStart) {
+      // Giờ nghỉ trưa (11:30 -> 13:00) → nhảy tới 13:00 cùng ngày
+      current.setHours(13, 0, 0, 0);
+    } else if (currentMinutesFromMidnight >= afternoonStart && currentMinutesFromMidnight < afternoonEnd) {
+      // Đang trong ca chiều
+      const availableInAfternoon = afternoonEnd - currentMinutesFromMidnight;
+      if (minutesRemaining <= availableInAfternoon) {
+        current.setMinutes(current.getMinutes() + minutesRemaining);
+        minutesRemaining = 0;
+      } else {
+        minutesRemaining -= availableInAfternoon;
+        // Hết ca chiều → nhảy tới 7:30 sáng ngày làm việc tiếp theo
+        current.setDate(current.getDate() + (day === 5 ? 3 : 1)); // Nếu Thứ 6 thì nhảy sang Thứ 2
+        current.setHours(7, 30, 0, 0);
+      }
+    } else {
+      // Sau 17:00 chiều → nhảy tới 7:30 sáng ngày làm việc tiếp theo
+      current.setDate(current.getDate() + (day === 5 ? 3 : 1));
+      current.setHours(7, 30, 0, 0);
+    }
+  }
+
+  return current;
 }
 
-/** Tính hạn phản hồi lần đầu dựa trên priority */
+/** Tính SLA deadline giải quyết dựa trên priority và Giờ hành chính ĐH Đà Lạt */
+export function computeSlaDeadline(priority: TicketPriority, from: Date = new Date()): Date {
+  return addWorkingHours(from, SLA_HOURS[priority]);
+}
+
+/** Tính hạn phản hồi lần đầu dựa trên priority và Giờ hành chính ĐH Đà Lạt */
 export function computeResponseDeadline(priority: TicketPriority, from: Date = new Date()): Date {
-  return new Date(from.getTime() + RESPONSE_SLA_HOURS[priority] * 60 * 60 * 1000);
+  return addWorkingHours(from, RESPONSE_SLA_HOURS[priority]);
 }
 
 /** Kiểm tra ticket quá hạn SLA chưa */

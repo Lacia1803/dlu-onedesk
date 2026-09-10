@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Role } from "@prisma/client";
 import { toast } from "sonner";
-import { RotateCcw, Trash2 } from "lucide-react";
+import { RotateCcw, Trash2, KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { updateUserRole, deleteUser, restoreUser } from "@/app/actions/user-actions";
+import { adminResetPassword } from "@/app/actions/user-settings";
 
 const ROLE_LABELS: Record<Role, string> = {
   ADMIN: "Quản trị",
@@ -46,6 +47,20 @@ export function UserRowActions({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  async function handleAdminReset() {
+    if (!confirm("Đặt lại mật khẩu người dùng này về mặc định (email)?")) return;
+    setResetting(true);
+    const res = await adminResetPassword(userId);
+    setResetting(false);
+    if (res.success) {
+      toast.success(`Đã đặt lại mật khẩu tạm: ${res.tempPassword}`);
+      router.refresh();
+    } else {
+      toast.error(res.error);
+    }
+  }
 
   async function handleRoleChange(newRole: Role) {
     if (newRole === currentRole) return;
@@ -118,6 +133,17 @@ export function UserRowActions({
           ))}
         </SelectContent>
       </Select>
+
+      <Button
+        variant="outline"
+        size="icon"
+        className="h-9 w-9"
+        onClick={handleAdminReset}
+        disabled={resetting || isSelf}
+        title="Đặt lại mật khẩu mặc định"
+      >
+        <KeyRound className="h-4 w-4" />
+      </Button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50" title="Vô hiệu hóa" disabled={isSelf}>
