@@ -15,7 +15,8 @@ import {
   CalendarDays,
   ScrollText,
   MessagesSquare,
-  Gauge
+  Gauge,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +38,8 @@ export function Sidebar() {
     { label: "Bảo trì", icon: CalendarDays, href: "/dashboard/maintenance", show: role === "ADMIN" || role === "TECHNICIAN" },
     { label: "Người dùng", icon: Users, href: "/admin/users", show: role === "ADMIN" },
     { label: "Nhật ký hệ thống", icon: ScrollText, href: "/admin/audit-logs", show: role === "ADMIN" },
-    { label: "Cài đặt", icon: Settings, href: "/settings", show: true },
+    { label: "Thông báo", icon: Bell, href: "/dashboard/notifications", show: true },
+
   ];
 
   return (

@@ -6,6 +6,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+export type MaintenanceLogWithDetails = {
+  id: string;
+  type: string;
+  description: string;
+  parts: string | null;
+  cost: number | null;
+  performedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deviceId: string;
+  technicianId: string;
+  technician: { name: string };
+};
+
 function checkPermission(session: any) {
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     return false;
@@ -67,6 +81,9 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
     if (exists) return { success: false, error: "Số Serial đã tồn tại." };
   }
 
+  const before = await db.device.findUnique({ where: { id } });
+  if (!before) return { success: false, error: "Thiết bị không tồn tại." };
+
   let purchaseDate = parsed.data.purchaseDate ? new Date(parsed.data.purchaseDate) : null;
   let warrantyEnd = parsed.data.warrantyEnd ? new Date(parsed.data.warrantyEnd) : null;
 
@@ -88,6 +105,24 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
       specifications: specsObj,
     },
   });
+
+  // Ghi DeviceHistory cho thay đổi nghiệp vụ quan trọng (điều chuyển, đổi trạng thái)
+  const history: { type: "RELOCATION" | "STATUS_CHANGE"; description: string }[] = [];
+  if (before.roomId !== parsed.data.roomId) {
+    const [oldRoom, newRoom] = await Promise.all([
+      db.room.findUnique({ where: { id: before.roomId }, select: { name: true } }),
+      db.room.findUnique({ where: { id: parsed.data.roomId }, select: { name: true } }),
+    ]);
+    history.push({ type: "RELOCATION", description: `Điều chuyển: ${oldRoom?.name ?? "?"} → ${newRoom?.name ?? "?"}` });
+  }
+  if (before.status !== parsed.data.status) {
+    history.push({ type: "STATUS_CHANGE", description: `Tình trạng: ${before.status} → ${parsed.data.status}` });
+  }
+  if (history.length > 0) {
+    await db.deviceHistory.createMany({
+      data: history.map((h) => ({ deviceId: id, type: h.type, description: h.description, userId: session!.user.id })),
+    });
+  }
 
   revalidatePath("/dashboard/devices");
   revalidatePath(`/dashboard/devices/${id}`);
@@ -114,13 +149,29 @@ export async function addMaintenanceLog(deviceId: string, data: MaintenanceFormV
   const parsed = maintenanceSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
 
+  const performedAt = new Date(parsed.data.performedAt);
+
   await db.maintenanceLog.create({
     data: {
       ...parsed.data,
       deviceId,
       technicianId: session!.user.id,
-      performedAt: new Date(parsed.data.performedAt),
+      performedAt,
     },
+  });
+
+  // Ghi lịch sử thiết bị + đẩy mốc bảo trì kế tiếp (mặc định 90 ngày)
+  await db.deviceHistory.create({
+    data: {
+      deviceId,
+      type: "PART_REPLACED",
+      description: `Bảo trì: ${parsed.data.description}${parsed.data.parts ? ` | Linh kiện: ${parsed.data.parts}` : ""}`,
+      userId: session!.user.id,
+    },
+  });
+  await db.device.update({
+    where: { id: deviceId },
+    data: { nextMaintenanceAt: new Date(performedAt.getTime() + 90 * 24 * 60 * 60 * 1000) },
   });
 
   revalidatePath(`/dashboard/devices/${deviceId}`);

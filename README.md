@@ -106,6 +106,22 @@ npm run start
 ```
 Truy cập ứng dụng tại: `http://localhost:3000`
 
+### 6. Deploy (Docker)
+
+```bash
+# Copy env mẫu và điền giá trị thật
+cp .env.example .env
+
+# Build + chạy app + DB (migrate schema lần đầu)
+docker compose up -d --build
+docker compose exec web npx prisma db push
+
+# Cron nhắc ticket quá hạn mỗi sáng (trên VPS/host)
+# 0 8 * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/overdue
+```
+
+> Đang chạy local `npm run dev`? Chạy `docker compose up db -d` để chỉ dùng Postgres trong Docker.
+
 ---
 
 ## 📑 Tài liệu chi tiết

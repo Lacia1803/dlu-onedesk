@@ -30,7 +30,55 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
-## Recently Completed
+## Recently Completed (đợt 4 tính năng nâng cao — 2026-09-10)
+- [x] F1: Trung tâm thông báo toàn diện
+  - Schema: trường `type` trên Notification (TICKET_ASSIGNED | TICKET_STATUS | TICKET_COMMENT | SLA_WARNING | MAINTENANCE | FAQ | GENERAL).
+  - `notifyUsers`/`notifyAdminsAndTechs` nhận `type`; cập nhật toàn bộ call site trong ticket-actions + cron daily.
+  - API `/api/notifications` + trang `/dashboard/notifications` (filter ALL/UNREAD/theo loại, dot màu theo loại).
+  - NotificationBell: dot màu theo loại + link "Xem tất cả thông báo".
+  - Actions mới: `getAllNotifications(filter)`, `deleteNotification`.
+- [x] F2: Bàn giao/điều chuyển thiết bị
+  - API `POST /api/devices/transfer` (ADMIN/TECH): đổi roomId + ghi DeviceHistory RELOCATION + thông báo Admin/Tech.
+  - UI: `DeviceTransferModal` trên trang chi tiết thiết bị (chỉ hiện với TECH/ADMIN).
+- [x] F3: Gộp ticket trùng (Incident Merge)
+  - Action `mergeTickets(targetId, dupIds)`: đóng ticket trùng, ghi TicketTransition (reason "Merged into #X"), comment tổng hợp trên ticket gốc, notify creator, audit log.
+  - UI: `MergeTicketDialog` trên ticket detail (TECH/ADMIN), nhập danh sách ID ticket trùng.
+- [x] F4: Kết quả xử lý → bản nháp FAQ có duyệt
+  - Action `createFaqDraftFromTicket`: chỉ áp dụng ticket RESOLVED/CLOSED, lấy comment Tech/Admin cuối + internalNote làm "Cách xử lý", tạo FAQ `isActive=false` (nháp), notify Admin "FAQ chờ duyệt".
+  - Action `approveFaqDraft(id, approve)`: chỉ ADMIN duyệt/từ chối (toggle isActive).
+  - UI: nút "Tạo FAQ từ ticket" (ticket detail), nút duyệt ✓/✗ trên trang quản lý FAQ (ADMIN).
+- Test & Build: `tsc --noEmit` pass, `npm run build` pass, 12/12 unit test pass.
+
+## Recently Completed (đợt review & nâng cấp 3 tính năng lớn — 2026-09-10)
+- [x] Spec 13: Hồ sơ thiết bị, Bảo trì định kỳ tự sinh công việc, SLA nâng cao
+  - **Hồ sơ thiết bị có chiều sâu**:
+    - Model `DeviceHistory` ghi vết điều chuyển phòng (`RELOCATION`), thay đổi tình trạng (`STATUS_CHANGE`), thay thế linh kiện (`PART_REPLACED`).
+    - `MaintenanceLog` mở rộng trường `parts` (linh kiện đã thay), tự động tính mốc `nextMaintenanceAt` (+90 ngày).
+    - UI `/dashboard/devices/[id]`: Tab Lịch sử bảo trì chi tiết (`MaintenanceList`), tab Lịch sử sự cố liên kết toàn bộ Ticket, cảnh báo hết hạn bảo hành.
+  - **Bảo trì định kỳ tự sinh công việc**:
+    - Model `MaintenancePlan` (chu kỳ `MONTHLY`, `QUARTERLY`, `SEMESTER`, checklist bảo trì phòng máy).
+    - Cron route `/api/cron/daily`: Tự sinh ticket bảo trì khi đến hạn kỳ (`planPeriod` chống sinh trùng), đính kèm checklist chi tiết vào ticket description, thông báo Tech/Admin.
+  - **SLA nâng cao & Cảnh báo leo thang**:
+    - Tách riêng SLA phản hồi (`computeResponseDeadline`) và SLA giải quyết (`computeSlaDeadline`).
+    - Ghi nhận `firstResponseAt` tự động khi Tech/Admin gửi bình luận đầu tiên.
+    - Cơ chế **Tạm dừng SLA** (`slaPausedAt`): Khi chuyển sang `WAITING_PARTS` (chờ linh kiện), tự động tạm dừng đếm SLA; khi chuyển sang trạng thái khác sẽ cộng dồn bù thời gian chờ (`extendSlaDeadline`).
+    - Cảnh báo leo thang qua `/api/cron/daily`: Nhắc nhở KTV khi còn <25% thời hạn SLA, gửi cảnh báo cho Quản trị viên khi ticket đã quá hạn.
+  - Test & Build: Unit test suite 12/12 pass, TypeScript 0 lỗi, Next.js production build hoàn tất.
+- [x] Spec 12: Ticket Lifecycle + SLA theo priority (URGENT 4h / HIGH 8h / MEDIUM 24h / LOW 72h)
+  - Model `TicketTransition` (from/to/reason/user/thời gian) + `slaDeadline` trên Ticket
+  - Enforce server-side trong `updateTicket` (đồ thị chuyển trạng thái, chặn đóng khi chưa RESOLVED)
+  - `reopenTicket`: reset slaDeadline mới + ghi transition + enforce 7 ngày server-side (trừ ADMIN)
+  - `bulkUpdateTickets`: ghi `createMany` transition hàng loạt
+  - UI: SLA badge (còn Xh / quá hạn) + section lịch sử chuyển trạng thái ở ticket detail
+  - `tsc --noEmit` + `npm run build` pass
+- [x] Unit Test Suite: 12/12 test cases cho SLA calculation, Overdue detection, Ticket transition graph (`npm run test:unit` dùng `node --test`)
+- [x] CI/CD Pipeline: GitHub Actions `.github/workflows/ci.yml` (Postgres service, lint, typecheck, unit tests, Next.js build)
+- [x] AI Chatbot Guardrails: Giới hạn system prompt chuyên sâu IT Helpdesk, chặn out-of-scope, không tự nhận là người thật
+- [x] UX Safety: Confirm modal trước các hành động bulk update trạng thái/ưu tiên nguy hiểm
+- [x] Device Lifecycle: Hiển thị ngày mua, thời hạn bảo hành (cảnh báo quá hạn), tab lịch sử sự cố gắn liền thiết bị
+- [x] Deployment: Dockerfile multi-container `docker-compose.yml`, route `/api/cron/overdue` bảo vệ bằng Bearer token, tài liệu chi tiết `docs/DEPLOY.md`
+
+## Previously Completed
 - [x] Feature: Quét mã QR bằng Camera — component `QrScanner`, tự động resolve `DEV-xxx` QR qua API `/api/devices/lookup`, bổ sung tùy chọn Xem thông tin / Tạo ticket ngay sau khi quét.
 - [x] Feature: In PDF phiếu sửa chữa Ticket — action `exportTicketPdf` (chữ ký 2 bên, ASCII safe), nút "In phiếu PDF" trên UI `/dashboard/tickets/[id]`.
 - [x] Feature: Tự động tạo ticket từ FAQ — nút "Tạo ticket từ FAQ" trong `FaqSearch`, tự động điều hướng sang `/dashboard/tickets/new` và điền sẵn tiêu đề/mô tả.

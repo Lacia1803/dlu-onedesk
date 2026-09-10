@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma skills sync || exit 0"
+    "test": "node test-e2e-all.js",
+    "test:actions": "node test-actions.js",
+    "test:unit": "node --test tests/*.test.mjs",
+    "postinstall": "echo 'Skipping prisma skills sync'"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

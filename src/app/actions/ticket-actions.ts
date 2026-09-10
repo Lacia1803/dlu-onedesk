@@ -10,12 +10,16 @@ import { logAudit } from "@/lib/audit";
 import { getCannedReplies } from "@/app/actions/canned-reply-actions";
 
 
+import { computeSlaDeadline, isValidTransition, VALID_TRANSITIONS } from "@/lib/ticket-actions";
+
 export async function createTicket(data: TicketFormValues) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
   const parsed = ticketSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
+
+  const slaDeadline = computeSlaDeadline(parsed.data.priority);
 
   const ticket = await db.ticket.create({
     data: {
@@ -24,6 +28,7 @@ export async function createTicket(data: TicketFormValues) {
       images: parsed.data.images || [],
       creatorId: session.user.id,
       status: "OPEN",
+      slaDeadline,
     },
   });
 
@@ -31,7 +36,8 @@ export async function createTicket(data: TicketFormValues) {
   await notifyAdminsAndTechs(
     "Ticket mới",
     `Ticket #${ticket.id.slice(-6).toUpperCase()}: ${ticket.title}`,
-    `/dashboard/tickets/${ticket.id}`
+    `/dashboard/tickets/${ticket.id}`,
+    "TICKET_STATUS"
   );
 
   await logAudit({
@@ -69,6 +75,12 @@ export async function addTicketComment(ticketId: string, data: TicketCommentForm
     },
   });
 
+  // First response: comment đầu tiên của Tech/Admin → ghi mốc phản hồi SLA
+  const responderRole = session.user.role;
+  if ((responderRole === "ADMIN" || responderRole === "TECHNICIAN") && !ticket.firstResponseAt) {
+    await db.ticket.update({ where: { id: ticketId }, data: { firstResponseAt: new Date() } });
+  }
+
   // Notifications
   const notifyList = [];
   if (session.user.id !== ticket.creatorId) {
@@ -83,7 +95,8 @@ export async function addTicketComment(ticketId: string, data: TicketCommentForm
       notifyList,
       "Bình luận mới",
       `Có bình luận mới trong Ticket #${ticket.id.slice(-6).toUpperCase()}`,
-      `/dashboard/tickets/${ticket.id}`
+      `/dashboard/tickets/${ticket.id}`,
+      "TICKET_COMMENT"
     );
   }
 
@@ -119,20 +132,63 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   }
 
   const updateData: any = { ...parsed.data };
-  
+
   if (updateData.assigneeId === "") updateData.assigneeId = null;
 
+  // Kiểm tra đồ thị chuyển trạng thái (ADMIN được bỏ qua, ngoại trừ CLOSED -> trạng thái khác)
+  if (parsed.data.status && parsed.data.status !== ticket.status) {
+    const isAdmin = session.user.role === "ADMIN";
+    if (ticket.status === "CLOSED") {
+      return { success: false, error: "Ticket đã đóng, chỉ mở lại được bằng nút Reopen." };
+    }
+    if (!isAdmin && !isValidTransition(ticket.status, parsed.data.status)) {
+      const allowed = VALID_TRANSITIONS[ticket.status].join(", ") || "không có";
+      return { success: false, error: `Không thể chuyển ${ticket.status} → ${parsed.data.status}. Trạng thái hợp lệ: ${allowed}` };
+    }
+    if (parsed.data.status === "CLOSED" && ticket.status !== "RESOLVED" && !isAdmin) {
+      return { success: false, error: "Phải chuyển sang RESOLVED trước khi đóng." };
+    }
+  }
+
+  const now = new Date();
   if (parsed.data.status === "RESOLVED" && ticket.status !== "RESOLVED") {
-    updateData.resolvedAt = new Date();
+    updateData.resolvedAt = now;
   }
   if (parsed.data.status === "CLOSED" && ticket.status !== "CLOSED") {
-    updateData.closedAt = new Date();
+    updateData.closedAt = now;
+  }
+
+  // SLA pause: vào WAITING_PARTS → tạm dừng; ra khỏi WAITING_PARTS → cộng dồn thời gian chờ
+  if (parsed.data.status === "WAITING_PARTS" && ticket.status !== "WAITING_PARTS" && !ticket.slaPausedAt) {
+    updateData.slaPausedAt = now;
+  }
+  if (ticket.status === "WAITING_PARTS" && parsed.data.status && parsed.data.status !== "WAITING_PARTS"
+      && ticket.slaPausedAt && ticket.slaDeadline) {
+    const { extendSlaDeadline } = await import("@/lib/ticket-actions");
+    updateData.slaDeadline = extendSlaDeadline(ticket.slaDeadline, ticket.slaPausedAt, now);
+    updateData.slaPausedAt = null;
+  }
+  // Đổi priority → tính lại SLA deadline
+  if (parsed.data.priority && parsed.data.priority !== ticket.priority) {
+    updateData.slaDeadline = computeSlaDeadline(parsed.data.priority, ticket.createdAt);
   }
 
   await db.ticket.update({
     where: { id },
     data: updateData,
   });
+
+  // Ghi lịch sử chuyển trạng thái
+  if (parsed.data.status && parsed.data.status !== ticket.status) {
+    await db.ticketTransition.create({
+      data: {
+        ticketId: id,
+        fromStatus: ticket.status,
+        toStatus: parsed.data.status,
+        userId: session.user.id,
+      },
+    });
+  }
 
   // Log audit trail for meaningful changes
   const auditDetails: Record<string, string | { from: string; to: string } | null> = {};
@@ -178,7 +234,8 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
       [...new Set(notifyList)], // unique ids
       title,
       message,
-      `/dashboard/tickets/${ticket.id}`
+      `/dashboard/tickets/${ticket.id}`,
+      title === "Phân công Ticket" ? "TICKET_ASSIGNED" : "TICKET_STATUS"
     );
   }
 
@@ -252,9 +309,19 @@ export async function reopenTicket(ticketId: string) {
 
   if (ticket.status !== "CLOSED") return { success: false, error: "Ticket chưa đóng." };
 
+  // Chỉ được mở lại trong 7 ngày (trừ ADMIN)
+  if (session.user.role !== "ADMIN" && (!ticket.closedAt || Date.now() - new Date(ticket.closedAt).getTime() > 7 * 24 * 3600 * 1000)) {
+    return { success: false, error: "Quá 7 ngày từ lúc đóng, không thể mở lại." };
+  }
+
+  const now = new Date();
   await db.ticket.update({
     where: { id: ticketId },
-    data: { status: "OPEN", reopenedAt: new Date() },
+    data: { status: "OPEN", reopenedAt: now, resolvedAt: null, closedAt: null, slaDeadline: computeSlaDeadline(ticket.priority, now) },
+  });
+
+  await db.ticketTransition.create({
+    data: { ticketId, fromStatus: ticket.status, toStatus: "OPEN", reason: "Reopen", userId: session.user.id },
   });
 
   await logAudit({
@@ -298,6 +365,23 @@ export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdat
 
   if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
     return { success: false, error: "Không có quyền thực hiện." };
+  }
+
+  // Ghi transition history cho từng ticket (bulk)
+  if (data.status) {
+    const current = await db.ticket.findMany({
+      where: { id: { in: ids }, status: { not: data.status } },
+      select: { id: true, status: true },
+    });
+    await db.ticketTransition.createMany({
+      data: current.map((t) => ({
+        ticketId: t.id,
+        fromStatus: t.status,
+        toStatus: data.status!,
+        reason: "Bulk update",
+        userId: session.user.id,
+      })),
+    });
   }
 
   await db.ticket.updateMany({
@@ -373,7 +457,8 @@ export async function autoAssignTicket(ticketId: string) {
     [target.id],
     "Phân công Ticket",
     `Bạn được phân công xử lý Ticket #${ticketId.slice(-6).toUpperCase()} (tự động).`,
-    `/dashboard/tickets/${ticketId}`
+    `/dashboard/tickets/${ticketId}`,
+    "TICKET_ASSIGNED"
   );
 
   revalidatePath("/dashboard/tickets");

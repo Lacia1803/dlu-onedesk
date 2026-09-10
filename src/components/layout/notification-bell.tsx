@@ -19,9 +19,20 @@ interface Notification {
   id: string;
   title: string;
   message: string;
+  type?: string;
   linkUrl: string | null;
   createdAt: Date;
 }
+
+const typeStyle: Record<string, string> = {
+  TICKET_ASSIGNED: "bg-blue-500",
+  TICKET_STATUS: "bg-purple-500",
+  TICKET_COMMENT: "bg-green-500",
+  SLA_WARNING: "bg-red-500",
+  MAINTENANCE: "bg-amber-500",
+  FAQ: "bg-teal-500",
+  GENERAL: "bg-gray-400",
+};
 
 export function NotificationBell() {
   const router = useRouter();
@@ -87,13 +98,16 @@ export function NotificationBell() {
             </div>
           ) : (
             notifications.map((notif) => (
-              <DropdownMenuItem 
-                key={notif.id} 
+              <DropdownMenuItem
+                key={notif.id}
                 className="flex flex-col items-start gap-1 p-3 cursor-pointer whitespace-normal"
                 onClick={() => handleClick(notif)}
               >
                 <div className="flex justify-between w-full items-start gap-2">
-                  <span className="font-semibold text-sm leading-none">{notif.title}</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className={`h-1.5 w-1.5 rounded-full ${typeStyle[notif.type ?? "GENERAL"] ?? typeStyle.GENERAL}`} />
+                    <span className="font-semibold text-sm leading-none">{notif.title}</span>
+                  </span>
                   <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
                     {format(new Date(notif.createdAt), "HH:mm dd/MM")}
                   </span>
@@ -103,6 +117,10 @@ export function NotificationBell() {
             ))
           )}
         </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => { setOpen(false); router.push("/dashboard/notifications"); }} className="justify-center text-xs text-muted-foreground">
+          Xem tất cả thông báo
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

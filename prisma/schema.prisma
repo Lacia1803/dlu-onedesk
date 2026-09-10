@@ -28,6 +28,19 @@ enum DeviceType {
   OTHER
 }
 
+enum DeviceHistoryType {
+  STATUS_CHANGE
+  RELOCATION
+  PART_REPLACED
+  NOTE
+}
+
+enum MaintenanceCycle {
+  MONTHLY
+  QUARTERLY
+  SEMESTER
+}
+
 enum TicketStatus {
   OPEN
   IN_PROGRESS
@@ -69,11 +82,14 @@ model User {
   ticketsCreated    Ticket[]           @relation("TicketCreator")
   ticketsAssigned   Ticket[]           @relation("TicketAssignee")
   ticketComments    TicketComment[]
+  ticketTransitions TicketTransition[]
   maintenanceLogs   MaintenanceLog[]
   faqsCreated       Faq[]
   notifications     Notification[]
   auditLogs         AuditLog[]
   chatLogs          ChatLog[]
+  deviceHistory     DeviceHistory[]
+  maintenancePlans  MaintenancePlan[]
 
   @@map("users")
 }
@@ -89,7 +105,26 @@ model Room {
   deletedAt     DateTime?
 
   devices       Device[]
+  maintenancePlans MaintenancePlan[]
   @@map("rooms")
+}
+
+model MaintenancePlan {
+  id          String           @id @default(cuid())
+  name        String
+  cycle       MaintenanceCycle
+  checklist   String           // Nội dung kiểm tra định kỳ (markdown/text)
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  roomId      String
+  room        Room             @relation(fields: [roomId], references: [id])
+  creatorId   String
+  creator     User             @relation(fields: [creatorId], references: [id])
+  tickets     Ticket[]
+
+  @@map("maintenance_plans")
 }
 
 model Device {
@@ -114,8 +149,23 @@ model Device {
   software      DeviceSoftware[]
   tickets       Ticket[]
   maintenanceLogs MaintenanceLog[]
+  history       DeviceHistory[]
+  nextMaintenanceAt DateTime?
 
   @@map("devices")
+}
+
+model DeviceHistory {
+  id          String            @id @default(cuid())
+  type        DeviceHistoryType
+  description String
+  date        DateTime          @default(now())
+  deviceId    String
+  device      Device            @relation(fields: [deviceId], references: [id])
+  userId      String?
+  user        User?             @relation(fields: [userId], references: [id])
+
+  @@map("device_history")
 }
 
 model Software {
@@ -155,6 +205,7 @@ model Ticket {
   scheduledAt   DateTime?
   resolvedAt    DateTime?
   closedAt      DateTime?
+  slaDeadline   DateTime?
   rating        Int?
   feedback      String?
   reopenedAt    DateTime?
@@ -168,8 +219,28 @@ model Ticket {
   deviceId      String?
   device        Device?         @relation(fields: [deviceId], references: [id])
   comments      TicketComment[]
+  transitions   TicketTransition[]
+  maintenancePlanId String?
+  maintenancePlan   MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id])
+  planPeriod        String?
+  firstResponseAt   DateTime?
+  slaPausedAt       DateTime?
 
   @@map("tickets")
+}
+
+model TicketTransition {
+  id          String      @id @default(cuid())
+  fromStatus  TicketStatus
+  toStatus    TicketStatus
+  reason      String?
+  ticketId    String
+  ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
+
+  @@map("ticket_transitions")
 }
 
 model TicketComment {
@@ -189,8 +260,9 @@ model TicketComment {
 
 model MaintenanceLog {
   id            String    @id @default(cuid())
-  type          String    
+  type          String
   description   String
+  parts         String?   // Linh kiện đã thay (text tự do)
   cost          Float?
   performedAt   DateTime  @default(now())
   createdAt     DateTime  @default(now())
@@ -224,6 +296,7 @@ model Notification {
   id            String    @id @default(cuid())
   title         String
   message       String
+  type          String    @default("GENERAL") // TICKET_ASSIGNED | TICKET_STATUS | TICKET_COMMENT | SLA_WARNING | MAINTENANCE | FAQ | GENERAL
   isRead        Boolean   @default(false)
   linkUrl       String?   // Link tới Ticket hoặc màn hình liên quan
   createdAt     DateTime  @default(now())

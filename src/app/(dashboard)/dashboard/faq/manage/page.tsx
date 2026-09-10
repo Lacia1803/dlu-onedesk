@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaqForm } from "@/components/faq/faq-form";
 import { FaqDeleteButton } from "@/components/faq/faq-delete-button";
+import { FaqApproveButtons } from "@/components/faq/faq-approve-button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -21,6 +22,8 @@ export default async function ManageFaqPage() {
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     redirect("/dashboard/faq");
   }
+
+  const isAdmin = session.user.role === "ADMIN";
 
   const faqs = await db.faq.findMany({
     orderBy: [{ category: "asc" }, { createdAt: "desc" }],
@@ -69,10 +72,11 @@ export default async function ManageFaqPage() {
                     {faq.isActive ? (
                       <Badge className="bg-green-500 hover:bg-green-600">Hiện</Badge>
                     ) : (
-                      <Badge variant="secondary">Ẩn</Badge>
+                      <Badge variant="secondary">Chờ duyệt</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
+                    {!faq.isActive && isAdmin && <FaqApproveButtons faqId={faq.id} />}
                     <FaqForm initialData={faq} />
                     <FaqDeleteButton id={faq.id} />
                   </TableCell>

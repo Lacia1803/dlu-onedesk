@@ -20,6 +20,7 @@ export type DeviceFormValues = z.infer<typeof deviceSchema>;
 export const maintenanceSchema = z.object({
   type: z.string().min(1, "Vui lòng nhập loại bảo trì"),
   description: z.string().min(1, "Vui lòng nhập mô tả chi tiết"),
+  parts: z.string().optional(),
   cost: z.coerce.number().min(0, "Chi phí không được âm").optional(),
   performedAt: z.string().min(1, "Vui lòng chọn ngày thực hiện"),
 });

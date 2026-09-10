@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { TicketActionsMenu } from "@/components/tickets/ticket-actions-menu";
 import { ExportTicketPdfButton } from "@/components/tickets/export-ticket-pdf-button";
+import { MergeTicketDialog } from "@/components/tickets/merge-ticket-dialog";
+import { FaqFromTicketButton } from "@/components/tickets/faq-from-ticket-button";
 
 export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -26,6 +28,10 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
         include: { author: { select: { name: true } } },
         orderBy: { createdAt: "asc" },
       },
+      transitions: {
+        include: { user: { select: { name: true } } },
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
@@ -33,6 +39,11 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
 
   const isCreator = ticket.creatorId === session.user.id;
   const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
+
+  const slaOverdue = ticket.status !== "CLOSED" && ticket.slaDeadline && new Date() > ticket.slaDeadline;
+  const slaRemaining = ticket.status !== "CLOSED" && ticket.slaDeadline
+    ? Math.max(0, Math.ceil((new Date(ticket.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60)))
+    : null;
 
   if (!isCreator && !isTech) {
     return notFound();
@@ -55,10 +66,23 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
             </span>
             <TicketStatusBadge status={ticket.status} />
             <TicketPriorityBadge priority={ticket.priority} />
+            {ticket.status !== "CLOSED" && ticket.slaDeadline && (
+              <span
+                className={`font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                  slaOverdue ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                }`}
+              >
+                {slaOverdue ? "Quá hạn SLA" : `SLA còn ${slaRemaining}h`}
+              </span>
+            )}
           </div>
           <h1 className="text-xl font-semibold line-clamp-1">{ticket.title}</h1>
         </div>
         <div className="flex items-start gap-2">
+          {isTech && <MergeTicketDialog targetTicketId={ticket.id} />}
+          {isTech && (ticket.status === "RESOLVED" || ticket.status === "CLOSED") && (
+            <FaqFromTicketButton ticketId={ticket.id} />
+          )}
           <ExportTicketPdfButton ticketId={ticket.id} />
           <TicketActionsMenu ticket={ticket} technicians={technicians} isTech={isTech} />
         </div>
@@ -149,6 +173,27 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
               <div className="font-mono text-xs text-muted-foreground pt-4 border-t border-border flex gap-4">
                 {ticket.resolvedAt && <p>XỬ LÝ LÚC: {format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm")}</p>}
                 {ticket.closedAt && <p>ĐÓNG LÚC: {format(new Date(ticket.closedAt), "dd/MM/yyyy HH:mm")}</p>}
+              </div>
+            )}
+
+            {ticket.transitions.length > 0 && (
+              <div className="border-t pt-4">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-3">
+                  LỊCH SỬ CHUYỂN TRẠNG THÁI [{ticket.transitions.length}]
+                </h3>
+                <ol className="space-y-2">
+                  {ticket.transitions.map((tr) => (
+                    <li key={tr.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-mono text-xs text-muted-foreground w-40 shrink-0">
+                        {format(new Date(tr.createdAt), "dd/MM/yyyy HH:mm")}
+                      </span>
+                      <span className="font-medium">{tr.user.name}</span>
+                      <span className="text-muted-foreground">→</span>
+                      <span className="font-mono text-xs">{tr.fromStatus} → {tr.toStatus}</span>
+                      {tr.reason && <span className="text-muted-foreground italic">({tr.reason})</span>}
+                    </li>
+                  ))}
+                </ol>
               </div>
             )}
           </div>
