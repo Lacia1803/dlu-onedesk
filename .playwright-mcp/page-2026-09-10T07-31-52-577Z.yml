@@ -1,0 +1,101 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - link "ONEDESK" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - navigation [ref=e9]:
+        - link "Dashboard" [ref=e10] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Tickets" [ref=e16] [cursor=pointer]:
+          - /url: /dashboard/tickets
+        - link "FAQ" [ref=e19] [cursor=pointer]:
+          - /url: /dashboard/faq
+        - link "Lịch sử chat AI" [ref=e22] [cursor=pointer]:
+          - /url: /dashboard/chat-history
+        - link "Thiết bị" [ref=e26] [cursor=pointer]:
+          - /url: /dashboard/devices
+        - link "Phần mềm" [ref=e29] [cursor=pointer]:
+          - /url: /dashboard/software
+        - link "Thông báo" [ref=e33] [cursor=pointer]:
+          - /url: /dashboard/notifications
+      - generic [ref=e37]: ● SYSTEM ONLINE
+    - generic [ref=e38]:
+      - banner [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: ●
+          - text: OPERATIONS
+        - generic [ref=e42]:
+          - button "Toggle theme" [ref=e43]
+          - button "Thông báo" [ref=e45]
+          - button "U" [ref=e50]
+      - main [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Tổng quan" [level=1] [ref=e56]
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - button "Xuất ảnh PNG" [ref=e59]
+              - button "Xuất PDF" [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - generic [ref=e64]:
+                    - heading "▶ SYSTEM.ADMIN_DASHBOARD" [level=1] [ref=e65]
+                    - paragraph [ref=e66]: Trung tâm điều hành hỗ trợ kỹ thuật
+                  - generic [ref=e67]: "[ UPTIME: LIVE // 10-09-2026 14:31:52 ]"
+                - generic [ref=e68]:
+                  - button "Xuất báo cáo" [ref=e69]
+                  - button "Xuất KPI PDF" [ref=e75]
+                  - button "Gửi reminder quá hạn" [ref=e76]
+                - generic [ref=e77]:
+                  - generic [ref=e78]:
+                    - paragraph [ref=e79]: "[ Tổng thiết bị ]"
+                    - generic [ref=e80]: "0"
+                  - generic [ref=e81]:
+                    - paragraph [ref=e82]: "[ Thiết bị hỏng ]"
+                    - generic [ref=e83]: "0"
+                  - generic [ref=e84]:
+                    - paragraph [ref=e85]: "[ Ticket mở ]"
+                    - generic [ref=e86]: "5"
+                  - generic [ref=e87]:
+                    - paragraph [ref=e88]: "[ Chưa xử lý xong ]"
+                    - generic [ref=e89]: "5"
+                - generic [ref=e90]:
+                  - generic [ref=e91]:
+                    - heading "▶ DEVICE.STATUS_DISTRIBUTION" [level=3] [ref=e92]
+                    - generic [ref=e93]: Chưa có dữ liệu thiết bị
+                  - generic [ref=e95]:
+                    - heading "▶ TICKETS.RECENT_ACTIVITY" [level=3] [ref=e96]
+                    - generic [ref=e97]:
+                      - generic [ref=e98]:
+                        - generic [ref=e99]:
+                          - link "Test upload ảnh đính kèm" [ref=e100] [cursor=pointer]:
+                            - /url: /dashboard/tickets/cmtu546ac0001bodu7m3xy0wq
+                          - paragraph [ref=e101]: by Admin DLU • 09/09 20:34
+                        - generic [ref=e102]: OPEN
+                      - generic [ref=e103]:
+                        - generic [ref=e104]:
+                          - link "Màn hình bị giật lag liên tục" [ref=e105] [cursor=pointer]:
+                            - /url: /dashboard/tickets/cmtu2c64u0002bos67iphgmcs
+                          - paragraph [ref=e106]: by Admin DLU • 09/09 19:16
+                        - generic [ref=e107]: OPEN
+                      - generic [ref=e108]:
+                        - generic [ref=e109]:
+                          - link "Màn hình bị giật lag liên tục" [ref=e110] [cursor=pointer]:
+                            - /url: /dashboard/tickets/cmttw5tx90005bo548gywk9oi
+                          - paragraph [ref=e111]: by Admin DLU • 09/09 16:23
+                        - generic [ref=e112]: OPEN
+                      - generic [ref=e113]:
+                        - generic [ref=e114]:
+                          - link "Màn hình bị giật lag liên tục" [ref=e115] [cursor=pointer]:
+                            - /url: /dashboard/tickets/cmttw42xf0003bo54t4x83zx1
+                          - paragraph [ref=e116]: by Admin DLU • 09/09 16:22
+                        - generic [ref=e117]: OPEN
+                      - generic [ref=e118]:
+                        - generic [ref=e119]:
+                          - link "Màn hình bị giật lag liên tục" [ref=e120] [cursor=pointer]:
+                            - /url: /dashboard/tickets/cmttw36rl0001bo540b8nzssi
+                          - paragraph [ref=e121]: by Admin DLU • 09/09 16:21
+                        - generic [ref=e122]: OPEN
+              - paragraph [ref=e123]: Đang tải KPI …
+    - button [ref=e124]
+  - region "Notifications alt+T"
