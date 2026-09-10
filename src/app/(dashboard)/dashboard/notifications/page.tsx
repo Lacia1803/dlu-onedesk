@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { markAllAsRead, deleteNotification } from "@/app/actions/notification-actions";
+import { toast } from "sonner";
 
 interface Notification {
   id: string;
@@ -22,30 +25,96 @@ const typeStyle: Record<string, string> = {
   GENERAL: "bg-gray-400",
 };
 
+export const typeLabel: Record<string, string> = {
+  ALL: "Tất cả",
+  UNREAD: "Chưa đọc",
+  TICKET_ASSIGNED: "Phân công",
+  TICKET_STATUS: "Trạng thái",
+  TICKET_COMMENT: "Bình luận",
+  SLA_WARNING: "Cảnh báo SLA",
+  MAINTENANCE: "Bảo trì",
+  FAQ: "Hỏi đáp",
+  GENERAL: "Chung",
+};
+
+export const typeTooltip: Record<string, string> = {
+  TICKET_ASSIGNED: "Ticket được gán cho bạn",
+  TICKET_STATUS: "Trạng thái ticket thay đổi",
+  TICKET_COMMENT: "Có bình luận mới trong ticket",
+  SLA_WARNING: "Ticket sắp hoặc đã quá hạn xử lý",
+  MAINTENANCE: "Nhắc việc bảo trì thiết bị",
+  FAQ: "FAQ mới hoặc chờ duyệt",
+  GENERAL: "Thông báo chung",
+};
+
 export default function NotificationCenter() {
   const [filter, setFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   async function fetchNotifications() {
-    const res = await fetch(`/api/notifications?filter=${filter}`);
-    if (res.ok) setNotifications(await res.json());
+    const res = await fetch(`/api/notifications?filter=${filter}&page=${page}`);
+    if (res.ok) {
+      const data = await res.json();
+      // Tương thích ngược: API cũ trả mảng, API mới trả {items,...}
+      if (Array.isArray(data)) {
+        setNotifications(data);
+        setTotalPages(0);
+      } else {
+        setNotifications(data.items);
+        setTotalPages(data.totalPages);
+      }
+    }
   }
 
   useEffect(() => {
     fetchNotifications();
-  }, [filter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, page]);
+
+  function changeFilter(f: string) {
+    setFilter(f);
+    setPage(1);
+  }
+
+  async function handleMarkAll() {
+    const res = await markAllAsRead();
+    if (res.success) {
+      toast.success("Đã đánh dấu tất cả là đã đọc");
+      fetchNotifications();
+    } else {
+      toast.error("Thất bại, thử lại sau");
+    }
+  }
+
+  async function handleDelete(id: string) {
+    const res = await deleteNotification(id);
+    if (res.success) {
+      toast.success("Đã xóa thông báo");
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    } else {
+      toast.error("Xóa thất bại");
+    }
+  }
 
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Thông báo</h1>
-      <div className="mb-4 flex gap-2">
-        {["ALL", "UNREAD", "TICKET_ASSIGNED", "TICKET_STATUS", "TICKET_COMMENT", "SLA_WARNING", "MAINTENANCE", "FAQ", "GENERAL"].map((f) => (
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Thông báo</h1>
+        <Button variant="outline" size="sm" onClick={handleMarkAll}>
+          Đánh dấu tất cả đã đọc
+        </Button>
+      </div>
+      <div className="mb-4 flex gap-2 flex-wrap">
+        {Object.keys(typeLabel).map((f) => (
           <button
             key={f}
-            onClick={() => setFilter(f)}
+            title={typeTooltip[f] ?? f}
+            onClick={() => changeFilter(f)}
             className={`px-3 py-1 rounded ${filter === f ? "bg-primary text-primary-foreground" : "bg-muted"}`}
           >
-            {f}
+            {typeLabel[f]}
           </button>
         ))}
       </div>
@@ -54,12 +123,27 @@ export default function NotificationCenter() {
           <div key={n.id} className="border rounded p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={`inline-block h-2 w-2 rounded-full ${typeStyle[n.type ?? "GENERAL"] ?? typeStyle.GENERAL}`} />
+                <span
+                  title={typeTooltip[n.type ?? "GENERAL"] ?? n.type}
+                  className={`inline-block h-2 w-2 rounded-full ${typeStyle[n.type ?? "GENERAL"] ?? typeStyle.GENERAL}`}
+                />
                 <span className="font-semibold">{n.title}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {typeLabel[n.type ?? "GENERAL"] ?? n.type}
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground">
-                {format(new Date(n.createdAt), "HH:mm dd/MM")}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(n.createdAt), "HH:mm dd/MM")}
+                </span>
+                <button
+                  onClick={() => handleDelete(n.id)}
+                  className="text-xs text-muted-foreground hover:text-destructive"
+                  aria-label="Xóa thông báo"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{n.message}</p>
             {n.linkUrl && (
@@ -71,6 +155,19 @@ export default function NotificationCenter() {
         ))}
         {notifications.length === 0 && <p className="text-muted-foreground">Không có thông báo.</p>}
       </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+            Trang trước
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Trang {page} / {totalPages}
+          </span>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+            Trang sau
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

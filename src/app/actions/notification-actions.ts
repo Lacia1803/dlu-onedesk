@@ -4,6 +4,14 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const NOTIFICATION_PAGE_SIZE = 20;
+
+// Pure helper — dễ kiểm thử, không đụng DB.
+export function notificationPageSkip(page: number, pageSize = NOTIFICATION_PAGE_SIZE) {
+  const p = Math.max(1, Math.floor(page) || 1);
+  return (p - 1) * pageSize;
+}
+
 export async function getUnreadNotifications() {
   const session = await getServerSession(authOptions);
   if (!session) return [];
@@ -20,19 +28,30 @@ export async function getUnreadNotifications() {
   });
 }
 
-export async function getAllNotifications(filter: "ALL" | "UNREAD" | string = "ALL", take = 50) {
+export async function getAllNotifications(
+  filter: "ALL" | "UNREAD" | string = "ALL",
+  page = 1,
+  pageSize = NOTIFICATION_PAGE_SIZE
+) {
   const session = await getServerSession(authOptions);
-  if (!session) return [];
+  if (!session) return { items: [], total: 0, page: 1, pageSize, totalPages: 0 };
 
   const where: { userId: string; isRead?: boolean; type?: string } = { userId: session.user.id };
   if (filter === "UNREAD") where.isRead = false;
   else if (filter !== "ALL") where.type = filter;
 
-  return await db.notification.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take,
-  });
+  const p = Math.max(1, Math.floor(page) || 1);
+  const [items, total] = await Promise.all([
+    db.notification.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: notificationPageSkip(p, pageSize),
+      take: pageSize,
+    }),
+    db.notification.count({ where }),
+  ]);
+
+  return { items, total, page: p, pageSize, totalPages: Math.ceil(total / pageSize) };
 }
 
 export async function deleteNotification(id: string) {
