@@ -15,7 +15,8 @@ export async function mergeTickets(targetTicketId: string, duplicateTicketIds: s
     return { success: false, error: "Không có quyền gộp ticket." };
   }
 
-  if (!rateLimit(`${session.user.id}:merge`, 10, 60 * 1000)) {
+  const { allowed } = rateLimit(`${session.user.id}:merge`, 10, 60 * 1000);
+  if (!allowed) {
     return { success: false, error: "Quá nhiều yêu cầu gộp ticket, vui lòng chờ 1 phút." };
   }
 

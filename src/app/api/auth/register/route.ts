@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/lib/validations/auth";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit } from "@/lib/cache";
 
 export async function POST(req: Request) {
   try {

@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { rateLimit } from "@/lib/rate-limit";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+import { rateLimit } from "@/lib/cache";
+import { saveUpload } from "@/lib/storage";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -19,23 +15,10 @@ export async function POST(req: Request) {
   const file = formData.get("file") as File | null;
   if (!file) return NextResponse.json({ success: false, error: "Không có file gửi lên." }, { status: 400 });
 
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ success: false, error: "Định dạng ảnh không hợp lệ (JPEG, PNG, WEBP)." }, { status: 400 });
+  try {
+    const url = await saveUpload(file, "avatars");
+    return NextResponse.json({ success: true, url });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message || "Lỗi lưu ảnh đại diện." }, { status: 400 });
   }
-
-  if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json({ success: false, error: "Kích thước ảnh vượt quá 5MB." }, { status: 400 });
-  }
-
-  const uploadDir = path.join(process.cwd(), "public", "avatars");
-  await mkdir(uploadDir, { recursive: true });
-
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
-  const filePath = path.join(uploadDir, filename);
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(filePath, buffer);
-  const url = `/avatars/${filename}`;
-
-  return NextResponse.json({ success: true, url });
 }

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit } from "@/lib/cache";
 
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 

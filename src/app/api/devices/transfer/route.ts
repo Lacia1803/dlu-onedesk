@@ -15,7 +15,8 @@ export async function POST(req: Request) {
 
   // Rate limit check
   const rlKey = `${session.user.id}:transfer`;
-  if (!rateLimit(rlKey, TRANSFER_LIMIT, 60 * 1000)) {
+  const { allowed } = rateLimit(rlKey, TRANSFER_LIMIT, 60 * 1000);
+  if (!allowed) {
     return new Response(JSON.stringify({ success: false, error: "Quá nhiều yêu cầu, vui lòng chờ" }), { status: 429 });
   }
 

@@ -13,7 +13,8 @@ export async function createFaqDraftFromTicket(ticketId: string) {
     return { success: false, error: "Không có quyền thao tác." };
   }
 
-  if (!rateLimit(`${session.user.id}:faq-draft`, 10, 60 * 1000)) {
+  const { allowed } = rateLimit(`${session.user.id}:faq-draft`, 10, 60 * 1000);
+  if (!allowed) {
     return { success: false, error: "Quá nhiều yêu cầu tạo FAQ, vui lòng chờ 1 phút." };
   }
 
