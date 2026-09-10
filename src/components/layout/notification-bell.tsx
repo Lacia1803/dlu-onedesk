@@ -50,10 +50,16 @@ export function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 15000);
-    return () => clearInterval(interval);
+    // ponytail: polling 15s — chỉ gọi khi tab đang hiển thị để tránh request thừa
+    const onVisible = () => {
+      if (document.visibilityState === "visible") fetchNotifications();
+    };
+    const interval = setInterval(onVisible, 15000);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   async function handleMarkAll() {
