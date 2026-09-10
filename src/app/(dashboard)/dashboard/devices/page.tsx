@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, QrCode } from "lucide-react";
 import { DeleteDeviceButton } from "@/components/devices/delete-device-button";
+import { ImportButton } from "@/components/import-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -62,6 +63,7 @@ export default async function DevicesPage() {
               Thêm thiết bị
             </Link>
           )}
+          {canEdit && <ImportButton label="Nhập dữ liệu thiết bị" subdir="devices" />}
         </div>
       </div>
 

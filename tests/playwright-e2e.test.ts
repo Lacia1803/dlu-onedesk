@@ -9,6 +9,16 @@ async function login(page: Page, email: string, password: string) {
   await expect(page).toHaveURL("/dashboard");
 }
 
+// 0. Login failure test
+test("login fails with invalid credentials", async ({ page }) => {
+  await page.goto("/login");
+  await page.fill("input[name='email']", "wrong@dlu.edu.vn");
+  await page.fill("input[name='password']", "wrongpass");
+  await page.click("button[type='submit']");
+  await expect(page).toHaveURL("/login");
+  await expect(page.locator(".text-destructive")).toBeVisible();
+});
+
 // 1. Notification Bell → Notification Center
 test("notification bell opens center and shows stats", async ({ page }) => {
   await login(page, "tech@dlu.edu.vn", "tech");
@@ -58,7 +68,7 @@ test("merge duplicate tickets", async ({ page }) => {
   await page.fill("textarea[name='description']", "First duplicate");
   await page.selectOption("select[name='category']", "OTHER");
   await page.selectOption("select[name='priority']", "MEDIUM");
-  await page.click("text=Tạo Ticket");
+  await page.click("text=Gửi báo cáo");
   const firstId = page.url().split("/").pop() || "";
 
   await page.goto("/dashboard/tickets/new");
@@ -66,7 +76,7 @@ test("merge duplicate tickets", async ({ page }) => {
   await page.fill("textarea[name='description']", "Second duplicate");
   await page.selectOption("select[name='category']", "OTHER");
   await page.selectOption("select[name='priority']", "MEDIUM");
-  await page.click("text=Tạo Ticket");
+  await page.click("text=Gửi báo cáo");
   const secondId = page.url().split("/").pop() || "";
 
   // Open first ticket detail page
@@ -91,7 +101,7 @@ test("faq draft creation and approval", async ({ page }) => {
   await page.fill("textarea[name='description']", "Issue description");
   await page.selectOption("select[name='category']", "OTHER");
   await page.selectOption("select[name='priority']", "MEDIUM");
-  await page.click("text=Tạo Ticket");
+  await page.click("text=Gửi báo cáo");
   const ticketId = page.url().split("/").pop() || "";
   // Add a technician comment (to be used as solution)
   await page.fill("textarea[name='content']", "Solution steps");

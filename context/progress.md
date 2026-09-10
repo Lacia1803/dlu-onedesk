@@ -30,6 +30,12 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt hoàn thiện 4 nhóm tính năng nâng cao — 2026-09-11)
+- [x] Nhóm 1 (Hạ tầng): Gộp `src/lib/rate-limit.ts` vào `src/lib/cache.ts` trả `{allowed}`, bổ sung Upstash Redis REST fallback khi có env, tạo `src/lib/storage.ts` chuẩn hóa upload, cập nhật các route avatar/tickets/register.
+- [x] Nhóm 2 (UX/UI): Tối ưu polling notification trong `notification-bell.tsx` qua `visibilitychange` (ngừng poll khi ẩn tab), xác nhận Dark Mode hoạt động trơn tru.
+- [x] Nhóm 3 (Nghiệp vụ): Tạo server action `importDevices` và `importUsers` từ file Excel/CSV (`src/app/actions/import-actions.ts`), tạo component `ImportButton` mount trên cả trang Quản lý Thiết bị và Quản lý Người dùng.
+- [x] Nhóm 4 (Testing & Ops): Bổ sung Playwright test cho flow đăng nhập thất bại và cập nhật bộ test E2E (`tests/playwright-e2e.test.ts`), dọn dẹp các script test ad-hoc ở root (giữ lại seed). Build và 21/21 unit test pass hoàn toàn.
+
 ## Recently Completed (đợt nâng cấp chất lượng & UX/UI — 2026-09-10)
 - [x] Nâng cấp UI/UX & Accessibility toàn diện: Thêm `EmptyState` component cho toàn bộ các trang danh sách rỗng, tạo `TableSkeleton` & `Skeleton` kèm file `loading.tsx` cho Next.js App Router, thêm `ErrorSummary` & ARIA-alert cho form validation, bổ sung `aria-label` & focus-visible ring cho toàn bộ icon-button/links (delete/edit), thêm CI workflow (`.github/workflows/ci.yml`), viết unit test mới (`ui-helpers.test.mjs`, 21/21 pass tổng).
 - [x] Sửa ảnh giao diện Landing Page: Thay thế toàn bộ hand-coded mockup trong `mockups.tsx` bằng ảnh chụp thực tế hệ thống (`realDashboard`, `realTickets`, `realDevices`, `realFaq`, `realKpi`).

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { UserRowActions } from "@/components/users/user-row-actions";
 import { ExportUsersButton } from "@/components/users/export-users-button";
+import { ImportButton } from "@/components/import-button";
 
 const ROLE_BADGE_STYLES: Record<Role, string> = {
   ADMIN: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
@@ -69,7 +70,10 @@ export default async function AdminUsersPage({
           <h1 className="text-2xl font-bold tracking-tight">Quản lý Người dùng</h1>
           <p className="text-muted-foreground">Xem và phân quyền tài khoản trong hệ thống.</p>
         </div>
-        <ExportUsersButton />
+        <div className="flex items-center gap-2">
+          <ImportButton label="Nhập người dùng" subdir="users" />
+          <ExportUsersButton />
+        </div>
       </div>
 
       <form className="relative max-w-sm" action="/admin/users">
