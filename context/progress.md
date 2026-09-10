@@ -30,7 +30,11 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
-## Recently Completed (đợt nâng cấp chất lượng — 2026-09-10)
+## Recently Completed (đợt nâng cấp chất lượng & UX/UI — 2026-09-10)
+- [x] Sửa ảnh giao diện Landing Page: Thay thế toàn bộ hand-coded mockup trong `mockups.tsx` bằng ảnh chụp thực tế hệ thống (`realDashboard`, `realTickets`, `realDevices`, `realFaq`, `realKpi`).
+- [x] Tăng tương phản WCAG AA & Accessibility: Nâng tông `text-gold-500`/`text-gold-600` thành `text-gold-700` trên nền sáng (tỷ lệ tương phản 5.73:1), thêm focus ring (`focus-visible:ring-2`) cho toàn bộ nút thao tác chính/phụ & modal close, tăng kích thước nút menu di động lên `size-11` (44px touch target).
+- [x] Xử lý tràn ngang di động (Mobile Overflow): Thêm `overflow-x: hidden` cho root landing page (`index.css`), điều chỉnh vị trí blob trang trí để triệt tiêu scroll ngang ở màn hình 375px/390px.
+- [x] Spec & Header Link: Tạo `specs/user-profile.md` làm rõ trang Hồ sơ (`/settings`), cập nhật link dropdown avatar trên Header.
 - [x] Pagination cho Notification Center: 20 mục/trang, prev/next + đếm trang, `getAllNotifications` trả `{items, total, totalPages}`, API nhận `?page=`.
 - [x] Cache in-memory (`src/lib/cache.ts`): `cached(key, ttl, fn)` + `rateLimit(key, limit, window)` — áp cache 5 phút cho API `/api/rooms`, rate limit 10 req/phút/user cho transfer/merge/FAQ-draft.
 - [x] Device Transfer Modal: dropdown chọn phòng (fetch `/api/rooms`), disable phòng hiện tại.
@@ -112,6 +116,8 @@
 - [x] Feature: Khôi phục người dùng đã vô hiệu hóa (soft-delete restore) — action `restoreUser` + nút "Khôi phục" trong trang Quản lý Người dùng
 - [x] Feature: Bảo mật 2 lớp (2-FA) — cài `@otplib/preset-default` + `qrcode`, action `enableTwoFactor`/`verifyTwoFactor`/`disableTwoFactor`, UI QR/OTP trong Settings và xác thực trong `authorize` NextAuth.
 - [x] Feature: Nhật ký hệ thống (Audit Logs) — model `AuditLog`, helper `logAudit()`, ghi log cho các hành động user (đổi vai trò, vô hiệu hóa/khôi phục, 2FA) và ticket (tạo, cập nhật, bulk), trang `/admin/audit-logs` chỉ ADMIN xem được.
+- [x] Feature: Landing page — tích hợp concept vào `src/app/landing/`, route `/` + `/landing`, theme Pine Green/Sun Gold + Be Vietnam Pro toàn app; screenshots thật từ hệ thống trong `public/screenshots/`.
+- [x] Fix: Nút "Hồ sơ" trong dropdown avatar (Header) điều hướng tới `/settings` (trang hồ sơ đã có sẵn: profile-form + 2FA).
 - [x] Feature: Bulk Actions cho Tickets — `BulkTicketTable` với checkbox chọn nhiều, chọn tất cả, toolbar đổi hàng loạt status/priority, action `bulkUpdateTickets` + API route `/api/tickets/bulk-update` (chỉ ADMIN/TECHNICIAN), test `test-bulk-actions.js` pass.
 
 ## Known Issues

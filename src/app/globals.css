@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,77 +46,129 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Landing page palette — xanh thông + vàng nắng */
+  --color-pine-50: #f3f7f4;
+  --color-pine-100: #e5eee8;
+  --color-pine-200: #cbded2;
+  --color-pine-300: #a7c5b4;
+  --color-pine-400: #7ba892;
+  --color-pine-500: #548572;
+  --color-pine-600: #3b6a59;
+  --color-pine-700: #2a5546;
+  --color-pine-800: #173f35;
+  --color-pine-900: #12312a;
+  --color-pine-950: #0b231d;
+  --color-ivory: #f7f8f4;
+  --color-paper: #fcfcf9;
+  --color-gold-100: #f6eeda;
+  --color-gold-200: #eddcb6;
+  --color-gold-300: #e2c78b;
+  --color-gold-400: #d6ae62;
+  --color-gold-500: #c39547;
+  --color-gold-600: #a1783a;
+  --color-gold-700: #7d5c2b;
+  --color-ink: #1f2937;
+
+  --animate-marquee: marquee 36s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out -3s infinite;
+  --animate-spin-slower: spin-slower 18s linear infinite;
+  --animate-mist: mist 16s ease-in-out infinite alternate;
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes spin-slower {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes mist {
+    from { transform: translate3d(-5%, 0, 0) scale(1.06); }
+    to { transform: translate3d(5%, 0, 0) scale(1.12); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgb(214 174 98 / 0.5); }
+    50% { opacity: 0.75; box-shadow: 0 0 0 6px rgb(214 174 98 / 0); }
+  }
+  --shadow-soft: 0 24px 48px -24px rgb(18 49 42 / 0.28);
+  --shadow-lift: 0 40px 80px -32px rgb(18 49 42 / 0.4);
 }
 
-/* Tech-ops theme: light nền mặc định, dark qua class .dark, accent neon xanh lá, radius sắc. */
+/* OneDesk theme — đồng bộ palette landing page: xanh thông (pine) + vàng nắng (gold), nền ngà (ivory). */
 :root {
-  --background: #fafafa;
-  --foreground: #0a0a0a;
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #16a34a;
-  --primary-foreground: #ffffff;
-  --secondary: #f0f0f0;
-  --secondary-foreground: #0a0a0a;
-  --muted: #f0f0f0;
-  --muted-foreground: #737373;
-  --accent: #f0f0f0;
-  --accent-foreground: #16a34a;
-  --destructive: #dc2626;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #16a34a;
-  --chart-1: #16a34a;
-  --chart-2: #dc2626;
-  --chart-3: #ca8a04;
-  --chart-4: #64748b;
-  --chart-5: #2563eb;
-  --radius: 0.25rem;
-  --sidebar: #f5f5f5;
-  --sidebar-foreground: #0a0a0a;
-  --sidebar-primary: #16a34a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eaeaea;
-  --sidebar-accent-foreground: #16a34a;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #16a34a;
+  --background: #f7f8f4; /* ivory */
+  --foreground: #1f2937; /* ink */
+  --card: #fcfcf9; /* paper */
+  --card-foreground: #12312a;
+  --popover: #fcfcf9;
+  --popover-foreground: #12312a;
+  --primary: #173f35; /* pine-800 */
+  --primary-foreground: #f7f8f4;
+  --secondary: #e5eee8; /* pine-100 */
+  --secondary-foreground: #12312a;
+  --muted: #eef2ec;
+  --muted-foreground: #5b6b63;
+  --accent: #f6eeda; /* gold-100 */
+  --accent-foreground: #173f35;
+  --destructive: #b91c1c;
+  --border: #cbded2; /* pine-200 */
+  --input: #cbded2;
+  --ring: #173f35;
+  --chart-1: #173f35;
+  --chart-2: #d6ae62;
+  --chart-3: #548572;
+  --chart-4: #a7c5b4;
+  --chart-5: #a1783a;
+  --radius: 0.625rem;
+  --sidebar: #12312a; /* pine-900 */
+  --sidebar-foreground: #cbded2;
+  --sidebar-primary: #d6ae62; /* gold-400 */
+  --sidebar-primary-foreground: #0b231d;
+  --sidebar-accent: #173f35;
+  --sidebar-accent-foreground: #e2c78b;
+  --sidebar-border: #1d4a3e;
+  --sidebar-ring: #d6ae62;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #111111;
-  --card-foreground: #ededed;
-  --popover: #111111;
-  --popover-foreground: #ededed;
-  --primary: #22c55e;
-  --primary-foreground: #052e16;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ededed;
-  --muted: #161616;
-  --muted-foreground: #737373;
-  --accent: #1a1a1a;
-  --accent-foreground: #22c55e;
+  --background: #0b231d; /* pine-950 */
+  --foreground: #e5eee8;
+  --card: #12312a; /* pine-900 */
+  --card-foreground: #e5eee8;
+  --popover: #12312a;
+  --popover-foreground: #e5eee8;
+  --primary: #d6ae62; /* gold — nổi bật trên nền tối */
+  --primary-foreground: #0b231d;
+  --secondary: #173f35;
+  --secondary-foreground: #cbded2;
+  --muted: #173f35;
+  --muted-foreground: #7ba892;
+  --accent: #1d4a3e;
+  --accent-foreground: #e2c78b;
   --destructive: #ef4444;
-  --border: #262626;
-  --input: #262626;
-  --ring: #22c55e;
-  --chart-1: #22c55e;
-  --chart-2: #ef4444;
-  --chart-3: #eab308;
-  --chart-4: #64748b;
-  --chart-5: #3b82f6;
-  --radius: 0.25rem;
-  --sidebar: #0d0d0d;
-  --sidebar-foreground: #ededed;
-  --sidebar-primary: #22c55e;
-  --sidebar-primary-foreground: #052e16;
-  --sidebar-accent: #161616;
-  --sidebar-accent-foreground: #22c55e;
-  --sidebar-border: #262626;
-  --sidebar-ring: #22c55e;
+  --border: #1d4a3e;
+  --input: #1d4a3e;
+  --ring: #d6ae62;
+  --chart-1: #d6ae62;
+  --chart-2: #7ba892;
+  --chart-3: #e2c78b;
+  --chart-4: #548572;
+  --chart-5: #a7c5b4;
+  --radius: 0.625rem;
+  --sidebar: #0b231d;
+  --sidebar-foreground: #a7c5b4;
+  --sidebar-primary: #d6ae62;
+  --sidebar-primary-foreground: #0b231d;
+  --sidebar-accent: #173f35;
+  --sidebar-accent-foreground: #e2c78b;
+  --sidebar-border: #173f35;
+  --sidebar-ring: #d6ae62;
 }
 
 @layer base {

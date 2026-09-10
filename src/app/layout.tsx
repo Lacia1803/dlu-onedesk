@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Be_Vietnam_Pro } from "next/font/google";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -15,9 +15,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const beVietnamPro = Be_Vietnam_Pro({
+  variable: "--font-be-vietnam",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin", "vietnamese"],
+});
+
 export const metadata: Metadata = {
-  title: "DLU OneDesk - ĐH Đà Lạt",
-  description: "Hệ thống hỗ trợ kỹ thuật - Trung tâm CNTT - Trường Đại học Đà Lạt",
+  title: "DLU OneDesk — Hỗ trợ kỹ thuật phòng máy · Đại học Đà Lạt",
+  description: "DLU OneDesk — hệ thống tiếp nhận và xử lý yêu cầu hỗ trợ kỹ thuật phòng máy. Đồ án thực tập tại Trường Đại học Đà Lạt.",
 };
 
 export default function RootLayout({
@@ -31,7 +37,7 @@ export default function RootLayout({
       suppressHydrationWarning
       data-darkreader-mode="disabled"
       data-darkreader-auto-scheme="disabled"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>

@@ -17,6 +17,7 @@ import {
   MessagesSquare,
   Gauge,
   Bell,
+  Trees,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -43,35 +44,37 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="hidden border-r border-border bg-sidebar md:block md:w-60">
+    <div className="hidden border-r border-sidebar-border bg-sidebar md:block md:w-60">
       <div className="flex h-full max-h-screen flex-col">
-        <div className="flex h-14 items-center border-b border-border px-5">
-          <Link href="/dashboard" className="flex items-center gap-2 font-mono text-sm font-semibold text-primary tracking-wide">
-            <Monitor className="h-5 w-5" />
-            ONEDESK
+        <div className="flex h-14 items-center border-b border-sidebar-border px-5">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-extrabold tracking-tight text-sidebar-foreground">
+            <span className="grid size-8 place-items-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+              <Trees className="h-4.5 w-4.5" />
+            </span>
+            DLU <span className="text-sidebar-primary">OneDesk</span>
           </Link>
         </div>
-        <nav className="flex-1 overflow-auto px-3 py-4 space-y-0.5">
+        <nav className="flex-1 overflow-auto px-3 py-4 space-y-1">
           {routes.map((route) =>
             route.show ? (
               <Link
                 key={route.href}
                 href={route.href}
                 className={cn(
-                  "flex items-center gap-3 border-l-2 px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-all",
+                  "flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-semibold transition-all",
                   (pathname.startsWith(route.href) && route.href !== "/dashboard") || pathname === route.href
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
                 )}
               >
-                <route.icon className="h-3.5 w-3.5" />
+                <route.icon className="h-4 w-4" />
                 {route.label}
               </Link>
             ) : null
           )}
         </nav>
-        <div className="border-t border-border px-5 py-3 font-mono text-[10px] text-muted-foreground">
-          <span className="text-primary">●</span> SYSTEM ONLINE
+        <div className="border-t border-sidebar-border px-5 py-3 text-[10.5px] font-semibold tracking-wide text-sidebar-foreground/60">
+          <span className="text-sidebar-primary">●</span> SYSTEM ONLINE
         </div>
       </div>
     </div>

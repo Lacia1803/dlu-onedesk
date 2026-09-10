@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 lg:h-[60px] lg:px-6">
@@ -38,9 +40,9 @@ export function Header() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel className="font-mono text-xs">{session?.user?.email ?? "unknown"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/settings")}>
               <User className="mr-2 h-4 w-4" />
-              <span>Hồ sơ</span>
+              <span>Hồ sơ / Cài đặt</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut()}>
