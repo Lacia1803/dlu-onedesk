@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, QrCode } from "lucide-react";
 import { DeleteDeviceButton } from "@/components/devices/delete-device-button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -78,8 +79,11 @@ export default async function DevicesPage() {
           <TableBody>
             {devices.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  Không có dữ liệu thiết bị
+                <TableCell colSpan={5} className="py-12">
+                  <EmptyState
+                    title="Không có dữ liệu thiết bị"
+                    description="Hiện chưa có thiết bị nào được ghi nhận."
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -96,7 +100,7 @@ export default async function DevicesPage() {
                   <TableCell>{getStatusBadge(device.status)}</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/devices/${device.id}/edit`} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground" title="Chỉnh sửa">
+                      <Link href={`/dashboard/devices/${device.id}/edit`} aria-label="Chỉnh sửa thiết bị" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}

@@ -167,7 +167,7 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
                     <button
                       key={`log-${log.id}`}
                       onClick={() => setSelectedLog(log)}
-                      className="w-full text-left truncate text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 text-foreground transition-colors flex items-center gap-1 border border-primary/20"
+                      className="w-full text-left truncate text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 text-foreground transition-colors flex items-center gap-1 border border-primary/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Wrench className="h-3 w-3 shrink-0 text-primary" />
                       <span className="truncate">{log.device.name}: {log.type}</span>

@@ -149,7 +149,7 @@ export function TicketImageUploader({
                   e.stopPropagation();
                   handleRemove(idx);
                 }}
-                className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 text-white hover:bg-destructive flex items-center justify-center transition-colors"
+                className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 text-white hover:bg-destructive flex items-center justify-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 title="Xóa ảnh"
               >
                 <X className="h-3 w-3" />

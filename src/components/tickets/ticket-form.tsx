@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Lightbulb } from "lucide-react";
 import { TicketImageUploader } from "@/components/tickets/ticket-image-uploader";
+import { ErrorSummary } from "@/components/ui/error-summary";
 
 interface DeviceOption {
   id: string;
@@ -65,6 +66,13 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
     },
   });
 
+  const errorSummary = {
+    title: errors.title,
+    category: errors.category,
+    priority: errors.priority,
+    description: errors.description,
+  };
+
   const title = watch("title");
   const images = watch("images") || [];
 
@@ -95,10 +103,11 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-card p-6 rounded-lg border">
+      <ErrorSummary errors={errorSummary} />
       <div className="space-y-2">
         <Label htmlFor="title">Tiêu đề (Tóm tắt sự cố) *</Label>
-        <Input id="title" {...register("title")} placeholder="VD: Máy tính không lên nguồn" />
-        {errors.title && <p className="text-sm text-destructive">{errors.title?.message as string}</p>}
+        <Input id="title" aria-invalid={!!errors.title} aria-describedby={errors.title ? "title-error" : undefined} {...register("title")} placeholder="VD: Máy tính không lên nguồn" />
+        {errors.title && <p id="title-error" role="alert" className="text-sm text-destructive">{errors.title?.message as string}</p>}
       </div>
 
       {suggestedFaqs.length > 0 && (
@@ -148,7 +157,7 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
               ))}
             </SelectContent>
           </Select>
-          {errors.category && <p className="text-sm text-destructive">{errors.category?.message as string}</p>}
+          {errors.category && <p id="category-error" role="alert" className="text-sm text-destructive">{errors.category?.message as string}</p>}
         </div>
 
         <div className="space-y-2">
@@ -163,7 +172,7 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
               ))}
             </SelectContent>
           </Select>
-          {errors.priority && <p className="text-sm text-destructive">{errors.priority?.message as string}</p>}
+          {errors.priority && <p id="priority-error" role="alert" className="text-sm text-destructive">{errors.priority?.message as string}</p>}
         </div>
       </div>
 
@@ -184,8 +193,8 @@ export function TicketForm({ devices, initialDeviceId, faqs = [] }: TicketFormPr
 
       <div className="space-y-2">
         <Label htmlFor="description">Mô tả chi tiết *</Label>
-        <Textarea id="description" {...register("description")} rows={5} placeholder="Mô tả rõ tình trạng bạn đang gặp phải..." />
-        {errors.description && <p className="text-sm text-destructive">{errors.description?.message as string}</p>}
+        <Textarea id="description" aria-invalid={!!errors.description} aria-describedby={errors.description ? "description-error" : undefined} {...register("description")} rows={5} placeholder="Mô tả rõ tình trạng bạn đang gặp phải..." />
+        {errors.description && <p id="description-error" role="alert" className="text-sm text-destructive">{errors.description?.message as string}</p>}
       </div>
 
       <div className="space-y-2">

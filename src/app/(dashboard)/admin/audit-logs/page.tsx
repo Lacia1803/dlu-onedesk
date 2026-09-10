@@ -7,6 +7,7 @@ import { vi } from "date-fns/locale";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -105,8 +106,8 @@ export default async function AdminAuditLogsPage({
           <TableBody>
             {logs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  Chưa có nhật ký hoạt động nào.
+                <TableCell colSpan={5} className="py-12">
+                  <EmptyState title="Chưa có nhật ký hoạt động nào" description="Hệ thống chưa ghi nhận hoạt động nào trong khoảng thời gian này." />
                 </TableCell>
               </TableRow>
             ) : (

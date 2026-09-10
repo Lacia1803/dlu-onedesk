@@ -131,7 +131,7 @@ export default function NotificationCenter() {
             key={f}
             title={typeTooltip[f] ?? f}
             onClick={() => changeFilter(f)}
-            className={`px-3 py-1 rounded ${filter === f ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+            className={`px-3 py-1.5 rounded text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${filter === f ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/70"}`}
           >
             {typeLabel[f]}
           </button>
@@ -157,7 +157,7 @@ export default function NotificationCenter() {
                 </span>
                 <button
                   onClick={() => handleDelete(n.id)}
-                  className="text-xs text-muted-foreground hover:text-destructive"
+                  className="inline-flex size-7 items-center justify-center rounded text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 outline-none focus-visible:ring-2 focus-visible:ring-destructive"
                   aria-label="Xóa thông báo"
                 >
                   ✕

@@ -8,6 +8,7 @@ import { FaqApproveButtons } from "@/components/faq/faq-approve-button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -56,8 +57,8 @@ export default async function ManageFaqPage() {
           <TableBody>
             {faqs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  Chưa có dữ liệu FAQ
+                <TableCell colSpan={5} className="py-12">
+                  <EmptyState title="Chưa có dữ liệu FAQ" description="Hiện chưa có bài viết nào trong cẩm nang hỗ trợ." />
                 </TableCell>
               </TableRow>
             ) : (

@@ -33,7 +33,11 @@ export function DeleteDeviceButton({ id }: { id: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90" title="Xóa thiết bị">
+      <DialogTrigger
+        className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+        aria-label="Xóa thiết bị"
+        title="Xóa thiết bị"
+      >
         <Trash2 className="h-4 w-4" />
       </DialogTrigger>
       <DialogContent>

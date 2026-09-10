@@ -92,7 +92,7 @@ export function ExportButton() {
     <DropdownMenu>
       <DropdownMenuTrigger
         disabled={loading}
-        className="inline-flex h-9 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 outline-none"
+        className="inline-flex h-9 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1"
       >
         <Download className="mr-2 h-4 w-4" />
         {loading ? "Đang xuất..." : "Xuất báo cáo"}

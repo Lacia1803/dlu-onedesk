@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { DeleteButton } from "./delete-button";
 import {
   Table,
@@ -50,8 +51,11 @@ export default async function RoomsPage() {
           <TableBody>
             {rooms.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                  Không có dữ liệu phòng máy
+                <TableCell colSpan={4} className="py-12">
+                  <EmptyState
+                    title="Không có dữ liệu phòng máy"
+                    description="Hiện tại chưa có phòng máy nào trong hệ thống."
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -66,7 +70,7 @@ export default async function RoomsPage() {
                   <TableCell>{room.capacity} máy</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/rooms/${room.id}/edit`} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground" title="Chỉnh sửa">
+                      <Link href={`/dashboard/rooms/${room.id}/edit`} aria-label="Chỉnh sửa phòng máy" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}

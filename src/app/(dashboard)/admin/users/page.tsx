@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Search, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -95,8 +96,8 @@ export default async function AdminUsersPage({
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  Không có người dùng nào.
+                <TableCell colSpan={5} className="py-12">
+                  <EmptyState title="Không có người dùng nào" description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc." />
                 </TableCell>
               </TableRow>
             ) : (

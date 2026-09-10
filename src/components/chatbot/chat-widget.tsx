@@ -13,6 +13,19 @@ interface Message {
   text: string;
 }
 
+/* ponytail: chỉ parse [text](url) nội bộ bot sinh ra; đổi sang react-markdown khi cần full markdown */
+function renderBotText(text: string) {
+  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+    const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (!m) return part;
+    return (
+      <a key={i} href={m[2]} className="underline underline-offset-2 font-semibold">
+        {m[1]}
+      </a>
+    );
+  });
+}
+
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -68,13 +81,14 @@ export function ChatWidget() {
           isOpen && "bg-destructive hover:bg-destructive/90"
         )}
         size="icon"
+        aria-label={isOpen ? "Đóng trợ lý AI" : "Mở trợ lý AI"}
       >
         {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </Button>
 
       {/* Chat window */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-[380px] max-h-[520px] z-50 shadow-2xl flex flex-col">
+        <Card className="fixed bottom-24 right-6 w-[min(380px,calc(100vw-3rem))] max-h-[520px] z-50 shadow-2xl flex flex-col">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Bot className="h-5 w-5 text-primary" />
@@ -100,13 +114,13 @@ export function ChatWidget() {
                   )}
                   <div
                     className={cn(
-                      "rounded-lg px-3 py-2 text-sm max-w-[280px] whitespace-pre-wrap",
+                      "rounded-lg px-3 py-2 text-sm max-w-[280px] whitespace-pre-wrap break-words",
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
                     )}
                   >
-                    {msg.text}
+                    {msg.role === "model" ? renderBotText(msg.text) : msg.text}
                   </div>
                   {msg.role === "user" && (
                     <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
@@ -155,6 +169,7 @@ export function ChatWidget() {
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading}
                 size="icon"
+                aria-label="Gửi tin nhắn"
               >
                 <Send className="h-4 w-4" />
               </Button>

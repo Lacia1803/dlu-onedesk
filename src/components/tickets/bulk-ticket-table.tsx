@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { bulkUpdateTickets, assignTicketToMe, autoAssignTicket } from "@/app/actions/ticket-actions";
 import { CheckCheck, XSquare } from "lucide-react";
 
@@ -191,8 +192,11 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
           <TableBody>
             {tickets.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isUser ? 6 : 9} className="text-center py-6 text-muted-foreground font-mono text-xs">
-                  Không có dữ liệu ticket
+                <TableCell colSpan={isUser ? 6 : 9} className="py-12">
+                  <EmptyState
+                    title="Không có dữ liệu ticket"
+                    description="Hiện chưa có yêu cầu hỗ trợ nào trong danh sách."
+                  />
                 </TableCell>
               </TableRow>
             ) : (

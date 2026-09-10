@@ -56,7 +56,7 @@ export function TicketActionsMenu({ ticket, technicians, isTech }: TicketActions
     <div className="flex gap-2 items-center flex-wrap">
       {/* Assignee */}
       <DropdownMenu>
-        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none" disabled={loading || ticket.status === "CLOSED"}>
+        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background" disabled={loading || ticket.status === "CLOSED"}>
           Người xử lý: {ticket.assignee?.name || "Chưa chọn"}
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -73,7 +73,7 @@ export function TicketActionsMenu({ ticket, technicians, isTech }: TicketActions
 
       {/* Status */}
       <DropdownMenu>
-        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none" disabled={loading}>
+        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background" disabled={loading}>
           Trạng thái: {ticket.status}
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -91,7 +91,7 @@ export function TicketActionsMenu({ ticket, technicians, isTech }: TicketActions
 
       {/* Priority */}
       <DropdownMenu>
-        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none" disabled={loading || ticket.status === "CLOSED"}>
+        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background" disabled={loading || ticket.status === "CLOSED"}>
           Mức độ: {ticket.priority}
         </DropdownMenuTrigger>
         <DropdownMenuContent>

@@ -61,7 +61,7 @@ export function Sidebar() {
                 key={route.href}
                 href={route.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-semibold transition-all",
+                  "flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
                   (pathname.startsWith(route.href) && route.href !== "/dashboard") || pathname === route.href
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"

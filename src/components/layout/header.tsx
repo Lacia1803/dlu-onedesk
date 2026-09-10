@@ -29,7 +29,7 @@ export function Header() {
         <ThemeToggle />
         <NotificationBell />
         <DropdownMenu>
-          <DropdownMenuTrigger className="rounded-full outline-none">
+          <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary border border-border hover:bg-secondary/80">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />

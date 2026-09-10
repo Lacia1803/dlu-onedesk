@@ -40,4 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.docker
-.impeccable/\n.playwright-mcp/\ndesktop.png\nmobile.png\n
+.impeccable/
+.playwright-mcp/
+*.png

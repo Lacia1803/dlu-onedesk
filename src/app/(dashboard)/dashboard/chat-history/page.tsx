@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getMyChatLogs } from "@/app/actions/chatbot-actions";
 import { format } from "date-fns";
 import { Bot, User } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +24,8 @@ export default async function ChatHistoryPage() {
       </div>
 
       {logs.length === 0 ? (
-        <div className="rounded-sm border bg-card p-8 text-center text-muted-foreground font-mono text-xs">
-          Chưa có cuộc trò chuyện nào
+        <div className="rounded-sm border bg-card px-4">
+          <EmptyState title="Chưa có cuộc trò chuyện nào" description="Bắt đầu chat với trợ lý AI để được gợi ý khắc phục sự cố." />
         </div>
       ) : (
         <div className="space-y-4">

@@ -31,6 +31,7 @@
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
 ## Recently Completed (đợt nâng cấp chất lượng & UX/UI — 2026-09-10)
+- [x] Nâng cấp UI/UX & Accessibility toàn diện: Thêm `EmptyState` component cho toàn bộ các trang danh sách rỗng, tạo `TableSkeleton` & `Skeleton` kèm file `loading.tsx` cho Next.js App Router, thêm `ErrorSummary` & ARIA-alert cho form validation, bổ sung `aria-label` & focus-visible ring cho toàn bộ icon-button/links (delete/edit), thêm CI workflow (`.github/workflows/ci.yml`), viết unit test mới (`ui-helpers.test.mjs`, 21/21 pass tổng).
 - [x] Sửa ảnh giao diện Landing Page: Thay thế toàn bộ hand-coded mockup trong `mockups.tsx` bằng ảnh chụp thực tế hệ thống (`realDashboard`, `realTickets`, `realDevices`, `realFaq`, `realKpi`).
 - [x] Tăng tương phản WCAG AA & Accessibility: Nâng tông `text-gold-500`/`text-gold-600` thành `text-gold-700` trên nền sáng (tỷ lệ tương phản 5.73:1), thêm focus ring (`focus-visible:ring-2`) cho toàn bộ nút thao tác chính/phụ & modal close, tăng kích thước nút menu di động lên `size-11` (44px touch target).
 - [x] Xử lý tràn ngang di động (Mobile Overflow): Thêm `overflow-x: hidden` cho root landing page (`index.css`), điều chỉnh vị trí blob trang trí để triệt tiêu scroll ngang ở màn hình 375px/390px.

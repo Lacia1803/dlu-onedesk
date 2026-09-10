@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Plus, Edit } from "lucide-react";
 import { DeleteButton } from "@/components/software/delete-button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -50,8 +51,8 @@ export default async function SoftwarePage() {
           <TableBody>
             {softwareList.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  Chưa có phần mềm nào
+                <TableCell colSpan={5} className="py-12">
+                  <EmptyState title="Chưa có phần mềm nào" description="Hiện chưa có phần mềm nào được ghi nhận." />
                 </TableCell>
               </TableRow>
             ) : (
@@ -67,7 +68,7 @@ export default async function SoftwarePage() {
                   <TableCell>{sw._count.devices} máy</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/software/${sw.id}/edit`} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground" title="Chỉnh sửa">
+                      <Link href={`/dashboard/software/${sw.id}/edit`} aria-label="Chỉnh sửa phần mềm" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}
