@@ -52,18 +52,19 @@ export default function NotificationCenter() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [stats, setStats] = useState<{ unread: number; openTickets: number; pendingFaqs: number } | null>(null);
 
   async function fetchNotifications() {
-    const res = await fetch(`/api/notifications?filter=${filter}&page=${page}`);
+    const res = await fetch(`/api/notifications?filter=${filter}&page=${page}&stats=true`);
     if (res.ok) {
       const data = await res.json();
-      // Tương thích ngược: API cũ trả mảng, API mới trả {items,...}
       if (Array.isArray(data)) {
         setNotifications(data);
         setTotalPages(0);
       } else {
         setNotifications(data.items);
         setTotalPages(data.totalPages);
+        if (data.stats) setStats(data.stats);
       }
     }
   }
@@ -106,6 +107,24 @@ export default function NotificationCenter() {
           Đánh dấu tất cả đã đọc
         </Button>
       </div>
+
+      {stats && (
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="border rounded-lg p-4 bg-card">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Chưa đọc</p>
+            <p className="text-2xl font-bold mt-1">{stats.unread}</p>
+          </div>
+          <div className="border rounded-lg p-4 bg-card">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Ticket chờ xử lý</p>
+            <p className="text-2xl font-bold mt-1">{stats.openTickets}</p>
+          </div>
+          <div className="border rounded-lg p-4 bg-card">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">FAQ chờ duyệt</p>
+            <p className="text-2xl font-bold mt-1">{stats.pendingFaqs}</p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-4 flex gap-2 flex-wrap">
         {Object.keys(typeLabel).map((f) => (
           <button

@@ -54,6 +54,19 @@ export async function getAllNotifications(
   return { items, total, page: p, pageSize, totalPages: Math.ceil(total / pageSize) };
 }
 
+export async function getNotificationStats() {
+  const session = await getServerSession(authOptions);
+  if (!session) return { unread: 0, openTickets: 0, pendingFaqs: 0 };
+
+  const [unread, openTickets, pendingFaqs] = await Promise.all([
+    db.notification.count({ where: { userId: session.user.id, isRead: false } }),
+    db.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } }),
+    db.faq.count({ where: { isActive: false } }),
+  ]);
+
+  return { unread, openTickets, pendingFaqs };
+}
+
 export async function deleteNotification(id: string) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false };

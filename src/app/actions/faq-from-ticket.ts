@@ -5,11 +5,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyAdmins } from "@/lib/notifications";
+import { rateLimit } from "@/lib/cache";
 
 export async function createFaqDraftFromTicket(ticketId: string) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     return { success: false, error: "Không có quyền thao tác." };
+  }
+
+  if (!rateLimit(`${session.user.id}:faq-draft`, 10, 60 * 1000)) {
+    return { success: false, error: "Quá nhiều yêu cầu tạo FAQ, vui lòng chờ 1 phút." };
   }
 
   const ticket = await db.ticket.findUnique({

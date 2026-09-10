@@ -7,10 +7,16 @@ import { revalidatePath } from "next/cache";
 import { notifyUsers } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
 
+import { rateLimit } from "@/lib/cache";
+
 export async function mergeTickets(targetTicketId: string, duplicateTicketIds: string[]) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     return { success: false, error: "Không có quyền gộp ticket." };
+  }
+
+  if (!rateLimit(`${session.user.id}:merge`, 10, 60 * 1000)) {
+    return { success: false, error: "Quá nhiều yêu cầu gộp ticket, vui lòng chờ 1 phút." };
   }
 
   if (!duplicateTicketIds || duplicateTicketIds.length === 0) {
