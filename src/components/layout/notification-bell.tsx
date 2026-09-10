@@ -81,7 +81,7 @@ export function NotificationBell() {
         )}
         <span className="sr-only">Thông báo</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="end" className="w-[min(20rem,90vw)]">
         <div className="flex items-center justify-between px-2 py-1.5">
           <DropdownMenuLabel className="p-0">Thông báo mới</DropdownMenuLabel>
           {notifications.length > 0 && (

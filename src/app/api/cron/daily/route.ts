@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { logAudit } from "@/lib/audit";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
-import { sendSlack } from "@/lib/webhook";
+import { sendAlert } from "@/lib/webhook";
 import { computeSlaDeadline, computeResponseDeadline, periodForCycle } from "@/lib/ticket-actions";
 import { MaintenanceCycle, TicketStatus } from "@prisma/client";
 
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       "/dashboard/maintenance",
       "MAINTENANCE"
     );
-    await sendSlack(`🛠 *Đến hạn bảo trì định kỳ*\nPhòng: ${plan.room.name}\nChu kỳ: ${period}`);
+    await sendAlert("[DLU OneDesk] Đến hạn bảo trì định kỳ", `Phòng: ${plan.room.name}\nChu kỳ: ${period}`);
   }
 
   // ---------- 2 & 3. Cảnh báo SLA leo thang ----------
@@ -91,7 +91,10 @@ export async function GET(req: NextRequest) {
         `/dashboard/tickets/${t.id}`,
         "SLA_WARNING"
       );
-      await sendSlack(`🚨 *SLA quá hạn!* Ticket #${t.id.slice(-6).toUpperCase()} (${t.priority}) - Assignee: ${t.assignee?.name || "N/A"}`);
+      await sendAlert(
+        "[DLU OneDesk] SLA quá hạn",
+        `Ticket #${t.id.slice(-6).toUpperCase()} (${t.priority}) - Assignee: ${t.assignee?.name || "N/A"}`
+      );
       escalated++;
     } else if (remaining < total * 0.25 && t.assignee) {
       // Sắp hết hạn (<25% thời gian còn lại) → nhắc tech được gán
