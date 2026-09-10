@@ -30,6 +30,15 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt Enterprise Improvements + UX bổ sung — 2026-09-11)
+- [x] Nhóm 1 (Security & RBAC): `src/proxy.ts` — Next.js 16 Proxy bảo vệ route theo role (ADMIN_ONLY, STAFF_WRITE, redirect login kèm callbackUrl); cron endpoints (`/api/cron/daily`, `/api/cron/overdue`) chuyển sang fail-closed (401 khi thiếu/sai `CRON_SECRET`); CSAT rating chỉ creator của ticket được gửi.
+- [x] Nhóm 2 (Account Lifecycle & Self-service): form đổi mật khẩu trong `/settings` (`changePassword` action + `password.ts` schema); Admin reset mật khẩu trong `/admin/users` (`adminResetPassword`, sinh mật khẩu tạm, set `mustChangePassword`); banner `FirstLoginBanner` cảnh báo trên dashboard khi tài khoản còn dùng mật khẩu mặc định/import.
+- [x] Nhóm 3 (DB & Performance): Prisma `@@index` cho Ticket (creatorId/assigneeId/status+slaDeadline/roomId), Device, Notification (userId+isRead), AuditLog; server-side pagination + search URL params cho Users, Audit Logs, Rooms, Software; Docker volume `upload_data:/app/public/uploads`.
+- [x] Nhóm 4 (Chuẩn hóa & SLA giờ hành chính): `computeSlaDeadline`/`computeResponseDeadline` tính theo giờ làm việc TTTT (07:30–11:30 & 13:00–17:00, T2–T6; nhảy giờ nghỉ trưa, ngoài giờ, cuối tuần); update `tests/sla.test.mjs` theo thuật toán mới — 21/21 pass; `tsc --noEmit` + `npm run build` pass.
+- [x] Mobile UX: `MobileNav` (Sheet drawer trái, `md:hidden`) trong Header + `src/lib/nav-items.ts` dùng chung routes cho Sidebar/MobileNav theo role.
+- [x] Pagination Tickets & Devices: `PaginationControls` URL-driven (?page=&q=&status=&priority=) cho `/dashboard/tickets` và `/dashboard/devices` (PAGE_SIZE 20, skip/take + count).
+- [x] Realtime SSE: event bus `src/lib/sse.ts` (EventEmitter, single-instance) + route `/api/notifications/sse` (ReadableStream, keepalive 20s, cleanup abort); `notifyUsers`/`notifyAdminsAndTechs` emit sau khi tạo notification; `notification-bell.tsx` kết nối `EventSource` (toast "Thông báo mới" + re-fetch), giữ polling 15s làm fallback.
+
 ## Recently Completed (đợt hoàn thiện 4 nhóm tính năng nâng cao — 2026-09-11)
 - [x] Nhóm 1 (Hạ tầng): Gộp `src/lib/rate-limit.ts` vào `src/lib/cache.ts` trả `{allowed}`, bổ sung Upstash Redis REST fallback khi có env, tạo `src/lib/storage.ts` chuẩn hóa upload, cập nhật các route avatar/tickets/register.
 - [x] Nhóm 2 (UX/UI): Tối ưu polling notification trong `notification-bell.tsx` qua `visibilitychange` (ngừng poll khi ẩn tab), xác nhận Dark Mode hoạt động trơn tru.

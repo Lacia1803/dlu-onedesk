@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getUnreadNotifications, markAsRead, markAllAsRead } from "@/app/actions/notification-actions";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   DropdownMenu,
@@ -57,6 +58,7 @@ export function NotificationBell() {
       es = new EventSource("/api/notifications/sse");
       es.onmessage = () => {
         fetchNotifications();
+        toast.info("Thông báo mới");
       };
     } catch (e) {
       // EventSource fail gracefully
