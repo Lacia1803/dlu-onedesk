@@ -24,7 +24,7 @@ export async function notifyUsers(
 
   // Emit SSE events for each recipient
   userIds.forEach((userId) => {
-    notifBus.emit(`notif:${userId}`, { title, message, linkUrl, type });
+    notifBus.publish(`notif:${userId}`, { title, message, linkUrl, type });
   });
 }
 
@@ -44,7 +44,7 @@ export async function notifyAdminsAndTechs(
   const userIds = users.map((u) => u.id);
   await notifyUsers(userIds, title, message, linkUrl, type);
   // Also emit to generic staff channel
-  notifBus.emit("notif:staff", { title, message, linkUrl, type });
+  notifBus.publish("notif:staff", { title, message, linkUrl, type });
 }
 
 export async function notifyAdmins(

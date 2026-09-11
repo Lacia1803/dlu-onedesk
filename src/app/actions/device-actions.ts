@@ -176,6 +176,21 @@ export async function deleteDevice(id: string) {
   if (!session)
     return { success: false, error: "Chỉ Admin mới có quyền xóa thiết bị." };
 
+  // Ràng buộc toàn vẹn: Không cho xóa nếu thiết bị đang có ticket chưa xử lý xong
+  const activeTickets = await db.ticket.count({
+    where: {
+      deviceId: id,
+      status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] },
+    },
+  });
+
+  if (activeTickets > 0) {
+    return {
+      success: false,
+      error: "Không thể xóa. Thiết bị đang có sự cố đang được xử lý (chưa đóng).",
+    };
+  }
+
   await db.device.update({
     where: { id },
     data: { deletedAt: new Date() },

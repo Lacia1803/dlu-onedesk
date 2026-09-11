@@ -21,9 +21,9 @@ export async function GET(req: Request) {
         controller.enqueue(new TextEncoder().encode(payload));
       };
 
-      notifBus.on(`notif:${userId}`, listener);
+      const unsubs = [notifBus.subscribe(`notif:${userId}`, listener)];
       if (isStaff) {
-        notifBus.on("notif:staff", listener);
+        unsubs.push(notifBus.subscribe("notif:staff", listener));
       }
 
       // Send initial keepalive ping
@@ -34,10 +34,7 @@ export async function GET(req: Request) {
       }, 20000);
 
       req.signal.addEventListener("abort", () => {
-        notifBus.off(`notif:${userId}`, listener);
-        if (isStaff) {
-          notifBus.off("notif:staff", listener);
-        }
+        unsubs.forEach((unsub) => unsub());
         clearInterval(pingInterval);
       });
     },

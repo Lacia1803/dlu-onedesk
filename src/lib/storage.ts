@@ -24,11 +24,43 @@ function getSafeExt(file: File): string {
   return ext;
 }
 
-function validate(file: File): void {
+/**
+ * Kiểm tra file signature (magic bytes) cấp thấp.
+ * Chặn Postman hoặc script sửa Content-Type để gửi file độc hại (JS, PHP, SVG,...).
+ */
+async function validateMagicBytes(file: File): Promise<void> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  if (buffer.length < 12) {
+    throw new Error(`File quá nhỏ để chứa dữ liệu ảnh hợp lệ.`);
+  }
+
+  // Chuyển 4 hoặc 12 byte đầu thành chuỗi Hex
+  const hex4 = buffer.subarray(0, 4).toString("hex").toUpperCase();
+  const hex12 = buffer.subarray(0, 12).toString("hex").toUpperCase();
+
+  const isJPEG = hex4.startsWith("FFD8FF");
+  const isPNG = hex4 === "89504E47";
+  // WEBP bắt đầu bằng RIFF, byte 8-11 là WEBP
+  const isWEBP = hex12.startsWith("52494646") && hex12.substring(16, 24) === "57454250";
+
+  if (!isJPEG && !isPNG && !isWEBP) {
+    throw new Error(`Phát hiện gian lận Header: Dữ liệu thực tế không phải ảnh JPEG/PNG/WEBP hợp lệ.`);
+  }
+
+  // Đối chiếu Magic Bytes với Header file.type
+  const ext = MIME_TO_EXT[file.type];
+  if (ext === ".jpg" && !isJPEG) throw new Error("Header JPEG nhưng dữ liệu không phải JPEG.");
+  if (ext === ".png" && !isPNG) throw new Error("Header PNG nhưng dữ liệu không phải PNG.");
+  if (ext === ".webp" && !isWEBP) throw new Error("Header WEBP nhưng dữ liệu không phải WEBP.");
+}
+
+async function validate(file: File): Promise<void> {
   getSafeExt(file); // Throws if file.type is not allowed
   if (file.size > MAX_SIZE) {
     throw new Error(`File ${file.name} vượt quá dung lượng tối đa 5MB.`);
   }
+  await validateMagicBytes(file);
 }
 
 /**
@@ -88,7 +120,7 @@ async function saveRemote(file: File, subdir: string): Promise<string> {
  * File serverless (Vercel/Render) không có filesystem persistent → dùng s3/r2.
  */
 export async function saveUpload(file: File, subdir: string): Promise<string> {
-  validate(file);
+  await validate(file);
   const driver = process.env.STORAGE_DRIVER || "local";
   if (driver === "s3" || driver === "r2") {
     return saveRemote(file, subdir);
