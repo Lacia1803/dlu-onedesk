@@ -41,6 +41,7 @@
 - [x] **Khắc phục cấu hình CI GitHub Actions**: Bổ sung bước `npx prisma generate` và cờ `--legacy-peer-deps` vào workflow `.github/workflows/ci.yml` và `pr.yml` giúp CI build & test tự động thông suốt.
 - [x] **Khắc phục triệt để cảnh báo ESLint**: Xử lý biến `disabled` trong `src/components/ui/button.tsx`, đưa dự án về trạng thái hoàn hảo 0 errors, 0 warnings.
 - [x] **Đồng bộ hóa 100% Repository**: Đã commit và push toàn bộ tài liệu, components, server actions và configuration lên GitHub.
+- [x] **Khắc phục ảnh sơ đồ kiến trúc bị cắt trong README**: Ảnh `docs/images/architecture-overview.png` trước đây là ảnh chụp theo viewport nên mất phần dưới (PostgreSQL, Prisma ORM, Nodemailer, Khách vãng lai). Đã chụp lại toàn trang (full-page, 3200x3450) để sơ đồ hiển thị đầy đủ trên GitHub.
 
 ## Recently Completed (đợt Khắc phục Lỗ hổng Bảo mật Nghiêm trọng & Lỗi nghiệp vụ — 2026-09-11)
 
