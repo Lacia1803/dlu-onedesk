@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getExportData } from "@/app/actions/dashboard-actions";
+import { getExportData, getExportWorkbook } from "@/app/actions/dashboard-actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, FileSpreadsheet, FileText, ChevronDown } from "lucide-react";
-import * as XLSX from "xlsx";
+import { downloadBase64File, downloadTextFile } from "@/lib/download";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -29,19 +29,29 @@ export function ExportButton() {
   }
 
   function downloadCsv(name: string, content: string) {
-    // ponytail: BOM cho Excel mở tiếng Việt đúng; bỏ khi chỉ dùng UTF-8 reader
-    const blob = new Blob(["﻿" + content], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadTextFile(name, content, "text/csv;charset=utf-8");
   }
 
   async function handleExport(formatType: "excel" | "csv") {
     try {
       setLoading(true);
+      const baseName = `BaoCao-ITHelpdesk-${format(new Date(), "yyyyMMdd")}`;
+
+      if (formatType === "excel") {
+        const file = await getExportWorkbook();
+        if (!file) {
+          toast.error("Không có quyền xuất dữ liệu");
+          return;
+        }
+        downloadBase64File(
+          file.filename,
+          file.base64,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        toast.success("Đã xuất báo cáo thành công");
+        return;
+      }
+
       const data = await getExportData();
 
       const devicesFormatted = data.devices.map((d) => ({
@@ -67,17 +77,8 @@ export function ExportButton() {
         "Ngày giải quyết": t.resolvedAt ? format(new Date(t.resolvedAt), "dd/MM/yyyy HH:mm") : "",
       }));
 
-      const filename = `BaoCao-ITHelpdesk-${format(new Date(), "yyyyMMdd")}`;
-
-      if (formatType === "csv") {
-        downloadCsv(`${filename}-ThietBi.csv`, toCsv(devicesFormatted));
-        downloadCsv(`${filename}-Tickets.csv`, toCsv(ticketsFormatted));
-      } else {
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(devicesFormatted), "Thiết bị");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ticketsFormatted), "Tickets");
-        XLSX.writeFile(wb, `${filename}.xlsx`);
-      }
+      downloadCsv(`${baseName}-ThietBi.csv`, toCsv(devicesFormatted));
+      downloadCsv(`${baseName}-Tickets.csv`, toCsv(ticketsFormatted));
       toast.success("Đã xuất báo cáo thành công");
     } catch (error) {
       console.error(error);

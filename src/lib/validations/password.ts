@@ -1,13 +1,10 @@
 import * as z from "zod";
+import { strongPasswordSchema } from "./auth";
 
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Nhập mật khẩu hiện tại"),
-    newPassword: z
-      .string()
-      .min(8, "Mật khẩu tối thiểu 8 ký tự")
-      .regex(/[A-Za-z]/, "Mật khẩu phải chứa ít nhất 1 chữ cái")
-      .regex(/\d/, "Mật khẩu phải chứa ít nhất 1 chữ số"),
+    newPassword: strongPasswordSchema,
     confirmPassword: z.string().min(1, "Xác nhận mật khẩu mới"),
   })
   .refine((data) => data.newPassword !== data.currentPassword, {

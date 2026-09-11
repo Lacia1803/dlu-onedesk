@@ -3,8 +3,9 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { rateLimit } from "@/lib/cache";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { DeviceType, DeviceStatus, Role, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
@@ -47,10 +48,89 @@ function toEnum<T extends Record<string, string>>(
 }
 
 async function parseWorkbook(file: File): Promise<RawRow[]> {
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const wb = XLSX.read(buffer, { type: "buffer" });
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json<RawRow>(sheet, { defval: "" });
+  if (file.name.toLowerCase().endsWith(".csv")) {
+    return parseCsv(await file.text());
+  }
+  const buffer = await file.arrayBuffer();
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(buffer);
+  const sheet = wb.worksheets[0];
+  if (!sheet) return [];
+
+  // Dòng 1 là header; các dòng sau map theo tên cột.
+  const headers: string[] = [];
+  const rows: RawRow[] = [];
+  sheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+    if (rowNumber === 1) {
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        headers[colNumber] = cellText(cell.value);
+      });
+      return;
+    }
+    const record: RawRow = {};
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      const key = headers[colNumber];
+      if (!key) return;
+      record[key] = cell.value as string | number | boolean | null | undefined;
+    });
+    rows.push(record);
+  });
+  return rows;
+}
+
+/** Parse CSV đơn giản (dòng 1 là header), hỗ trợ ô có dấu ngoặc kép và BOM. */
+function parseCsv(text: string): RawRow[] {
+  const clean = text.replace(/^﻿/, "");
+  const lines = clean.split(/\r?\n/).filter((l) => l.trim() !== "");
+  if (lines.length < 2) return [];
+
+  const parseLine = (line: string): string[] => {
+    const cells: string[] = [];
+    let cur = "";
+    let quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (quoted) {
+        if (ch === '"') {
+          if (line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else quoted = false;
+        } else cur += ch;
+      } else if (ch === '"') quoted = true;
+      else if (ch === "," || ch === ";") {
+        cells.push(cur);
+        cur = "";
+      } else cur += ch;
+    }
+    cells.push(cur);
+    return cells;
+  };
+
+  const headers = parseLine(lines[0]);
+  return lines.slice(1).map((line) => {
+    const cells = parseLine(line);
+    const record: RawRow = {};
+    headers.forEach((h, i) => {
+      record[h.trim()] = cells[i] ?? "";
+    });
+    return record;
+  });
+}
+
+/** Chuyển giá trị ô ExcelJS (có thể là object rich-text/công thức) thành text thuần. */
+function cellText(value: ExcelJS.CellValue): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") {
+    if (value instanceof Date) return value.toISOString();
+    if ("richText" in value && Array.isArray(value.richText)) {
+      return value.richText.map((r) => r.text).join("");
+    }
+    if ("text" in value && typeof value.text === "string") return value.text;
+    if ("result" in value) return cellText(value.result as ExcelJS.CellValue);
+    if ("hyperlink" in value) return String(value.text ?? value.hyperlink);
+  }
+  return String(value);
 }
 
 function genQrCode(): string {
@@ -74,7 +154,7 @@ export async function importDevices(formData: FormData): Promise<{
     };
   }
 
-  const { allowed } = rateLimit(`import:devices:${session.user.id}`, 5, 60_000);
+  const { allowed } = await rateLimit(`import:devices:${session.user.id}`, 5, 60_000);
   if (!allowed) {
     return {
       success: false,
@@ -101,7 +181,7 @@ export async function importDevices(formData: FormData): Promise<{
       success: false,
       inserted: 0,
       skipped: 0,
-      errors: [{ row: 0, message: "File không đọc được (phải là .xlsx/.xls/.csv)." }],
+      errors: [{ row: 0, message: "File không đọc được (phải là .xlsx hoặc .csv)." }],
     };
   }
 
@@ -194,8 +274,8 @@ export async function importUsers(formData: FormData): Promise<{
   skipped: number;
   errors: ImportRowError[];
 }> {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return {
       success: false,
       inserted: 0,
@@ -204,7 +284,7 @@ export async function importUsers(formData: FormData): Promise<{
     };
   }
 
-  const { allowed } = rateLimit(`import:users:${session.user.id}`, 5, 60_000);
+  const { allowed } = await rateLimit(`import:users:${session.user.id}`, 5, 60_000);
   if (!allowed) {
     return {
       success: false,
@@ -231,7 +311,7 @@ export async function importUsers(formData: FormData): Promise<{
       success: false,
       inserted: 0,
       skipped: 0,
-      errors: [{ row: 0, message: "File không đọc được (phải là .xlsx/.xls/.csv)." }],
+      errors: [{ row: 0, message: "File không đọc được (phải là .xlsx hoặc .csv)." }],
     };
   }
 

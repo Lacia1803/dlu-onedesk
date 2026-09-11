@@ -11,6 +11,7 @@ import {
 } from "@/lib/validations/device";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 
 export type MaintenanceLogWithDetails = {
@@ -171,8 +172,8 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
 }
 
 export async function deleteDevice(id: string) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN")
+  const session = await requireFreshAdmin();
+  if (!session)
     return { success: false, error: "Chỉ Admin mới có quyền xóa thiết bị." };
 
   await db.device.update({

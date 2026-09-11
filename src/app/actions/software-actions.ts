@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { softwareSchema, SoftwareFormValues } from "@/lib/validations/software";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 
 export async function createSoftware(data: SoftwareFormValues) {
@@ -66,8 +67,8 @@ export async function updateSoftware(id: string, data: SoftwareFormValues) {
 }
 
 export async function deleteSoftware(id: string) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Chỉ Admin mới có quyền xóa phần mềm." };
   }
 

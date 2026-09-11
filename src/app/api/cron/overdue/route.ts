@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { TicketStatus } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { logAudit } from "@/lib/audit";
 
@@ -18,13 +17,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, message: "SMTP not configured" }, { status: 200 });
   }
 
-  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  // Nhắc quá hạn theo ĐÚNG deadline SLA (không dùng mốc 3 ngày cố định),
+  // chỉ áp cho ticket đang xử lý và không bị tạm dừng SLA.
+  const now = new Date();
   const overdueTickets = await db.ticket.findMany({
-    where: { status: { not: TicketStatus.CLOSED }, createdAt: { lt: threeDaysAgo } },
+    where: {
+      status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] },
+      slaDeadline: { lt: now },
+      slaPausedAt: null,
+      maintenancePlanId: null,
+    },
     select: {
       id: true,
       title: true,
       createdAt: true,
+      slaDeadline: true,
       assignee: { select: { email: true, name: true } },
     },
   });
@@ -51,7 +58,7 @@ export async function GET(req: NextRequest) {
         from,
         to: t.assignee.email,
         subject: `[DLU OneDesk] Nhắc nhở ticket quá hạn: ${t.title}`,
-        text: `Ticket #${t.id.slice(-6).toUpperCase()} đã mở hơn 3 ngày chưa đóng.\nNgày tạo: ${t.createdAt.toLocaleString("vi-VN")}\nVui lòng truy cập hệ thống để cập nhật tiến độ.`,
+        text: `Ticket #${t.id.slice(-6).toUpperCase()} đã QUÁ HẠN SLA.\nHạn SLA: ${t.slaDeadline?.toLocaleString("vi-VN") ?? "N/A"}\nNgày tạo: ${t.createdAt.toLocaleString("vi-VN")}\nVui lòng truy cập hệ thống để cập nhật tiến độ.`,
       });
     })
   );

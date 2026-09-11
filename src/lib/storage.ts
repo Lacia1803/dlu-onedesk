@@ -9,6 +9,12 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/png": ".png",
   "image/webp": ".webp",
 };
+// Ánh xạ ngược: từ đuôi đã whitelist suy ra Content-Type (không tin client).
+const EXT_TO_MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
 
 function getSafeExt(file: File): string {
   const ext = MIME_TO_EXT[file.type];
@@ -65,7 +71,8 @@ async function saveRemote(file: File, subdir: string): Promise<string> {
       Bucket: S3_BUCKET,
       Key: key,
       Body: Buffer.from(await file.arrayBuffer()),
-      ContentType: file.type,
+      // Suy Content-Type từ đuôi đã whitelist, KHÔNG lấy từ client.
+      ContentType: EXT_TO_MIME[ext] ?? "application/octet-stream",
     })
   );
   const base = S3_ENDPOINT

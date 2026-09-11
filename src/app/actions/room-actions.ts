@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { roomSchema, RoomFormValues } from "@/lib/validations/room";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 
 export async function createRoom(data: RoomFormValues) {
@@ -44,8 +45,8 @@ export async function updateRoom(id: string, data: RoomFormValues) {
 }
 
 export async function deleteRoom(id: string) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Chỉ Admin mới có quyền xóa phòng máy." };
   }
 

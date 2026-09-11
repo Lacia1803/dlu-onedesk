@@ -41,7 +41,7 @@ export function ImportButton({ label, subdir }: ImportButtonProps) {
         <Upload className="h-4 w-4 mr-1" />
         {loading ? "Đang nhập..." : label}
       </Button>
-      <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleChange} />
+      <input type="file" accept=".xlsx,.csv" className="hidden" onChange={handleChange} />
     </label>
   );
 }

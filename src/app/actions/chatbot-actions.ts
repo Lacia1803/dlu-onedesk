@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { rateLimit } from "@/lib/cache";
+import { headers } from "next/headers";
 
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -40,10 +41,26 @@ export async function chatWithBot(
   messages: ChatMessage[]
 ): Promise<{ reply: string; shouldCreateTicket: boolean }> {
   try {
-    // Rate limit per user (10 requests/minute)
+    // Bắt buộc đăng nhập: chatbot gọi API Gemini tốn phí, không cho phép ẩn danh
+    // để tránh lạm dụng chi phí. Rate limit theo userId (10 yêu cầu/phút).
     const session = await getServerSession(authOptions);
-    const rateLimitKey = `chatbot:${session?.user?.id ?? "anon"}`;
-    const { allowed } = rateLimit(rateLimitKey, 10, 60_000);
+    if (!session) {
+      return {
+        reply: "Vui lòng đăng nhập để sử dụng trợ lý AI.",
+        shouldCreateTicket: false,
+      };
+    }
+
+    // Giới hạn thêm theo IP (phòng trường hợp nhiều tài khoản cùng một máy).
+    const h = await headers();
+    const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const ipLimit = await rateLimit(`chatbot:ip:${ip}`, 30, 60_000);
+    if (!ipLimit.allowed) {
+      return { reply: "Quá nhiều yêu cầu. Vui lòng thử lại sau.", shouldCreateTicket: false };
+    }
+
+    const rateLimitKey = `chatbot:${session.user.id}`;
+    const { allowed } = await rateLimit(rateLimitKey, 10, 60_000);
     if (!allowed) {
       return { reply: "Quá nhiều yêu cầu. Vui lòng thử lại sau.", shouldCreateTicket: false };
     }

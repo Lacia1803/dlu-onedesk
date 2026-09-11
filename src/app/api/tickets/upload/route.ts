@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Vui lòng đăng nhập." }, { status: 401 });
     }
 
-    const { allowed } = rateLimit(`upload:${session.user.id}`, 10, 60_000);
+    const { allowed } = await rateLimit(`upload:${session.user.id}`, 10, 60_000);
     if (!allowed) {
       return NextResponse.json(
         { success: false, error: "Tải lên quá nhanh. Thử lại sau." },

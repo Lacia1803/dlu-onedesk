@@ -9,8 +9,8 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict_Mode-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Unit Tests](https://img.shields.io/badge/Unit_Tests-37%2F37_Pass-success.svg)](#-kiểm-thử--đảm-bảo-chất-lượng)
-[![E2E Tests](https://img.shields.io/badge/E2E_Tests-19%2F19_Pass-success.svg)](#-kiểm-thử--đảm-bảo-chất-lượng)
+[![Unit Tests](https://img.shields.io/badge/Unit_Tests-40%2F40_Pass-success.svg)](#-kiểm-thử--đảm-bảo-chất-lượng)
+[![E2E Tests](https://img.shields.io/badge/E2E_Tests-20%2F20_Pass-success.svg)](#-kiểm-thử--đảm-bảo-chất-lượng)
 [![Security](https://img.shields.io/badge/Security-Hardened_AES--256--GCM-red.svg)](#-bảo-mật--an-toàn-hệ-thống)
 
 ---
@@ -212,7 +212,7 @@ dlu-onedesk/
 │   ├── HuongDan.md                 # Hướng dẫn sử dụng chi tiết từng vai trò
 │   └── images/                     # Ảnh sơ đồ kiến trúc hệ thống
 ├── prisma/                         # Schema CSDL
-│   └── schema.prisma               # Prisma Schema (8 models có index & cascade)
+│   └── schema.prisma               # Prisma Schema (16 models có index & cascade)
 ├── seed-data.js                    # Script nạp dữ liệu mẫu thực tế
 ├── scripts/                        # Script tự động hóa (Playwright screenshots)
 ├── src/
@@ -238,7 +238,7 @@ dlu-onedesk/
 │   │   ├── storage.ts              # Whitelist MIME file storage driver (Chống XSS)
 │   │   ├── ticket-actions.ts       # SLA calculator & State machine validator
 │   │   └── validations/            # Zod validation schemas
-│   └── middleware.ts               # Proxy RBAC Route Middleware
+│   └── proxy.ts                    # Proxy RBAC Route Middleware (thay thế middleware.ts)
 ├── public/screenshots/             # Ảnh chụp giao diện thực tế (Playwright)
 ├── tests/                          # Test Suite (Unit & E2E)
 ├── dlu-onesk-architecture.html     # Sơ đồ kiến trúc tương tác Archify HTML
@@ -251,7 +251,7 @@ dlu-onedesk/
 ## 🚀 Hướng dẫn Cài đặt & Khởi chạy Local (Getting Started)
 
 ### 1. Yêu cầu Tiền đề (Prerequisites)
-- **Node.js**: Phiên bản 20.x trở lên.
+- **Node.js**: Phiên bản 22.x trở lên.
 - **Database**: PostgreSQL 15+ (Local PostgreSQL hoặc Cloud PostgreSQL như Supabase, Neon.tech...).
 
 ### 2. Tải mã nguồn & Cài đặt Dependencies
@@ -359,18 +359,18 @@ npx tsc --noEmit
 # Kiểm tra Lỗi Code Style & Linter
 npm run lint
 
-# Chạy toàn bộ 37 Unit Tests
+# Chạy toàn bộ 40 Unit Tests
 npm run test:unit
 
-# Chạy toàn bộ 19 E2E Integration Tests
-node test-e2e-all.js
+# Chạy toàn bộ 20 E2E Integration Tests (Playwright)
+npm run test:e2e
 ```
 
 **Kết quả kiểm thử:**
 - ✅ TypeScript Compilation: `0 errors`
 - ✅ ESLint Code Style: `0 errors, 0 warnings`
-- ✅ Unit Test Suite: `37/37 passed`
-- ✅ E2E Integration Test Suite: `19/19 passed`
+- ✅ Unit Test Suite: `40/40 passed`
+- ✅ E2E Integration Test Suite (Playwright): `20/20 passed`
 - ✅ Production Build: Pass 100% trên Next.js Turbopack compiler.
 
 ---

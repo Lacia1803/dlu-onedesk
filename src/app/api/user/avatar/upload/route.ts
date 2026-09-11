@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   if (!session)
     return NextResponse.json({ success: false, error: "Vui lòng đăng nhập." }, { status: 401 });
 
-  const { allowed } = rateLimit(`avatar:${session.user.id}`, 5, 60_000);
+  const { allowed } = await rateLimit(`avatar:${session.user.id}`, 5, 60_000);
   if (!allowed)
     return NextResponse.json(
       { success: false, error: "Upload quá nhanh, thử lại sau." },

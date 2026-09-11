@@ -27,23 +27,27 @@ describe("In-memory cache", () => {
 });
 
 describe("Rate limiter", () => {
-  it("allows up to limit within window then blocks", () => {
+  it("allows up to limit within window then blocks", async () => {
     for (let i = 0; i < 3; i++) {
-      assert.strictEqual(rateLimit("u1:act", 3, 60_000).allowed, true, `call ${i + 1} should pass`);
+      assert.strictEqual(
+        (await rateLimit("u1:act", 3, 60_000)).allowed,
+        true,
+        `call ${i + 1} should pass`
+      );
     }
-    assert.strictEqual(rateLimit("u1:act", 3, 60_000).allowed, false);
+    assert.strictEqual((await rateLimit("u1:act", 3, 60_000)).allowed, false);
   });
 
   it("resets after window expires", async () => {
-    assert.strictEqual(rateLimit("u2:act", 1, 20).allowed, true);
-    assert.strictEqual(rateLimit("u2:act", 1, 20).allowed, false);
+    assert.strictEqual((await rateLimit("u2:act", 1, 20)).allowed, true);
+    assert.strictEqual((await rateLimit("u2:act", 1, 20)).allowed, false);
     await new Promise((r) => setTimeout(r, 30));
-    assert.strictEqual(rateLimit("u2:act", 1, 20).allowed, true);
+    assert.strictEqual((await rateLimit("u2:act", 1, 20)).allowed, true);
   });
 
-  it("keys are independent", () => {
-    assert.strictEqual(rateLimit("u3:a", 1, 60_000).allowed, true);
-    assert.strictEqual(rateLimit("u3:b", 1, 60_000).allowed, true);
-    assert.strictEqual(rateLimit("u3:a", 1, 60_000).allowed, false);
+  it("keys are independent", async () => {
+    assert.strictEqual((await rateLimit("u3:a", 1, 60_000)).allowed, true);
+    assert.strictEqual((await rateLimit("u3:b", 1, 60_000)).allowed, true);
+    assert.strictEqual((await rateLimit("u3:a", 1, 60_000)).allowed, false);
   });
 });

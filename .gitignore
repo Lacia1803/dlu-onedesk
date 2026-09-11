@@ -45,3 +45,4 @@ next-env.d.ts
 *.png
 # ...nhưng ảnh chụp giao diện trong README phải được commit
 !public/screenshots/*.png
+test-results/

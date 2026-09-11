@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getUsersExportData } from "@/app/actions/user-actions";
+import { getUsersExportData, getUsersExportWorkbook } from "@/app/actions/user-actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Download, Loader2 } from "lucide-react";
-import * as XLSX from "xlsx";
+import { downloadBase64File, downloadTextFile } from "@/lib/download";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -40,6 +40,18 @@ export function ExportUsersButton() {
     setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   }
 
+  function toCsv(rows: Record<string, unknown>[]): string {
+    if (rows.length === 0) return "";
+    const headers = Object.keys(rows[0]);
+    const escape = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    return [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))].join(
+      "\n"
+    );
+  }
+
   async function handleExport() {
     if (selected.length === 0) {
       toast.error("Chọn ít nhất một cột để xuất.");
@@ -47,6 +59,23 @@ export function ExportUsersButton() {
     }
     try {
       setLoading(true);
+
+      if (formatType === "xlsx") {
+        const file = await getUsersExportWorkbook(selected);
+        if (!file) {
+          toast.error("Không có quyền xuất dữ liệu.");
+          return;
+        }
+        downloadBase64File(
+          file.filename,
+          file.base64,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        toast.success("Đã xuất danh sách người dùng.");
+        setOpen(false);
+        return;
+      }
+
       const data = await getUsersExportData();
       if (!data) {
         toast.error("Không có quyền xuất dữ liệu.");
@@ -67,23 +96,7 @@ export function ExportUsersButton() {
       });
 
       const stamp = format(new Date(), "yyyyMMdd_HHmm");
-      if (formatType === "xlsx") {
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(rows);
-        XLSX.utils.book_append_sheet(wb, ws, "Users");
-        XLSX.writeFile(wb, `Users_Report_${stamp}.xlsx`);
-      } else {
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const csv = XLSX.utils.sheet_to_csv(ws);
-        const blob = new Blob(["" + csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Users_Report_${stamp}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-
+      downloadTextFile(`Users_Report_${stamp}.csv`, toCsv(rows), "text/csv;charset=utf-8;");
       toast.success(`Đã xuất ${rows.length} người dùng.`);
       setOpen(false);
     } catch (error) {

@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { notifyAdmins } from "@/lib/notifications";
 import { rateLimit } from "@/lib/cache";
@@ -13,7 +14,7 @@ export async function createFaqDraftFromTicket(ticketId: string) {
     return { success: false, error: "Không có quyền thao tác." };
   }
 
-  const { allowed } = rateLimit(`${session.user.id}:faq-draft`, 10, 60 * 1000);
+  const { allowed } = await rateLimit(`${session.user.id}:faq-draft`, 10, 60 * 1000);
   if (!allowed) {
     return { success: false, error: "Quá nhiều yêu cầu tạo FAQ, vui lòng chờ 1 phút." };
   }
@@ -59,8 +60,8 @@ export async function createFaqDraftFromTicket(ticketId: string) {
 }
 
 export async function approveFaqDraft(id: string, approve: boolean) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Chỉ Admin mới duyệt được FAQ." };
   }
 

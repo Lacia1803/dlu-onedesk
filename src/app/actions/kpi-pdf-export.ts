@@ -1,8 +1,7 @@
 "use server";
 
 import { jsPDF } from "jspdf";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { getTechKPI } from "@/app/actions/kpi-actions";
 import {
@@ -18,8 +17,8 @@ const FONT_BOLD = "DejaVuSans-Bold";
  * Only ADMIN can request.
  */
 export async function exportKpiPdf() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Không có quyền." };
   }
 

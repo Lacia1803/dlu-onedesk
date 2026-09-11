@@ -2,30 +2,34 @@
 
 import { db } from "@/lib/db";
 import nodemailer from "nodemailer";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
-import { TicketStatus } from "@prisma/client";
 
 /**
- * Gửi email nhắc reminder cho các ticket quá hạn (>3 ngày, chưa CLOSED).
+ * Gửi email nhắc reminder cho các ticket QUÁ HẠN SLA (đang xử lý, chưa tạm dừng SLA).
  * Chỉ ADMIN mới được gọi.
  * Sử dụng SMTP cấu hình qua env vars:
  *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
  */
 export async function sendOverdueReminder() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Không có quyền" };
   }
 
-  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  const now = new Date();
   const overdueTickets = await db.ticket.findMany({
-    where: { status: { not: TicketStatus.CLOSED }, createdAt: { lt: threeDaysAgo } },
+    where: {
+      status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] },
+      slaDeadline: { lt: now },
+      slaPausedAt: null,
+      maintenancePlanId: null,
+    },
     select: {
       id: true,
       title: true,
       createdAt: true,
+      slaDeadline: true,
       assignee: { select: { email: true, name: true } },
     },
   });
@@ -51,8 +55,8 @@ export async function sendOverdueReminder() {
     const mailOptions = {
       from,
       to: t.assignee.email,
-      subject: `Ticket quá hạn: ${t.title}`,
-      text: `Ticket #${t.id.slice(-6).toUpperCase()} đã mở hơn 3 ngày mà vẫn chưa đóng.\nCreated: ${t.createdAt}\nVui lòng xem và xử lý.`,
+      subject: `Ticket quá hạn SLA: ${t.title}`,
+      text: `Ticket #${t.id.slice(-6).toUpperCase()} đã QUÁ HẠN SLA.\nHạn SLA: ${t.slaDeadline?.toLocaleString("vi-VN") ?? "N/A"}\nNgày tạo: ${t.createdAt.toLocaleString("vi-VN")}\nVui lòng xem và xử lý.`,
     };
     await transporter.sendMail(mailOptions);
     return t.id;

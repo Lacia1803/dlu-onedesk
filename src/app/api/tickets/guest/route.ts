@@ -13,7 +13,7 @@ import { notifyAdminsAndTechs } from "@/lib/notifications";
 export async function POST(req: NextRequest) {
   // Rate limit by IP (10 requests per minute)
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const { allowed } = rateLimit(`guest-ticket:${ip}`, 10, 60_000);
+  const { allowed } = await rateLimit(`guest-ticket:${ip}`, 10, 60_000);
   if (!allowed) {
     return NextResponse.json(
       { success: false, error: "Quá nhiều yêu cầu. Vui lòng thử lại sau." },

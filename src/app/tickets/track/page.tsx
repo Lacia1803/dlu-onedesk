@@ -3,11 +3,11 @@
 import { useState, useEffect, useTransition, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { trackTicket, type PublicTrackResult } from "@/app/actions/track-ticket";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TicketStatusBadge } from "@/components/tickets/status-badge";
-import { Search, CheckCircle2, Clock, Wrench, AlertCircle, ArrowLeft, MessageSquare } from "lucide-react";
+import { Search, CheckCircle2, Clock, Wrench, AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 
@@ -214,29 +214,17 @@ function TrackTicketContent() {
               </CardContent>
             </Card>
 
-            {/* Public Comments / Communication from Technicians */}
-            {ticket.comments.length > 0 && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-primary" />
-                    Phản hồi & Cập nhật từ Kỹ thuật viên
-                  </CardTitle>
-                  <CardDescription>Ghi chú công khai gửi đến người báo sự cố</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {ticket.comments.map((comment, idx) => (
-                    <div key={idx} className="bg-muted/50 p-3.5 rounded-lg space-y-1.5 text-sm">
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="font-semibold text-foreground">{comment.authorName}</span>
-                        <span>{format(new Date(comment.createdAt), "dd/MM/yyyy HH:mm")}</span>
-                      </div>
-                      <p className="text-foreground whitespace-pre-wrap">{comment.content}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            {/* Lưu ý: trang tra cứu công khai KHÔNG hiển thị bình luận nội bộ
+                để tránh rò rỉ ghi chú kỹ thuật. Chỉ hiển thị trạng thái tiến trình. */}
+            <Card className="border-dashed">
+              <CardContent className="pt-6 flex items-start gap-3 text-sm text-muted-foreground">
+                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                <p>
+                  Để biết thông tin chi tiết hoặc trao đổi thêm, vui lòng liên hệ trực tiếp
+                  Trung tâm Công nghệ Thông tin hoặc kỹ thuật viên phụ trách.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

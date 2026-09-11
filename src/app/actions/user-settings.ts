@@ -6,6 +6,7 @@ import { userSettingsSchema } from "@/lib/validations/user-settings";
 import { changePasswordSchema } from "@/lib/validations/password";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/lib/audit";
 
@@ -73,8 +74,8 @@ export async function changePassword(data: {
 }
 
 export async function adminResetPassword(targetUserId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  const session = await requireFreshAdmin();
+  if (!session) {
     return { success: false, error: "Chỉ Admin mới có quyền." };
   }
   if (targetUserId === session.user.id) {

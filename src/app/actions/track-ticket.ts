@@ -1,10 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
 import { db } from "@/lib/db";
-import { TicketStatus } from "@prisma/client";
+import { rateLimit } from "@/lib/cache";
+import { TicketStatus, Prisma } from "@prisma/client";
 
 export interface PublicTrackResult {
-  id: string;
   code: string;
   title: string;
   status: TicketStatus;
@@ -16,56 +17,77 @@ export interface PublicTrackResult {
     status: TicketStatus;
     createdAt: string;
   }>;
-  comments: Array<{
-    authorName: string;
-    content: string;
-    createdAt: string;
-  }>;
 }
 
-export async function trackTicket(query: string): Promise<{ success: boolean; data?: PublicTrackResult; error?: string }> {
+const STUDENT_ID_MARKER = "[Mã sinh viên/Người báo]: ";
+const CUID_RE = /^[a-z0-9]{20,32}$/i;
+const SUFFIX_RE = /^[a-z0-9]{6}$/i;
+
+const publicSelect = {
+  id: true,
+  title: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+  device: { select: { name: true, room: { select: { name: true } } } },
+  transitions: {
+    orderBy: { createdAt: "asc" },
+    select: { toStatus: true, createdAt: true },
+  },
+} satisfies Prisma.TicketSelect;
+
+type PublicTicket = Prisma.TicketGetPayload<{ select: typeof publicSelect }>;
+
+/**
+ * Tra cứu tiến độ ticket công khai (không cần đăng nhập).
+ * Bảo mật: CHỈ khớp chính xác một trong ba dạng:
+ *   1. Mã CUID đầy đủ của ticket.
+ *   2. Đúng 6 ký tự đuôi của mã ticket.
+ *   3. Mã sinh viên chính xác (khớp đúng marker trong mô tả).
+ * Không tìm mờ theo mô tả, không trả bình luận nội bộ, có rate limit chống dò.
+ */
+export async function trackTicket(
+  query: string
+): Promise<{ success: boolean; data?: PublicTrackResult; error?: string }> {
+  // Rate limit theo IP để chống enumeration.
+  const h = await headers();
+  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { allowed } = await rateLimit(`track:${ip}`, 20, 60_000);
+  if (!allowed) {
+    return { success: false, error: "Quá nhiều lượt tra cứu. Vui lòng thử lại sau một phút." };
+  }
+
   const q = query.trim();
   if (!q) {
     return { success: false, error: "Vui lòng nhập mã ticket hoặc mã sinh viên." };
   }
+  if (q.length > 64) {
+    return { success: false, error: "Mã tra cứu không hợp lệ." };
+  }
 
-  // 1. Try direct CUID match first
-  let ticket = await db.ticket.findUnique({
-    where: { id: q },
-    include: {
-      device: { select: { name: true, room: { select: { name: true } } } },
-      transitions: { orderBy: { createdAt: "asc" } },
-      comments: {
-        include: { author: { select: { name: true } } },
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
+  let ticket: PublicTicket | null = null;
 
-  // 2. If not found by full ID, search by 6-char suffix or student ID in description
-  if (!ticket) {
-    const candidates = await db.ticket.findMany({
-      where: {
-        OR: [
-          { id: { endsWith: q.toLowerCase() } },
-          { description: { contains: q, mode: "insensitive" } },
-        ],
-      },
-      include: {
-        device: { select: { name: true, room: { select: { name: true } } } },
-        transitions: { orderBy: { createdAt: "asc" } },
-        comments: {
-          include: { author: { select: { name: true } } },
-          orderBy: { createdAt: "asc" },
-        },
-      },
+  // 1. Mã CUID đầy đủ → khớp chính xác theo id.
+  if (CUID_RE.test(q)) {
+    ticket = await db.ticket.findFirst({ where: { id: q }, select: publicSelect });
+  }
+
+  // 2. Đúng 6 ký tự đuôi của mã ticket.
+  if (!ticket && SUFFIX_RE.test(q)) {
+    ticket = await db.ticket.findFirst({
+      where: { id: { endsWith: q.toLowerCase() } },
       orderBy: { createdAt: "desc" },
-      take: 1,
+      select: publicSelect,
     });
+  }
 
-    if (candidates.length > 0) {
-      ticket = candidates[0];
-    }
+  // 3. Mã sinh viên chính xác (khớp nguyên marker, không tìm mờ tự do).
+  if (!ticket) {
+    ticket = await db.ticket.findFirst({
+      where: { description: { contains: `${STUDENT_ID_MARKER}${q}` } },
+      orderBy: { createdAt: "desc" },
+      select: publicSelect,
+    });
   }
 
   if (!ticket) {
@@ -75,7 +97,6 @@ export async function trackTicket(query: string): Promise<{ success: boolean; da
   return {
     success: true,
     data: {
-      id: ticket.id,
       code: ticket.id.slice(-6).toUpperCase(),
       title: ticket.title,
       status: ticket.status,
@@ -86,11 +107,6 @@ export async function trackTicket(query: string): Promise<{ success: boolean; da
       transitions: ticket.transitions.map((t) => ({
         status: t.toStatus,
         createdAt: t.createdAt.toISOString(),
-      })),
-      comments: ticket.comments.map((c) => ({
-        authorName: c.author.name,
-        content: c.content,
-        createdAt: c.createdAt.toISOString(),
       })),
     },
   };

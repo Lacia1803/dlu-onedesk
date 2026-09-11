@@ -3,8 +3,7 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/lib/validations/auth";
 import { rateLimit } from "@/lib/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireFreshAdmin } from "@/lib/permissions";
 
 export async function POST(req: Request) {
   try {
@@ -15,8 +14,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "ADMIN") {
+    const session = await requireFreshAdmin();
+    if (!session) {
       return NextResponse.json(
         { success: false, error: "Chỉ quản trị viên mới có quyền tạo người dùng mới." },
         { status: 403 }
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-    const { allowed } = rateLimit(`register:${ip}`, 5, 60_000);
+    const { allowed } = await rateLimit(`register:${ip}`, 5, 60_000);
     if (!allowed) {
       return NextResponse.json(
         { success: false, error: "Quá nhiều yêu cầu. Thử lại sau." },
@@ -32,8 +31,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
-    const { name, email, password } = registerSchema.parse(body);
+    const body = await req.json().catch(() => null);
+    if (body === null) {
+      return NextResponse.json({ success: false, error: "Dữ liệu không hợp lệ." }, { status: 400 });
+    }
+
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      }));
+      return NextResponse.json(
+        { success: false, error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.", fieldErrors },
+        { status: 400 }
+      );
+    }
+    const { name, email, password } = parsed.data;
 
     if (!email.endsWith("@dlu.edu.vn")) {
       return NextResponse.json(
@@ -50,7 +64,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     const user = await db.user.create({
       data: {
         name,
@@ -62,7 +76,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, data: user }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("Register error:", error);
     return NextResponse.json(
       { success: false, error: "Lỗi hệ thống hoặc dữ liệu không hợp lệ" },
       { status: 500 }

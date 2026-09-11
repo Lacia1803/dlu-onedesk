@@ -6,7 +6,7 @@ import { rateLimit } from "@/lib/cache";
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-    const { allowed } = rateLimit(`check-2fa:${ip}`, 5, 60_000);
+    const { allowed } = await rateLimit(`check-2fa:${ip}`, 5, 60_000);
     if (!allowed) {
       return NextResponse.json(
         { error: "Quá nhiều yêu cầu. Vui lòng thử lại sau." },

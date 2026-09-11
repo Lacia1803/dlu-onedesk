@@ -1,8 +1,20 @@
 export const cache = new Map<string, { value: unknown; expires: number }>();
 
+// Dọn các entry hết hạn để tránh phình bộ nhớ (memory DoS).
+let lastPrune = 0;
+function pruneExpired(now: number) {
+  // Chỉ quét tối đa 1 lần/giây để không ảnh hưởng hiệu năng đường nóng.
+  if (now - lastPrune < 1000 && cache.size < 1000) return;
+  lastPrune = now;
+  for (const [key, entry] of cache) {
+    if (entry.expires < now) cache.delete(key);
+  }
+}
+
 /**
  * In-memory cache with TTL (ms) + Upstash Redis REST fallback.
- * ponytail: single-process Map default; Upstash REST khi set env UPSTASH_REDIS_REST_URL.
+ * Mặc định dùng Map đơn tiến trình; bật Upstash REST khi set env
+ * UPSTASH_REDIS_REST_URL để dùng chung giữa nhiều instance.
  */
 export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -29,6 +41,7 @@ export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>
   }
 
   const now = Date.now();
+  pruneExpired(now);
   const entry = cache.get(key);
   if (entry && entry.expires > now) return entry.value as T;
   const result = await fn();
@@ -37,19 +50,43 @@ export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>
 }
 
 /**
- * Basic per‑key rate limiter.
- * ponytail: in-process counter default; đủ cho 1 instance VPS — hỗ trợ Upstash REST khi set env.
+ * Rate limiter theo key (IP hoặc userId).
+ * - Mặc định: bộ đếm in-memory, phù hợp 1 instance. KHÔNG hiệu lực khi chạy
+ *   nhiều instance/serverless — bật Upstash REST để dùng chung toàn cụm.
+ * - Khi set UPSTASH_REDIS_REST_URL + _TOKEN: dùng Redis INCR + PEXPIRE (cửa sổ cố định).
  */
-export function rateLimit(key: string, limit: number, windowMs: number): { allowed: boolean } {
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<{ allowed: boolean }> {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (url && token) {
+    try {
+      const redisKey = `ratelimit:${key}`;
+      const headers = { Authorization: `Bearer ${token}` };
+      const incrRes = await fetch(`${url}/incr/${encodeURIComponent(redisKey)}`, { headers });
+      const incrData = await incrRes.json();
+      const count = Number(incrData?.result ?? 0);
+      if (count === 1) {
+        await fetch(`${url}/pexpire/${encodeURIComponent(redisKey)}/${windowMs}`, { headers });
+      }
+      return { allowed: count <= limit };
+    } catch {
+      // Fallback sang bộ đếm in-memory nếu Upstash lỗi.
+    }
+  }
+
   const now = Date.now();
+  pruneExpired(now);
   const entry = cache.get(key);
   if (!entry || entry.expires < now) {
     cache.set(key, { value: 1, expires: now + windowMs });
     return { allowed: true };
   }
-  if ((entry.value as number) < limit) {
-    entry.value = (entry.value as number) + 1;
-    return { allowed: true };
-  }
-  return { allowed: false };
+  const count = (entry.value as number) + 1;
+  entry.value = count;
+  return { allowed: count <= limit };
 }

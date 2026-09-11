@@ -3,19 +3,19 @@
 import { authenticator } from "@otplib/preset-default";
 import QRCode from "qrcode";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { userRoleUpdateSchema } from "@/lib/validations/user";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/lib/audit";
 import { encryptSecret, decryptSecret } from "@/lib/crypto";
+import { requireFreshAdmin, requireFreshRole } from "@/lib/permissions";
+import { buildWorkbookBuffer, bufferToBase64 } from "@/lib/xlsx";
+import { format } from "date-fns";
 
+/**
+ * Kiểm tra quyền ADMIN với role tươi từ DB (không tin role trong JWT).
+ */
 async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
-    return null;
-  }
-  return session;
+  return requireFreshAdmin();
 }
 
 export async function updateUserRole(data: { id: string; role: string }) {
@@ -91,7 +91,7 @@ export async function restoreUser(id: string) {
 }
 
 export async function enableTwoFactor(userId?: string) {
-  const session = await getServerSession(authOptions);
+  const session = await requireFreshRole("ADMIN", "TECHNICIAN", "USER");
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
   const targetId = userId && session.user.role === "ADMIN" ? userId : session.user.id;
@@ -111,7 +111,7 @@ export async function enableTwoFactor(userId?: string) {
 }
 
 export async function verifyTwoFactor(code: string, userId?: string) {
-  const session = await getServerSession(authOptions);
+  const session = await requireFreshRole("ADMIN", "TECHNICIAN", "USER");
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
   const targetId = userId && session.user.role === "ADMIN" ? userId : session.user.id;
@@ -138,7 +138,7 @@ export async function verifyTwoFactor(code: string, userId?: string) {
 }
 
 export async function disableTwoFactor(password: string, userId?: string) {
-  const session = await getServerSession(authOptions);
+  const session = await requireFreshRole("ADMIN", "TECHNICIAN", "USER");
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
   const targetId = userId && session.user.role === "ADMIN" ? userId : session.user.id;
@@ -171,7 +171,7 @@ export async function getUsersExportData() {
   const session = await requireAdmin();
   if (!session) return null;
 
-  // ponytail: trả toàn bộ user về client để build xlsx; tách sang API route streaming nếu >10k dòng
+  // ponytail: trả toàn bộ user về client để build CSV; tách sang API route streaming nếu >10k dòng
   return db.user.findMany({
     orderBy: [{ role: "asc" }, { createdAt: "desc" }],
     select: {
@@ -184,4 +184,57 @@ export async function getUsersExportData() {
       deletedAt: true,
     },
   });
+}
+
+const USER_COLUMN_LABELS: Record<string, string> = {
+  name: "Tên",
+  email: "Email",
+  role: "Vai trò",
+  phone: "Số điện thoại",
+  createdAt: "Ngày tham gia",
+  deletedAt: "Trạng thái",
+};
+
+/**
+ * Xuất danh sách người dùng ra .xlsx trên server (không bundle exceljs xuống client).
+ * `columns` là danh sách key cột người dùng chọn. Trả null nếu không có quyền.
+ */
+export async function getUsersExportWorkbook(
+  columns: string[]
+): Promise<{ filename: string; base64: string } | null> {
+  const session = await requireAdmin();
+  if (!session) return null;
+
+  const validColumns = columns.filter((c) => c in USER_COLUMN_LABELS);
+  if (validColumns.length === 0) return null;
+
+  const users = await db.user.findMany({
+    orderBy: [{ role: "asc" }, { createdAt: "desc" }],
+    select: {
+      name: true,
+      email: true,
+      role: true,
+      phone: true,
+      createdAt: true,
+      deletedAt: true,
+    },
+  });
+
+  const rows = users.map((u) => {
+    const row: Record<string, string> = {};
+    for (const key of validColumns) {
+      const label = USER_COLUMN_LABELS[key];
+      if (key === "createdAt") row[label] = format(new Date(u.createdAt), "dd/MM/yyyy HH:mm");
+      else if (key === "deletedAt") row[label] = u.deletedAt ? "Đã vô hiệu hóa" : "Hoạt động";
+      else row[label] = ((u as Record<string, unknown>)[key] as string) || "";
+    }
+    return row;
+  });
+
+  const buffer = await buildWorkbookBuffer([{ name: "Users", rows }]);
+
+  return {
+    filename: `Users_Report_${format(new Date(), "yyyyMMdd_HHmm")}.xlsx`,
+    base64: bufferToBase64(buffer),
+  };
 }
