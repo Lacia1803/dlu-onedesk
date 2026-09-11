@@ -14,6 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -64,9 +74,17 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
     );
   };
 
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status?: TicketStatus; priority?: TicketPriority }>({ open: false });
+
   const handleBulkStatus = async (status: TicketStatus) => {
     if (selectedIds.length === 0) return;
-    if (!window.confirm(`Bạn có chắc muốn chuyển ${selectedIds.length} ticket sang trạng thái ${status}?`)) return;
+    setConfirmDialog({ open: true, status });
+  };
+
+  const confirmBulkStatus = async () => {
+    const status = confirmDialog.status;
+    if (!status) return;
+    setConfirmDialog({ open: false });
     setLoading(true);
     const res = await bulkUpdateTickets(selectedIds, { status });
     setLoading(false);
@@ -79,9 +97,10 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
     }
   };
 
-  const handleBulkPriority = async (priority: TicketPriority) => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`Bạn có chắc muốn chuyển ${selectedIds.length} ticket sang mức độ ưu tiên ${priority}?`)) return;
+  const confirmBulkPriority = async () => {
+    const priority = confirmDialog.priority;
+    if (!priority) return;
+    setConfirmDialog({ open: false });
     setLoading(true);
     const res = await bulkUpdateTickets(selectedIds, { priority });
     setLoading(false);
@@ -92,6 +111,11 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
     } else {
       toast.error(res.error || "Không thể cập nhật.");
     }
+  };
+
+  const handleBulkPriority = async (priority: TicketPriority) => {
+    if (selectedIds.length === 0) return;
+    setConfirmDialog({ open: true, priority });
   };
 
   return (
@@ -282,6 +306,27 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={confirmDialog.open} onOpenChange={(open: boolean) => !open && setConfirmDialog({ open: false })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận thay đổi hàng loạt</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDialog.status
+                ? `Bạn có chắc muốn chuyển ${selectedIds.length} ticket sang trạng thái ${confirmDialog.status}?`
+                : confirmDialog.priority
+                  ? `Bạn có chắc muốn chuyển ${selectedIds.length} ticket sang mức độ ưu tiên ${confirmDialog.priority}?`
+                  : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={() => confirmDialog.status ? confirmBulkStatus() : confirmBulkPriority()}>
+              Xác nhận
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -8,6 +8,7 @@ export function TicketStatusBadge({ status }: { status: string }) {
     case "IN_PROGRESS": return <Badge className={`${mono} bg-orange-500 hover:bg-orange-600 text-black`}>IN_PROGRESS</Badge>;
     case "WAITING_PARTS": return <Badge className={`${mono} bg-yellow-500 hover:bg-yellow-600 text-black`}>WAITING_PARTS</Badge>;
     case "RESOLVED": return <Badge className={`${mono} bg-primary hover:bg-primary/90`}>RESOLVED</Badge>;
+    case "CANCELLED": return <Badge variant="destructive" className={`${mono}`}>CANCELLED</Badge>;
     case "CLOSED": return <Badge variant="outline" className={`${mono} border-muted-foreground text-muted-foreground`}>CLOSED</Badge>;
     default: return <Badge className={mono}>{status}</Badge>;
   }

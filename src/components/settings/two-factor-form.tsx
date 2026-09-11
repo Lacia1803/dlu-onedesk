@@ -15,6 +15,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 import Image from "next/image";
 
 export function TwoFactorForm({
@@ -30,6 +41,7 @@ export function TwoFactorForm({
   const [secret, setSecret] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [disableDialogOpen, setDisableDialogOpen] = useState(false);
 
   async function handleStartEnable() {
     setLoading(true);
@@ -63,8 +75,7 @@ export function TwoFactorForm({
   }
 
   async function handleDisable() {
-    if (!confirm("Bạn có chắc chắn muốn tắt xác thực 2 lớp?")) return;
-
+    setDisableDialogOpen(false);
     setLoading(true);
     const res = await disableTwoFactor(userId);
     setLoading(false);
@@ -141,7 +152,7 @@ export function TwoFactorForm({
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleDisable}
+              onClick={() => setDisableDialogOpen(true)}
               disabled={loading}
             >
               {loading ? "Đang xử lý..." : "Tắt xác thực 2FA"}
@@ -211,6 +222,23 @@ export function TwoFactorForm({
           </Button>
         )}
       </CardContent>
+
+      <AlertDialog open={disableDialogOpen} onOpenChange={setDisableDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tắt xác thực 2 lớp?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn tắt xác thực 2 lớp? Tài khoản của bạn sẽ giảm bớt một lớp bảo mật.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDisable}>
+              Tắt 2FA
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

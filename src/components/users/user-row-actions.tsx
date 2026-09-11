@@ -22,6 +22,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { updateUserRole, deleteUser, restoreUser } from "@/app/actions/user-actions";
 import { adminResetPassword } from "@/app/actions/user-settings";
 
@@ -48,9 +58,10 @@ export function UserRowActions({
   const [deleting, setDeleting] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   async function handleAdminReset() {
-    if (!confirm("Đặt lại mật khẩu người dùng này về mặc định (email)?")) return;
+    setResetDialogOpen(false);
     setResetting(true);
     const res = await adminResetPassword(userId);
     setResetting(false);
@@ -138,7 +149,7 @@ export function UserRowActions({
         variant="outline"
         size="icon"
         className="h-9 w-9"
-        onClick={handleAdminReset}
+        onClick={() => setResetDialogOpen(true)}
         disabled={resetting || isSelf}
         title="Đặt lại mật khẩu mặc định"
       >
@@ -164,6 +175,23 @@ export function UserRowActions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Đặt lại mật khẩu</AlertDialogTitle>
+            <AlertDialogDescription>
+              Đặt lại mật khẩu người dùng này về mặc định (chính là email của họ)? Họ sẽ được yêu cầu đổi mật khẩu ở lần đăng nhập tiếp theo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAdminReset}>
+              Đặt lại
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

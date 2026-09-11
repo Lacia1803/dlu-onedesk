@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { authenticator } from "@otplib/preset-default";
 import { db } from "./db";
+import { decryptSecret } from "./crypto";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -32,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         // 2-FA: chặn phiên đăng nhập cho tới khi OTP hợp lệ (verify ngay trong authorize)
         if (user.twoFactorEnabled) {
           if (!credentials.token || !user.twoFactorSecret) return null;
-          const otpValid = authenticator.check(credentials.token, user.twoFactorSecret);
+          const otpValid = authenticator.check(credentials.token, decryptSecret(user.twoFactorSecret));
           if (!otpValid) return null;
         }
 

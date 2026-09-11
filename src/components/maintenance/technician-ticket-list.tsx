@@ -4,7 +4,7 @@ import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/sta
 interface TechnicianTicket {
   id: string;
   title: string;
-  status: "OPEN" | "IN_PROGRESS" | "WAITING_PARTS" | "RESOLVED" | "CLOSED";
+  status: "OPEN" | "IN_PROGRESS" | "WAITING_PARTS" | "RESOLVED" | "CANCELLED" | "CLOSED";
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   createdAt: Date;
   device: { name: string } | null;

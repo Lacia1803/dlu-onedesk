@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
-import { Prisma } from "@prisma/client";
+import { Prisma, TicketPriority } from "@prisma/client";
 
 
 import { computeSlaDeadline, isValidTransition, VALID_TRANSITIONS } from "@/lib/ticket-actions";
@@ -121,10 +121,14 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     return { success: false, error: "Không có quyền thao tác." };
   }
 
-  // Users can only close tickets, Techs can do anything
+  // Users can only close or cancel their own tickets, Techs/Admins can do anything
   if (!isTech) {
-    if (parsed.data.status !== "CLOSED" && parsed.data.status !== undefined) {
-      return { success: false, error: "Bạn chỉ có quyền đóng ticket." };
+    if (parsed.data.status !== undefined && parsed.data.status !== "CLOSED" && parsed.data.status !== "CANCELLED") {
+      return { success: false, error: "Bạn chỉ có quyền đóng hoặc hủy ticket." };
+    }
+    // Only creator can cancel
+    if (parsed.data.status === "CANCELLED" && !isCreator) {
+      return { success: false, error: "Chỉ người tạo ticket mới có thể hủy." };
     }
     // Users cannot change priority or assignee
     delete parsed.data.priority;
@@ -389,10 +393,24 @@ export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdat
     });
   }
 
-  await db.ticket.updateMany({
-    where: { id: { in: ids } },
-    data,
-  });
+  // Recalculate SLA deadline when priority changes in bulk
+  if (data.priority) {
+    const affectedTickets = await db.ticket.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, createdAt: true },
+    });
+    for (const t of affectedTickets) {
+      await db.ticket.update({
+        where: { id: t.id },
+        data: { priority: data.priority, slaDeadline: computeSlaDeadline(data.priority as TicketPriority, t.createdAt) },
+      });
+    }
+    // Remove priority from the bulk updateMany since we handled it per-ticket
+    const { priority, ...restData } = data;
+    await db.ticket.updateMany({ where: { id: { in: ids } }, data: restData });
+  } else {
+    await db.ticket.updateMany({ where: { id: { in: ids } }, data });
+  }
 
   await logAudit({
     action: "TICKET_BULK_UPDATE",

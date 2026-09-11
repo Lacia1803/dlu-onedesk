@@ -30,6 +30,25 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt Khắc phục 17 lỗi & Nâng cấp bảo mật — 2026-09-11)
+- [x] Trạng thái `CANCELLED`: Thêm giá trị `CANCELLED` vào `TicketStatus` enum, cập nhật đồ thị chuyển trạng thái `VALID_TRANSITIONS`, cho phép người tạo tự hủy ticket.
+- [x] Báo hỏng nhanh vãng lai: Tạo luồng báo hỏng không cần đăng nhập qua Mã sinh viên tại `/devices/qr/[code]` + API `POST /api/tickets/guest`.
+- [x] Sửa tab Lịch sử sự cố: Thêm `<TabsContent value="history">` còn thiếu trong `DeviceDetailPage` (`/dashboard/devices/[id]`).
+- [x] Thay `window.confirm`: Thay thế toàn bộ 5 vị trí dùng `window.confirm()` bằng component `AlertDialog` của shadcn/ui.
+- [x] DB Index FKs: Bổ sung `@@index` cho tất cả khóa ngoại chưa có index trong Prisma schema (`device_history`, `ticket_transitions`, `ticket_comments`, `maintenance_logs`, `chat_logs`, `tickets.deviceId`).
+- [x] Cloud Storage abstraction: Thêm hỗ trợ S3/R2 qua SDK `@aws-sdk/client-s3` bên cạnh local storage driver (`src/lib/storage.ts`).
+- [x] Refactor Import Excel: Dùng `db.$transaction` + `createMany` và mã hóa bcrypt song song (`Promise.all`) trong `importDevices` / `importUsers`.
+- [x] Sửa `deleteRoom`: Chặn xóa phòng nếu còn thiết bị ở bất kỳ trạng thái nào ngoại trừ `RETIRED` (thanh lý).
+- [x] Sinh QR Code an toàn: Dùng `crypto.randomBytes` thay `Math.random` kèm cơ chế tự động thử lại khi gặp lỗi trùng khóa `P2002`.
+- [x] Chống XSS Chatbot: Kiểm tra protocol `http:` / `https:` trong `renderBotText` (`chat-widget.tsx`) trước khi render thẻ `<a>`.
+- [x] Mã hóa 2FA Secret: Dùng thuật toán AES-256-GCM với `ENCRYPTION_KEY` để mã hóa `twoFactorSecret` trong CSDL.
+- [x] Chống DoS Password: Thêm ràng buộc `.max(72)` cho tất cả schema mật khẩu (Zod).
+- [x] Đồng bộ Seed Data: Cập nhật `seed-admin.js` tạo sẵn tài khoản `admin@dlu.edu.vn`/`admin` và `tech@dlu.edu.vn`/`tech` khớp với `TESTING.md` và Playwright E2E.
+- [x] Sửa lệnh test: Cập nhật `package.json` `"test:actions": "node --test tests/actions.test.mjs"`.
+- [x] Dockerfile tối ưu: Chuyển sang Multi-stage build + bật `output: "standalone"` giảm kích thước Docker image.
+- [x] Dọn dẹp file debug: Xóa các file rác `tmp-debug-login.js` và `admin-users.html` ở thư mục gốc.
+- [x] SLA Bulk Update: Tự động tính toán lại `slaDeadline` dựa theo mức độ ưu tiên mới khi cập nhật hàng loạt ticket.
+
 ## Recently Completed (đợt Code Quality — 2026-09-11)
 - [x] Loại bỏ `any` trong `src/app/actions/*`: thay thế bằng `Prisma.UserWhereInput`, `Prisma.DeviceUncheckedCreateInput`, `Prisma.TicketUncheckedUpdateInput`, `Record<string, string>`, helper `cellStr()`/`errorMessage()`, exported interfaces `TechKPIResult`; bảo hành type-check strict.
 - [x] Server actions trả plain objects (`{ success, error }`) thay vì `NextResponse.json` — loại bỏ `import { NextResponse }` khỏi tất cả action files; `NextResponse.json` chỉ dùng trong `src/app/api/*/route.ts` (bulk-update route đã thêm `{ status: 500 }`).

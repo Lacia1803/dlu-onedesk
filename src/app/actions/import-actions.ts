@@ -48,7 +48,9 @@ async function parseWorkbook(file: File): Promise<RawRow[]> {
 }
 
 function genQrCode(): string {
-  return `DEV-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+  // Sinh QR an toàn bằng crypto (không Math.random) — import dùng crypto module
+  const { randomBytes } = require("crypto") as typeof import("crypto");
+  return `DEV-${randomBytes(4).toString("hex").toUpperCase()}`;
 }
 
 export async function importDevices(formData: FormData): Promise<{
@@ -113,20 +115,33 @@ export async function importDevices(formData: FormData): Promise<{
     });
   });
 
+  // Kiểm tra serial trùng trong 1 query thay vì từng dòng
+  const serials = toCreate.map((d) => d.serialNumber).filter((s): s is string => !!s);
+  const existingSerials = new Set(
+    serials.length > 0
+      ? (await db.device.findMany({ where: { serialNumber: { in: serials }, deletedAt: null }, select: { serialNumber: true } })).map((d) => d.serialNumber)
+      : []
+  );
+
+  const valid = toCreate.filter((d) => {
+    if (d.serialNumber && existingSerials.has(d.serialNumber)) {
+      errors.push({ row: -1, message: `Serial ${d.serialNumber} đã tồn tại, bỏ qua.` });
+      return false;
+    }
+    return true;
+  });
+
+  // Tất cả hoặc không: 1 transaction, lỗi 1 dòng → rollback toàn bộ
   let inserted = 0;
-  for (const d of toCreate) {
+  if (valid.length > 0) {
     try {
-      if (d.serialNumber) {
-        const dup = await db.device.findFirst({ where: { serialNumber: d.serialNumber, deletedAt: null } });
-        if (dup) {
-          errors.push({ row: -1, message: `Serial ${d.serialNumber} đã tồn tại, bỏ qua.` });
-          continue;
-        }
-      }
-      await db.device.create({ data: d });
-      inserted++;
+      await db.$transaction(async (tx) => {
+        await tx.device.createMany({ data: valid });
+        inserted = valid.length;
+      });
     } catch (e: unknown) {
-      errors.push({ row: -1, message: `Lỗi lưu ${d.name}: ${errorMessage(e)}` });
+      errors.push({ row: 0, message: `Import thất bại, đã rollback toàn bộ: ${errorMessage(e)}` });
+      inserted = 0;
     }
   }
 
@@ -162,8 +177,11 @@ export async function importUsers(formData: FormData): Promise<{
   const errors: ImportRowError[] = [];
   let inserted = 0;
 
-  for (let i = 0; i < rows.length; i++) {
-    const raw = rows[i];
+  // Validate tất cả các dòng trước, gom dữ liệu hợp lệ
+  type UserCreateData = Prisma.UserUncheckedCreateInput;
+  const toCreate: UserCreateData[] = [];
+
+  rows.forEach((raw, i) => {
     const rowNum = i + 2;
     const name = cellStr(raw, "name").trim();
     const email = cellStr(raw, "email").trim().toLowerCase();
@@ -171,34 +189,54 @@ export async function importUsers(formData: FormData): Promise<{
 
     if (!name || !email) {
       errors.push({ row: rowNum, message: "Thiếu tên hoặc email." });
-      continue;
+      return;
     }
     if (!email.endsWith("@dlu.edu.vn")) {
       errors.push({ row: rowNum, message: `${email} không phải email @dlu.edu.vn.` });
-      continue;
+      return;
     }
+    toCreate.push({
+      name,
+      email,
+      password: "", // placeholder, hash song song bên dưới
+      role,
+      phone: cellStr(raw, "phone").trim() || null,
+      mustChangePassword: true,
+    });
+  });
 
-    const existing = await db.user.findUnique({ where: { email } });
-    if (existing) {
-      errors.push({ row: rowNum, message: `${email} đã tồn tại, bỏ qua.` });
-      continue;
+  // Kiểm tra email trùng DB trong 1 query
+  const emails = toCreate.map((u) => u.email);
+  const existingEmails = new Set(
+    emails.length > 0
+      ? (await db.user.findMany({ where: { email: { in: emails } }, select: { email: true } })).map((u) => u.email)
+      : []
+  );
+
+  const valid = toCreate.filter((u) => {
+    if (existingEmails.has(u.email)) {
+      errors.push({ row: -1, message: `${u.email} đã tồn tại, bỏ qua.` });
+      return false;
     }
+    return true;
+  });
 
+  // Hash mật khẩu song song (bcrypt mỗi dòng ~100ms → 200 dòng song song nhanh hơn nhiều)
+  if (valid.length > 0) {
     try {
-      const password = await bcrypt.hash(email, 10);
-      await db.user.create({
-        data: {
-          name,
-          email,
-          password,
-          role,
-          phone: cellStr(raw, "phone").trim() || null,
-          mustChangePassword: true,
-        },
+      const hashed = await Promise.all(valid.map((u) => bcrypt.hash(u.email, 10)));
+      valid.forEach((u, idx) => {
+        u.password = hashed[idx];
       });
-      inserted++;
+
+      // Tất cả hoặc không: 1 transaction
+      await db.$transaction(async (tx) => {
+        await tx.user.createMany({ data: valid });
+        inserted = valid.length;
+      });
     } catch (e: unknown) {
-      errors.push({ row: rowNum, message: `Lỗi lưu ${email}: ${errorMessage(e)}` });
+      errors.push({ row: 0, message: `Import thất bại, đã rollback toàn bộ: ${errorMessage(e)}` });
+      inserted = 0;
     }
   }
 

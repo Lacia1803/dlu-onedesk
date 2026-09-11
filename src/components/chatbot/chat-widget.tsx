@@ -14,13 +14,21 @@ interface Message {
   text: string;
 }
 
-/* ponytail: chỉ parse [text](url) nội bộ bot sinh ra; đổi sang react-markdown khi cần full markdown */
+/* ponytail: chỉ parse [text](url) nội bộ bot sinh ra; chỉ chấp nhận http/https */
 function renderBotText(text: string) {
   return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
     const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (!m) return part;
+    const url = m[2];
+    // Only allow http: and https: protocols — block javascript:, data:, vbscript:, etc.
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return part;
+    } catch {
+      return part;
+    }
     return (
-      <a key={i} href={m[2]} className="underline underline-offset-2 font-semibold">
+      <a key={i} href={url} className="underline underline-offset-2 font-semibold" rel="noopener noreferrer">
         {m[1]}
       </a>
     );

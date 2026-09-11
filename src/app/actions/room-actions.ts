@@ -50,10 +50,10 @@ export async function deleteRoom(id: string) {
   }
 
   const activeDevices = await db.device.count({
-    where: { roomId: id, deletedAt: null, status: "ACTIVE" }
+    where: { roomId: id, deletedAt: null, status: { not: "RETIRED" } }
   });
   if (activeDevices > 0) {
-    return { success: false, error: "Không thể xóa. Phòng này đang có thiết bị hoạt động." };
+    return { success: false, error: "Không thể xóa. Phòng này đang còn thiết bị (không bao gồm thanh lý). Vui lòng chuyển hoặc thanh lý tất cả thiết bị trước." };
   }
 
   await db.room.update({ where: { id }, data: { deletedAt: new Date() } });

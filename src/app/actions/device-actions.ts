@@ -53,17 +53,30 @@ export async function createDevice(data: DeviceFormValues) {
     }
   }
 
-  const qrCode = `DEV-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-
-  await db.device.create({
-    data: {
-      ...parsed.data,
-      purchaseDate,
-      warrantyEnd,
-      specifications: specsObj,
-      qrCode,
-    },
-  });
+  // Generate unique QR code with collision retry (max 5 attempts)
+  const { randomBytes } = await import("crypto");
+  let qrCode = "";
+  for (let attempt = 0; attempt < 5; attempt++) {
+    qrCode = `DEV-${randomBytes(4).toString("hex").toUpperCase()}`;
+    try {
+      await db.device.create({
+        data: {
+          ...parsed.data,
+          purchaseDate,
+          warrantyEnd,
+          specifications: specsObj,
+          qrCode,
+        },
+      });
+      break; // success
+    } catch (err: unknown) {
+      // P2002 = unique constraint violation → retry with new code
+      if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002" && attempt < 4) {
+        continue;
+      }
+      throw err; // re-throw non-constraint errors or final attempt
+    }
+  }
 
   revalidatePath("/dashboard/devices");
   return { success: true };

@@ -136,6 +136,31 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
         <TabsContent value="maintenance" className="pt-4">
           <MaintenanceList deviceId={device.id} logs={maintenanceLogs} canEdit={canEdit} />
         </TabsContent>
+
+        <TabsContent value="history" className="pt-4">
+          {deviceTickets.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">Chưa có sự cố nào được ghi nhận cho thiết bị này.</p>
+          ) : (
+            <div className="space-y-3">
+              {deviceTickets.map((t) => (
+                <Link key={t.id} href={`/dashboard/tickets/${t.id}`} className="block border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="font-semibold text-sm">#{t.id.slice(-6).toUpperCase()} — {t.title}</span>
+                    <Badge variant={t.status === "CLOSED" ? "secondary" : t.status === "RESOLVED" ? "default" : "destructive"}>
+                      {t.status}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground flex gap-4">
+                    <span>Người tạo: {t.creator.name}</span>
+                    {t.assignee && <span>Xử lý: {t.assignee.name}</span>}
+                    <span>{new Date(t.createdAt).toLocaleDateString("vi-VN")}</span>
+                    {t.rating && <span>⭐ {t.rating}/5</span>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );

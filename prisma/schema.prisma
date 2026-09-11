@@ -46,6 +46,7 @@ enum TicketStatus {
   IN_PROGRESS
   WAITING_PARTS
   RESOLVED
+  CANCELLED
   CLOSED
 }
 
@@ -169,6 +170,8 @@ model DeviceHistory {
   userId      String?
   user        User?             @relation(fields: [userId], references: [id])
 
+  @@index([deviceId])
+  @@index([userId])
   @@map("device_history")
 }
 
@@ -232,6 +235,7 @@ model Ticket {
 
   @@index([creatorId])
   @@index([assigneeId])
+  @@index([deviceId])
   @@index([status])
   @@index([createdAt])
   @@index([slaDeadline])
@@ -249,6 +253,8 @@ model TicketTransition {
   user        User        @relation(fields: [userId], references: [id])
   createdAt   DateTime    @default(now())
 
+  @@index([ticketId])
+  @@index([userId])
   @@map("ticket_transitions")
 }
 
@@ -264,6 +270,8 @@ model TicketComment {
   authorId      String
   author        User      @relation(fields: [authorId], references: [id])
 
+  @@index([ticketId])
+  @@index([authorId])
   @@map("ticket_comments")
 }
 
@@ -282,6 +290,8 @@ model MaintenanceLog {
   technicianId  String
   technician    User      @relation(fields: [technicianId], references: [id])
 
+  @@index([deviceId])
+  @@index([technicianId])
   @@map("maintenance_logs")
 }
 
@@ -327,6 +337,7 @@ model ChatLog {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 
+  @@index([userId])
   @@map("chat_logs")
 }
 

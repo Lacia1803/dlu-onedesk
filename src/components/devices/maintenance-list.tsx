@@ -17,6 +17,16 @@ import {
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { MaintenanceLogWithDetails } from "@/app/actions/device-actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Props {
   deviceId: string;
@@ -27,6 +37,7 @@ interface Props {
 export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
   const router = useRouter();
   const [, setIsEditing] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Sort newest first
   const sortedLogs = [...logs].sort((a, b) => new Date(b.performedAt).getTime() - new Date(a.performedAt).getTime());
@@ -80,11 +91,7 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
                         <Button variant="ghost" size="icon" onClick={() => setIsEditing(log.id)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => {
-                          if (confirm("Xác nhận xóa lịch sử bảo trì này?")) {
-                            toast.error("Tính năng xóa đang phát triển");
-                          }
-                        }}>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteDialogOpen(true)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -96,6 +103,21 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+            <AlertDialogDescription>Bạn có chắc muốn xóa lịch sử bảo trì này?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setDeleteDialogOpen(false); toast.error("Tính năng xóa đang phát triển"); }}>
+              Xác nhận
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

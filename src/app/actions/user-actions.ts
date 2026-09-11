@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/auth";
 import { userRoleUpdateSchema } from "@/lib/validations/user";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/lib/audit";
+import { encryptSecret, decryptSecret } from "@/lib/crypto";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -100,7 +101,7 @@ export async function enableTwoFactor(userId?: string) {
   const secret = authenticator.generateSecret();
   await db.user.update({
     where: { id: targetId },
-    data: { twoFactorSecret: secret },
+    data: { twoFactorSecret: encryptSecret(secret) },
   });
 
   const otpauth = authenticator.keyuri(user.email, "DLU OneDesk", secret);
@@ -117,7 +118,7 @@ export async function verifyTwoFactor(code: string, userId?: string) {
   const user = await db.user.findUnique({ where: { id: targetId } });
   if (!user?.twoFactorSecret) return { success: false, error: "Chưa khởi tạo cấu hình 2FA." };
 
-  const valid = authenticator.check(code, user.twoFactorSecret);
+  const valid = authenticator.check(code, decryptSecret(user.twoFactorSecret));
   if (!valid) return { success: false, error: "Mã OTP không chính xác." };
 
   await db.user.update({

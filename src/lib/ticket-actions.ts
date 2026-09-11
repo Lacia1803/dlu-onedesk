@@ -120,10 +120,11 @@ export function periodForCycle(cycle: MaintenanceCycle, at: Date = new Date()): 
 
 /** Đồ thị chuyển trạng thái hợp lệ (server-side enforcement) */
 export const VALID_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
-  [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS, TicketStatus.CLOSED],
-  [TicketStatus.IN_PROGRESS]: [TicketStatus.WAITING_PARTS, TicketStatus.RESOLVED],
-  [TicketStatus.WAITING_PARTS]: [TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED],
+  [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS, TicketStatus.CANCELLED, TicketStatus.CLOSED],
+  [TicketStatus.IN_PROGRESS]: [TicketStatus.WAITING_PARTS, TicketStatus.RESOLVED, TicketStatus.CANCELLED],
+  [TicketStatus.WAITING_PARTS]: [TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED, TicketStatus.CANCELLED],
   [TicketStatus.RESOLVED]: [TicketStatus.CLOSED],
+  [TicketStatus.CANCELLED]: [],
   [TicketStatus.CLOSED]: [],
 };
 

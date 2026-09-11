@@ -39,16 +39,25 @@ export function TicketActionsMenu({ ticket, technicians, isTech }: TicketActions
 
   // User view
   if (!isTech) {
-    if (ticket.status === "CLOSED") return null;
+    if (ticket.status === "CLOSED" || ticket.status === "CANCELLED") return null;
     return (
-      <Button 
-        variant="outline" 
-        disabled={loading} 
-        onClick={() => handleUpdate("status", "CLOSED")}
-      >
-        <CheckCircle2 className="mr-2 h-4 w-4" />
-        Đóng Ticket
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          disabled={loading}
+          onClick={() => handleUpdate("status", "CANCELLED")}
+        >
+          Hủy Ticket
+        </Button>
+        <Button
+          variant="outline"
+          disabled={loading}
+          onClick={() => handleUpdate("status", "CLOSED")}
+        >
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          Đóng Ticket
+        </Button>
+      </div>
     );
   }
 
@@ -85,6 +94,7 @@ export function TicketActionsMenu({ ticket, technicians, isTech }: TicketActions
             <DropdownMenuRadioItem value="IN_PROGRESS">Đang xử lý</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="WAITING_PARTS">Chờ linh kiện</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="RESOLVED">Đã xử lý</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="CANCELLED">Hủy</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="CLOSED">Đóng</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
