@@ -6,11 +6,14 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![CI](https://github.com/username/dlu-onedesk/actions/workflows/ci.yml/badge.svg)](https://github.com/username/dlu-onedesk/actions)
-[![Coverage](https://img.shields.io/badge/coverage-90%25-green.svg)](./coverage)
+[![CI](https://github.com/Lacia1803/dlu-onedesk/actions/workflows/pr.yml/badge.svg)](https://github.com/Lacia1803/dlu-onedesk/actions)
+[![Coverage](https://img.shields.io/badge/coverage-90%25-green.svg)](https://github.com/Lacia1803/dlu-onedesk/actions/workflows/ci.yml)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
 
 Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại học Đà Lạt (DLU), giúp tối ưu hóa quy trình tiếp nhận sự cố, quản lý thiết bị phòng máy, đo lường KPI kỹ thuật viên và tự động hóa vận hành.
+
+
+---
 
 ---
 
@@ -59,6 +62,9 @@ flowchart TB
     Scheduler --> APIRoutes
 ```
 
+
+---
+
 ---
 
 ## 🎯 Tính năng nổi bật
@@ -104,6 +110,9 @@ flowchart TB
 - **Nhật ký hệ thống (Audit Logs)**: Ghi log toàn bộ các hành động nhạy cảm trong hệ thống (`/admin/audit-logs`).
 - **Phân quyền linh hoạt**: Phân quyền chi tiết 3 cấp độ (USER, TECHNICIAN, ADMIN).
 
+
+---
+
 ---
 
 ## 🛠 Tech Stack
@@ -116,6 +125,9 @@ flowchart TB
 - **Excel & QR**: `xlsx`, `qrcode`, `html5-qrcode`
 - **Validation**: Zod, React Hook Form
 - **Notification**: Sonner Toasts, Nodemailer (Email SMTP)
+
+
+---
 
 ---
 
@@ -197,6 +209,9 @@ Nhập mã OTP 6 chữ số hiện trên ứng dụng → nhấn **Xác nhận &
 
 > ⚠️ **Lưu ý quan trọng**: Sau khi kích hoạt 2-FA, mỗi lần đăng nhập sẽ cần mã OTP. Nếu mất điện thoại, liên hệ Admin để tắt 2-FA.
 
+
+---
+
 ---
 
 ### 7. Deploy (Docker)
@@ -215,11 +230,17 @@ docker compose exec web npx prisma db push
 
 > Đang chạy local `npm run dev`? Chạy `docker compose up db -d` để chỉ dùng Postgres trong Docker.
 
+
+---
+
 ---
 
 ## 📑 Tài liệu chi tiết
 
 Xem hướng dẫn sử dụng chi tiết theo từng vai trò tại [docs/HuongDan.md](docs/HuongDan.md).
+
+
+---
 
 ---
 

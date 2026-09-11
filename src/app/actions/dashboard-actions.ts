@@ -10,32 +10,36 @@ export async function getAdminStats() {
     throw new Error("Unauthorized");
   }
 
-  const [totalDevices, brokenDevices, openTickets, unresolvedTickets, devices, recentTickets] =
-    await Promise.all([
-      db.device.count({ where: { deletedAt: null } }),
-      db.device.count({ where: { deletedAt: null, status: "BROKEN" } }),
-      db.ticket.count({ where: { status: "OPEN" } }),
-      db.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } }),
-      db.device.findMany({ where: { deletedAt: null }, select: { status: true } }),
-      db.ticket.findMany({
-        take: 5,
-        orderBy: { createdAt: "desc" },
-        include: { creator: { select: { name: true } }, assignee: { select: { name: true } } },
-      }),
-    ]);
+  const [statusAgg, openTickets, unresolvedTickets, recentTickets] = await Promise.all([
+    db.device.groupBy({
+      by: ["status"],
+      _count: true,
+      where: { deletedAt: null },
+    }),
+    db.ticket.count({ where: { status: "OPEN" } }),
+    db.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } }),
+    db.ticket.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        priority: true,
+        createdAt: true,
+        creator: { select: { id: true, name: true, email: true } },
+        assignee: { select: { id: true, name: true, email: true } },
+      },
+    }),
+  ]);
 
-  // Aggregate device statuses for pie chart
-  const statusCounts = devices.reduce(
-    (acc, curr) => {
-      acc[curr.status] = (acc[curr.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const totalDevices = statusAgg.reduce((sum, item) => sum + item._count, 0);
+  const brokenItem = statusAgg.find((item) => item.status === "BROKEN");
+  const brokenDevices = brokenItem ? brokenItem._count : 0;
 
-  const pieData = Object.entries(statusCounts).map(([name, value]) => ({
-    name,
-    value,
+  const pieData = statusAgg.map((item) => ({
+    name: item.status,
+    value: item._count,
   }));
 
   return {
@@ -64,7 +68,14 @@ export async function getUserStats() {
       where: { creatorId: session.user.id },
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: { assignee: { select: { name: true } } },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        priority: true,
+        createdAt: true,
+        assignee: { select: { id: true, name: true, email: true } },
+      },
     }),
   ]);
 

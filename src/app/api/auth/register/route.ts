@@ -3,9 +3,26 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/lib/validations/auth";
 import { rateLimit } from "@/lib/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
+    if (process.env.DISABLE_REGISTRATION === "true") {
+      return NextResponse.json(
+        { success: false, error: "Đăng ký tài khoản công khai đã bị vô hiệu hóa." },
+        { status: 403 }
+      );
+    }
+
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { success: false, error: "Chỉ quản trị viên mới có quyền tạo người dùng mới." },
+        { status: 403 }
+      );
+    }
+
     const ip = req.headers.get("x-forwarded-for") ?? "unknown";
     const { allowed } = rateLimit(`register:${ip}`, 5, 60_000);
     if (!allowed) {
