@@ -43,3 +43,5 @@ next-env.d.ts
 .impeccable/
 .playwright-mcp/
 *.png
+# ...nhưng ảnh chụp giao diện trong README phải được commit
+!public/screenshots/*.png

@@ -34,6 +34,16 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt Chụp lại Toàn bộ Ảnh Giao diện & Bổ sung vào README — 2026-09-11)
+
+- [x] **Xây dựng Script Chụp ảnh Tự động (`scripts/capture-all.mjs`)**: Harness Playwright tự kiểm chứng — log `h1` từng route, phát hiện redirect-về-login / trang lỗi / console error / HTTP 5xx, đóng băng animation (`animation-duration:0s`) để ảnh full-page deterministic, và trả exit code 1 nếu có trang lỗi.
+- [x] **Chụp lại toàn bộ 17 màn hình hệ thống**: Landing, Login, Tra cứu Ticket, Dashboard, Tickets, Chi tiết Ticket, Rooms, Devices, Software, FAQ, Maintenance, KPI, Notifications, Chat History, Admin Users, Audit Logs, Settings. Ảnh chụp từ production build thật (viewport 1440×900, `deviceScaleFactor: 2`, locale `vi-VN`), **0 trang lỗi, 0 console error**.
+- [x] **Khắc phục lỗi chụp sai trang Chi tiết Ticket**: Locator cũ `a[href^="/dashboard/tickets/"]` khớp phải nút "Tạo Ticket mới" nên ảnh bị chụp nhầm form tạo ticket. Đã lọc bỏ các route `/(new|edit)` để chỉ chụp ticket thật đang tồn tại.
+- [x] **Tối ưu ảnh Landing Page**: Trang chủ cao ~16.000px nên ảnh full-page không đọc được trên GitHub; chuyển sang chụp theo viewport (hero section) và downscale về 1440px, giảm dung lượng từ 3.8MB xuống 1.1MB.
+- [x] **Bổ sung mục "Giao diện Hệ thống" vào README**: 17 ảnh được nhóm theo 4 khu vực chức năng (Công khai / Dashboard & Ticket / Phòng máy - Thiết bị - Phần mềm / Quản trị & Cài đặt).
+- [x] **Sửa `.gitignore` để commit được ảnh chụp**: Rule `*.png` trước đây chặn toàn bộ ảnh mới; bổ sung ngoại lệ `!public/screenshots/*.png`.
+- [x] **Đồng bộ tài liệu theo thực tế mã nguồn**: Sửa README các thông tin sai — mật khẩu seed (`admin`/`tech`/`user` thay vì `Admin@123`...), email không có hậu tố `1`, và đường dẫn seed đúng là `node seed-data.js` (không phải `prisma/seed-data.js`).
+
 ## Recently Completed (đợt Cập nhật Sơ đồ Kiến trúc, Tài liệu & CI Workflow — 2026-09-11)
 
 - [x] **Tích hợp Sơ đồ Kiến trúc Hệ thống (Archify)**: Xuất bản sơ đồ kiến trúc tương tác `dlu-onesk-architecture.html` / `.json` và ảnh chụp PNG vào `docs/images/architecture-overview.png`.
@@ -60,8 +70,8 @@
 
 ## Recently Completed (đợt Kiểm toán Toàn diện, Clean-up Lint & Seed Data Mẫu Thực tế — 2026-09-11)
 
-- [x] **Triệt tiêu 100% ESLint & TypeScript Warning/Error**: Khắc phục toàn bộ 7 vấn đề linter. Đạt chuẩn **0 errors, 0 warnings**.
-- [x] **Phản hồi Trực quan Form Đăng nhập**: Bổ sung state `errorMessage` hiển thị cảnh báo đỏ trực tiếp ngay trên form đăng nhập ngoài toast thông báo, nâng cao trải nghiệm người dùng khó tính.
+- [x] **Khắc phục triệt để lỗi Next.js 16 Async Params trên Device Routes**: Sửa lỗi `PrismaClientValidationError: id undefined` tại `DeviceDetailPage` (`/dashboard/devices/[id]`) và `EditDevicePage` (`/dashboard/devices/[id]/edit`) bằng cách unwrap `await params` theo chuẩn Next.js 15+, đảm bảo 100% route động trong hệ thống đều async an toàn.
+- [x] **Triệt tiêu 100% ESLint & TypeScript Warning/Error**: Khắc phục toàn bộ 7 vấn đề linter — loại bỏ unused `Link` tại `login/page.tsx`, unused `signIn` tại `register-form.tsx`, loại bỏ `any` types tại `maintenance/page.tsx` (dùng `TicketItem`) và `kpi-actions.ts` (bỏ unused `now` và ép kiểu thừa `isOverdue`), loại bỏ unused eslint-disable trong `vietnamese-font.ts`. Đạt chuẩn **0 errors, 0 warnings**.
 - [x] **Tương thích Cookie Session Local & Production**: Cập nhật logic `secure` cookie trong `src/lib/auth.ts` chỉ bật khi chạy HTTPS thật sự.
 - [x] **Xây dựng Bộ Dữ liệu Mẫu Thực tế (`seed-data.js`)**: Nạp đầy đủ 4 phòng máy thực tế, 5 gói phần mềm môn học, 5 thiết bị, 4 bài cẩm nang FAQ, 1 kế hoạch bảo trì.
 - [x] **Verification & Test Suite**: `npx tsc --noEmit` 0 errors, `npm run lint` 0 errors/warnings, `npm run test:unit` 37/37 pass, `node test-e2e-all.js` 19/19 pass 100%, Next.js production build pass 100%.

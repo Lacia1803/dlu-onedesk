@@ -133,6 +133,60 @@ flowchart TB
 
 ---
 
+## 📸 Giao diện Hệ thống (Screenshots)
+
+Toàn bộ ảnh dưới đây được chụp trực tiếp từ hệ thống DLU OneDesk đang chạy ở môi trường production build, thông qua script tự động hóa Playwright tại [`scripts/capture-all.mjs`](scripts/capture-all.mjs) (viewport `1440×900`, `deviceScaleFactor: 2`, locale `vi-VN`).
+
+### 🌐 Khu vực Công khai (Public)
+
+| Trang chủ (Landing Page) | Đăng nhập |
+| :---: | :---: |
+| ![Trang chủ](public/screenshots/real-landing.png) | ![Đăng nhập](public/screenshots/real-login.png) |
+
+**Tra cứu tiến độ Ticket công khai** (`/tickets/track`) — tra cứu không cần đăng nhập qua CUID, 6 ký tự đuôi hoặc MSSV:
+
+![Tra cứu Ticket](public/screenshots/real-track.png)
+
+### 📊 Dashboard & Nghiệp vụ Ticket
+
+| Tổng quan Dashboard | Danh sách Ticket |
+| :---: | :---: |
+| ![Dashboard](public/screenshots/real-dashboard.png) | ![Danh sách Ticket](public/screenshots/real-tickets.png) |
+
+| Chi tiết Ticket | KPI Kỹ thuật viên |
+| :---: | :---: |
+| ![Chi tiết Ticket](public/screenshots/real-ticket-detail.png) | ![KPI](public/screenshots/real-kpi.png) |
+
+| Thông báo Realtime (SSE) | Lịch sử Chat AI |
+| :---: | :---: |
+| ![Thông báo](public/screenshots/real-notifications.png) | ![Lịch sử Chat](public/screenshots/real-chat-history.png) |
+
+### 🖥️ Quản lý Phòng máy, Thiết bị & Phần mềm
+
+| Quản lý Phòng máy | Quản lý Thiết bị |
+| :---: | :---: |
+| ![Phòng máy](public/screenshots/real-rooms.png) | ![Thiết bị](public/screenshots/real-devices.png) |
+
+| Quản lý Phần mềm | Lịch bảo trì (Drag & Drop) |
+| :---: | :---: |
+| ![Phần mềm](public/screenshots/real-software.png) | ![Lịch bảo trì](public/screenshots/real-maintenance.png) |
+
+**Cẩm nang Hỗ trợ (FAQ)** — nguồn dữ liệu cho AI Chatbot tư vấn:
+
+![FAQ](public/screenshots/real-faq.png)
+
+### 🔐 Quản trị & Cài đặt
+
+| Quản lý Người dùng | Nhật ký Hệ thống (Audit Log) |
+| :---: | :---: |
+| ![Người dùng](public/screenshots/real-admin-users.png) | ![Audit Log](public/screenshots/real-admin-audit-logs.png) |
+
+**Cài đặt Cá nhân** (`/settings`):
+
+![Cài đặt](public/screenshots/real-settings.png)
+
+---
+
 ## 🛠 Tech Stack
 
 | Phân loại | Công nghệ / Thư viện | Ghi chú / Mục đích |
@@ -157,9 +211,10 @@ dlu-onedesk/
 ├── docs/                           # Tài liệu hướng dẫn & Ảnh kiến trúc
 │   ├── HuongDan.md                 # Hướng dẫn sử dụng chi tiết từng vai trò
 │   └── images/                     # Ảnh sơ đồ kiến trúc hệ thống
-├── prisma/                         # Schema & Seed data CSDL
-│   ├── schema.prisma               # Prisma Schema (8 models có index & cascade)
-│   └── seed-data.js                # Script nạp dữ liệu mẫu thực tế
+├── prisma/                         # Schema CSDL
+│   └── schema.prisma               # Prisma Schema (8 models có index & cascade)
+├── seed-data.js                    # Script nạp dữ liệu mẫu thực tế
+├── scripts/                        # Script tự động hóa (Playwright screenshots)
 ├── src/
 │   ├── app/                        # Next.js App Router
 │   │   ├── (auth)/                 # Route đăng nhập, đăng ký, 2FA
@@ -184,6 +239,7 @@ dlu-onedesk/
 │   │   ├── ticket-actions.ts       # SLA calculator & State machine validator
 │   │   └── validations/            # Zod validation schemas
 │   └── middleware.ts               # Proxy RBAC Route Middleware
+├── public/screenshots/             # Ảnh chụp giao diện thực tế (Playwright)
 ├── tests/                          # Test Suite (Unit & E2E)
 ├── dlu-onesk-architecture.html     # Sơ đồ kiến trúc tương tác Archify HTML
 ├── dlu-onesk-architecture.json     # Cấu hình nguồn Archify JSON
@@ -239,7 +295,7 @@ npx prisma db push
 npx prisma generate
 
 # Nạp bộ dữ liệu mẫu thực tế (4 phòng máy, 5 thiết bị, 5 phần mềm, 4 FAQ)
-node prisma/seed-data.js
+node seed-data.js
 ```
 
 ### 5. Khởi chạy Ứng dụng
@@ -254,9 +310,9 @@ npm run start
 Mở trình duyệt và truy cập: `http://localhost:3000`
 
 Tài khoản mẫu sau khi seed:
-- **Admin:** `admin@dlu.edu.vn` / `Admin@123`
-- **Kỹ thuật viên:** `tech1@dlu.edu.vn` / `Tech@123`
-- **Người dùng:** `user1@dlu.edu.vn` / `User@123`
+- **Admin:** `admin@dlu.edu.vn` / `admin`
+- **Kỹ thuật viên:** `tech@dlu.edu.vn` / `tech`
+- **Người dùng:** `user@dlu.edu.vn` / `user`
 
 ---
 
@@ -287,7 +343,7 @@ docker compose up -d --build
 docker compose exec web npx prisma db push
 
 # 4. (Tùy chọn) Nạp dữ liệu mẫu
-docker compose exec web node prisma/seed-data.js
+docker compose exec web node seed-data.js
 ```
 
 ---

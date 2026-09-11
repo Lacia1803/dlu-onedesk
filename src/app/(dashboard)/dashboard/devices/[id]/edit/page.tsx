@@ -4,14 +4,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 
-export default async function EditDevicePage({ params }: { params: { id: string } }) {
+export default async function EditDevicePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
     redirect("/dashboard/devices");
   }
 
   const device = await db.device.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
   });
 
   if (!device || device.deletedAt) {

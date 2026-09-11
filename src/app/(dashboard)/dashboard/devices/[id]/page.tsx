@@ -10,13 +10,14 @@ import { DeviceSoftwareList } from "@/components/devices/device-software-list";
 import { DeviceTransferModal } from "@/components/devices/device-transfer-modal";
 import { Badge } from "@/components/ui/badge";
 
-export default async function DeviceDetailPage({ params }: { params: { id: string } }) {
+export default async function DeviceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "TECHNICIAN";
 
   const device = await db.device.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
     include: {
       room: true,
       software: { include: { software: true } },
@@ -28,14 +29,14 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
   }
 
   const maintenanceLogs = await db.maintenanceLog.findMany({
-    where: { deviceId: params.id },
+    where: { deviceId: resolvedParams.id },
     include: { technician: { select: { name: true } } },
     orderBy: { performedAt: "desc" },
   });
 
   // Lịch sử ticket của thiết bị
   const deviceTickets = await db.ticket.findMany({
-    where: { deviceId: params.id },
+    where: { deviceId: resolvedParams.id },
     select: {
       id: true,
       title: true,
