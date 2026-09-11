@@ -7,7 +7,13 @@ This document describes a **step‑by‑step manual test plan** covering every u
 - **TECHNICIAN** – support staff handling tickets, devices, and FAQ drafts.
 - **ADMIN** – manager with full permissions (approve FAQ, configure Slack, etc.).
 
-The guide assumes you have a fresh dev database (run `npx prisma db push` after pulling the repo). Use the default credentials created by `seed-admin.js` (admin:admin@dlu.edu.vn / password: admin) and a tech user (tech@dlu.edu.vn / password: tech) which are seeded in the script.
+The guide assumes you have a fresh dev database (run `npx prisma db push` after pulling the repo). Use the default credentials created by `seed-admin.js`:
+
+| Role | Email | Password |
+|------|-------|----------|
+| ADMIN | admin@dlu.edu.vn | admin |
+| TECHNICIAN | tech@dlu.edu.vn | tech |
+| USER | user@dlu.edu.vn | user |
 
 ---
 

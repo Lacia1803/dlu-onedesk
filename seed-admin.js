@@ -32,6 +32,20 @@ async function main() {
     },
   });
   console.log('Tech user ready:', tech.email, '/ tech');
+
+  // Normal user account (for testing ticket creation flow)
+  const userHash = await bcrypt.hash('user', 10);
+  const user = await prisma.user.upsert({
+    where: { email: 'user@dlu.edu.vn' },
+    update: { password: userHash, role: 'USER' },
+    create: {
+      name: 'Student Test',
+      email: 'user@dlu.edu.vn',
+      password: userHash,
+      role: 'USER',
+    },
+  });
+  console.log('User account ready:', user.email, '/ user');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

@@ -43,8 +43,9 @@
 - [x] Chống XSS Chatbot: Kiểm tra protocol `http:` / `https:` trong `renderBotText` (`chat-widget.tsx`) trước khi render thẻ `<a>`.
 - [x] Mã hóa 2FA Secret: Dùng thuật toán AES-256-GCM với `ENCRYPTION_KEY` để mã hóa `twoFactorSecret` trong CSDL.
 - [x] Chống DoS Password: Thêm ràng buộc `.max(72)` cho tất cả schema mật khẩu (Zod).
-- [x] Đồng bộ Seed Data: Cập nhật `seed-admin.js` tạo sẵn tài khoản `admin@dlu.edu.vn`/`admin` và `tech@dlu.edu.vn`/`tech` khớp với `TESTING.md` và Playwright E2E.
-- [x] Sửa lệnh test: Cập nhật `package.json` `"test:actions": "node --test tests/actions.test.mjs"`.
+- [x] Đồng bộ Seed Data: Cập nhật `seed-admin.js` tạo đủ 3 tài khoản mẫu `admin@dlu.edu.vn`/`admin`, `tech@dlu.edu.vn`/`tech` và `user@dlu.edu.vn`/`user` khớp với `TESTING.md` và Playwright E2E.
+- [x] Dọn lệnh test thừa: Xóa `test:actions` khỏi `package.json` (`test:unit` đã bao phủ toàn bộ unit tests).
+- [x] Trang lỗi tùy biến: Tạo `src/app/not-found.tsx` (404) và `src/app/error.tsx` (error boundary) mang thương hiệu Đại học Đà Lạt, có nút "Thử lại" (reset) và "Về bảng điều khiển".
 - [x] Dockerfile tối ưu: Chuyển sang Multi-stage build + bật `output: "standalone"` giảm kích thước Docker image.
 - [x] Dọn dẹp file debug: Xóa các file rác `tmp-debug-login.js` và `admin-users.html` ở thư mục gốc.
 - [x] SLA Bulk Update: Tự động tính toán lại `slaDeadline` dựa theo mức độ ưu tiên mới khi cập nhật hàng loạt ticket.
