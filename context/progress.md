@@ -34,6 +34,14 @@
 - [ ] Deploy (Vercel/Render/Railway)
 - [ ] Kiểm thử diện rộng & Feedback người dùng thật
 
+## Recently Completed (đợt Cập nhật Sơ đồ Kiến trúc, Tài liệu & CI Workflow — 2026-09-11)
+
+- [x] **Tích hợp Sơ đồ Kiến trúc Hệ thống (Archify)**: Xuất bản sơ đồ kiến trúc tương tác `dlu-onesk-architecture.html` / `.json` và ảnh chụp PNG vào `docs/images/architecture-overview.png`.
+- [x] **Viết lại toàn diện README.md**: Cập nhật toàn bộ tổng quan hệ thống, sơ đồ tương tác, luồng nghiệp vụ, danh mục bảo mật doanh nghiệp, hướng dẫn cài đặt & deploy Docker, chi tiết test suite.
+- [x] **Khắc phục cấu hình CI GitHub Actions**: Bổ sung bước `npx prisma generate` và cờ `--legacy-peer-deps` vào workflow `.github/workflows/ci.yml` và `pr.yml` giúp CI build & test tự động thông suốt.
+- [x] **Khắc phục triệt để cảnh báo ESLint**: Xử lý biến `disabled` trong `src/components/ui/button.tsx`, đưa dự án về trạng thái hoàn hảo 0 errors, 0 warnings.
+- [x] **Đồng bộ hóa 100% Repository**: Đã commit và push toàn bộ tài liệu, components, server actions và configuration lên GitHub.
+
 ## Recently Completed (đợt Khắc phục Lỗ hổng Bảo mật Nghiêm trọng & Lỗi nghiệp vụ — 2026-09-11)
 
 - [x] **Ngăn chặn 100% Stored XSS khi Upload File**: Áp dụng cơ chế ánh xạ cứng MIME-type thành phần mở rộng file (chỉ cho phép `.jpg`, `.png`, `.webp`) trong `src/lib/storage.ts`, loại bỏ hoàn toàn việc sử dụng tên file do client cung cấp, vô hiệu hóa việc tải lên các mã thực thi độc hại (HTML/SVG/JS).
