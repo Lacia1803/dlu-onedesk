@@ -1,10 +1,13 @@
 # Feature Spec: Quản lý Thiết bị & QR Code
 
 ## Goal
+
 CRUD thiết bị (máy tính, thiết bị mạng, ngoại vi), quản lý phần mềm cài đặt, generate/scan mã QR, lịch sử bảo trì.
 
 ## Scope
+
 ### In Scope
+
 - Danh sách thiết bị (table: search, filter theo phòng/loại/trạng thái)
 - CRUD thiết bị (tên, loại, phòng, cấu hình, trạng thái...)
 - Generate mã QR unique cho mỗi thiết bị
@@ -14,11 +17,13 @@ CRUD thiết bị (máy tính, thiết bị mạng, ngoại vi), quản lý ph�
 - Thêm log bảo trì/sửa chữa
 
 ### Out of Scope
+
 - In QR code hàng loạt
 - Import thiết bị từ Excel/CSV
 - Tracking linh kiện thay thế
 
 ## Dependencies
+
 - Auth system (spec 01)
 - Room management (spec 02) — thiết bị thuộc phòng
 - Prisma models: Device, Software, DeviceSoftware, MaintenanceLog (đã có)
@@ -27,6 +32,7 @@ CRUD thiết bị (máy tính, thiết bị mạng, ngoại vi), quản lý ph�
 ## Technical Design
 
 ### Routes
+
 ```
 /devices                — Danh sách thiết bị
 /devices/new            — Form tạo thiết bị
@@ -36,6 +42,7 @@ CRUD thiết bị (máy tính, thiết bị mạng, ngoại vi), quản lý ph�
 ```
 
 ### API Endpoints
+
 ```
 GET    /api/devices              — Danh sách (search, filter, pagination)
 POST   /api/devices              — Tạo mới (ADMIN, TECHNICIAN)
@@ -53,12 +60,14 @@ POST   /api/devices/[id]/maintenance     — Thêm log bảo trì (TECHNICIAN, A
 ```
 
 ### QR Code Flow
+
 1. Tạo thiết bị → auto generate `qrCode` = `DEVICE-{cuid}`
 2. GET `/api/devices/[id]/qr` → trả về PNG QR chứa URL: `{APP_URL}/devices/qr/{qrCode}`
 3. User scan QR bằng camera → redirect tới trang chi tiết thiết bị
 4. Từ trang chi tiết → nút "Báo sự cố" → tạo ticket với device đã pre-fill
 
 ### Specifications (JSON field)
+
 ```json
 {
   "cpu": "Intel Core i5-12400",
@@ -68,14 +77,17 @@ POST   /api/devices/[id]/maintenance     — Thêm log bảo trì (TECHNICIAN, A
   "monitor": "Dell 24 inch"
 }
 ```
+
 Dùng dynamic key-value form, không fixed fields.
 
 ### Permissions
+
 - USER: xem danh sách, xem chi tiết, scan QR
 - TECHNICIAN: xem + tạo + sửa + thêm log bảo trì + quản lý software
 - ADMIN: toàn quyền (bao gồm xóa)
 
 ### Validation (Zod)
+
 - name: required, min 2, max 100
 - type: enum DeviceType
 - roomId: required, must exist
@@ -85,6 +97,7 @@ Dùng dynamic key-value form, không fixed fields.
 - Maintenance log: description required, type required (repair/maintenance/upgrade)
 
 ## Invariants
+
 - qrCode phải unique, auto-generated, không cho user sửa
 - serialNumber nếu có phải unique
 - Thiết bị phải thuộc 1 phòng (roomId required)
@@ -92,6 +105,7 @@ Dùng dynamic key-value form, không fixed fields.
 - Software-device relation: không duplicate (unique constraint)
 
 ## Verification Checklist
+
 - [ ] Danh sách thiết bị hiển thị, filter theo phòng/loại/trạng thái OK
 - [ ] Tạo thiết bị → auto generate QR code
 - [ ] Xem QR code image của thiết bị

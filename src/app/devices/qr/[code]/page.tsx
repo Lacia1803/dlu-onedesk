@@ -21,7 +21,7 @@ export default async function QrLookupPage({ params }: { params: { code: string 
           <h1 className="text-2xl font-bold tracking-tight">Báo cáo sự cố nhanh</h1>
           <p className="text-muted-foreground">
             Thiết bị: <span className="font-semibold text-foreground">{device.name}</span>
-            {device.room && ` — Phòng {device.room.name}`}
+            {device.room && ` — Phòng ${device.room.name}`}
           </p>
         </div>
 

@@ -146,6 +146,8 @@ function LoginForm({ onClose }: { onClose: () => void }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needOtp, setNeedOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -153,17 +155,33 @@ function LoginForm({ onClose }: { onClose: () => void }) {
     setError(null);
 
     try {
+      if (!needOtp) {
+        const check = await fetch("/api/auth/check-2fa", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const { twoFactorEnabled } = await check.json();
+        if (twoFactorEnabled) {
+          setNeedOtp(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await signIn("credentials", {
         email,
         password,
+        token: needOtp ? otp : undefined,
         redirect: false,
       });
 
       if (res?.error) {
-        setError("Email hoặc mật khẩu không chính xác.");
+        setError(needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác.");
       } else {
         router.push("/dashboard");
         router.refresh();
+        onClose();
       }
     } catch {
       setError("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
@@ -211,6 +229,26 @@ function LoginForm({ onClose }: { onClose: () => void }) {
             className="w-full rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-sm text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
           />
         </label>
+
+        {needOtp && (
+          <label className="block">
+            <span className="mb-1.5 block text-[11px] font-bold tracking-wide text-pine-900 uppercase">
+              Mã xác thực OTP (6 chữ số)
+            </span>
+            <input
+              type="text"
+              maxLength={6}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="123456"
+              className="w-full font-mono text-center tracking-[0.3em] rounded-2xl border border-pine-950/12 bg-white px-4 py-3 text-base text-pine-950 outline-none transition placeholder:text-ink/30 focus:border-pine-600 focus:ring-4 focus:ring-pine-100"
+              autoFocus
+            />
+            <span className="mt-1 block text-[11px] text-ink/60">
+              Tài khoản đã bật 2FA. Vui lòng mở Authenticator để lấy mã.
+            </span>
+          </label>
+        )}
 
         {error && (
           <p className="rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-600 border border-red-200">

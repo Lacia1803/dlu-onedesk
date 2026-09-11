@@ -10,7 +10,7 @@ interface TechnicianTicket {
   device: { name: string } | null;
 }
 
-export function TechnicianTicketList({ tickets }: { tickets: TechnicianTicket[] }) {
+export function TechnicianTicketList({ tickets, onSelectTicket, selectedTicketId }: { tickets: TechnicianTicket[]; onSelectTicket?: (id: string) => void; selectedTicketId?: string }) {
   return (
     <div className="border rounded-sm bg-card p-4">
       <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">
@@ -20,11 +20,12 @@ export function TechnicianTicketList({ tickets }: { tickets: TechnicianTicket[] 
         {tickets.map((t) => (
           <li
             key={t.id}
-            className="py-2 flex items-center justify-between gap-4"
+            className={`py-2 flex items-center justify-between gap-4 ${selectedTicketId === t.id ? "bg-primary/10" : ""}`}
             draggable="true"
             onDragStart={(e) => {
               e.dataTransfer.setData("application/json", JSON.stringify({ id: t.id }));
             }}
+            onClick={() => onSelectTicket && onSelectTicket(t.id)}
           >
             <Link
               href={`/dashboard/tickets/${t.id}`}

@@ -20,10 +20,17 @@ function renderBotText(text: string) {
     const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (!m) return part;
     const url = m[2];
-    // Only allow http: and https: protocols — block javascript:, data:, vbscript:, etc.
+    // Allow absolute http/https URLs and relative paths starting with '/' (but not protocol‑relative "//")
     try {
-      const parsed = new URL(url);
-      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return part;
+      // If it looks like an absolute URL, validate protocol
+      if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url)) {
+        const parsed = new URL(url);
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return part;
+      } else if (url.startsWith('/') && !url.startsWith('//')) {
+        // Relative path – allowed
+      } else {
+        return part;
+      }
     } catch {
       return part;
     }

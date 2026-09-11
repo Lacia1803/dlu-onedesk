@@ -53,21 +53,17 @@ export async function POST(req: NextRequest) {
   }
 
   // Create a system "guest" user reference — we store studentId in the ticket notes
-  // since Ticket requires a creatorId, we use/find a special "Guest" user
-  let guestUser = await db.user.findFirst({
+  // since Ticket requires a creatorId, we use an atomic upsert for the "Guest" user
+  const guestUser = await db.user.upsert({
     where: { email: "guest@system.local" },
+    update: {},
+    create: {
+      name: "Khách vãng lai",
+      email: "guest@system.local",
+      password: "", // never used
+      role: "USER",
+    },
   });
-
-  if (!guestUser) {
-    guestUser = await db.user.create({
-      data: {
-        name: "Khách vãng lai",
-        email: "guest@system.local",
-        password: "", // never used
-        role: "USER",
-      },
-    });
-  }
 
   const slaDeadline = computeSlaDeadline("MEDIUM");
 

@@ -16,7 +16,7 @@ export function QrCodeDisplay({ qrCode, deviceName }: QrCodeDisplayProps) {
 
   useEffect(() => {
     // Generate URL that points to the scan redirect page
-    const scanUrl = `${window.location.origin}/dashboard/devices/qr/${qrCode}`;
+    const scanUrl = `${window.location.origin}/devices/qr/${qrCode}`;
 
     QRCode.toDataURL(scanUrl, {
       width: 300,

@@ -4,12 +4,22 @@ import { randomBytes } from "crypto";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
+const MIME_TO_EXT: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
 
-function validate(file: File): void {
-  if (!ALLOWED.includes(file.type)) {
+function getSafeExt(file: File): string {
+  const ext = MIME_TO_EXT[file.type];
+  if (!ext) {
     throw new Error(`File ${file.name} không đúng định dạng (JPEG, PNG, WEBP).`);
   }
+  return ext;
+}
+
+function validate(file: File): void {
+  getSafeExt(file); // Throws if file.type is not allowed
   if (file.size > MAX_SIZE) {
     throw new Error(`File ${file.name} vượt quá dung lượng tối đa 5MB.`);
   }
@@ -22,7 +32,7 @@ async function saveLocal(file: File, subdir: string): Promise<string> {
   const uploadDir = path.join(process.cwd(), "public", "uploads", subdir);
   await mkdir(uploadDir, { recursive: true });
 
-  const ext = path.extname(file.name) || ".jpg";
+  const ext = getSafeExt(file);
   const filename = `${Date.now()}-${randomBytes(4).toString("hex")}${ext}`;
   const filePath = path.join(uploadDir, filename);
 
@@ -48,7 +58,7 @@ async function saveRemote(file: File, subdir: string): Promise<string> {
     endpoint: S3_ENDPOINT || undefined,
     credentials: { accessKeyId: S3_ACCESS_KEY_ID, secretAccessKey: S3_SECRET_ACCESS_KEY },
   });
-  const ext = path.extname(file.name) || ".jpg";
+  const ext = getSafeExt(file);
   const key = `${subdir}/${Date.now()}-${randomBytes(4).toString("hex")}${ext}`;
   await client.send(
     new PutObjectCommand({

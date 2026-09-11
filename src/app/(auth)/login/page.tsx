@@ -7,7 +7,6 @@ import { loginSchema } from "@/lib/validations/auth";
 import * as z from "zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -36,6 +35,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [needOtp, setNeedOtp] = useState(false);
   const [otp, setOtp] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(loginSchema),
@@ -47,6 +47,7 @@ export default function LoginPage() {
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
+    setErrorMessage(null);
 
     try {
       // Bước 1: kiểm tra xem tài khoản có bật 2FA không
@@ -72,16 +73,18 @@ export default function LoginPage() {
       });
 
       if (signInResult?.error) {
-        toast.error(
-          needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác"
-        );
+        const msg = needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác";
+        setErrorMessage(msg);
+        toast.error(msg);
       } else {
         toast.success("Đăng nhập thành công!");
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+      const msg = "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -146,6 +149,9 @@ export default function LoginPage() {
                   </p>
                 </div>
               )}
+              {errorMessage && (
+                <p className="text-sm font-medium text-destructive text-center">{errorMessage}</p>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Đang xử lý..." : needOtp ? "Xác thực & Đăng nhập" : "Đăng nhập"}
               </Button>
@@ -153,11 +159,10 @@ export default function LoginPage() {
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center border-t p-4">
-          <p className="text-sm text-muted-foreground">
-            Chưa có tài khoản?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">
-              Đăng ký ngay
-            </Link>
+          <p className="text-sm text-muted-foreground text-center">
+            Tài khoản hệ thống do Trung tâm CNTT cấp.
+            <br />
+            Vui lòng liên hệ Quản trị viên để được cấp tài khoản.
           </p>
         </CardFooter>
       </Card>

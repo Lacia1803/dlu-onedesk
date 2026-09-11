@@ -14,7 +14,7 @@ import {
   subMonths,
 } from "date-fns";
 import { vi } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Wrench, DollarSign, User, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Wrench, DollarSign, User, MapPin, CalendarPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -43,11 +43,15 @@ interface TicketItem {
 interface MaintenanceCalendarProps {
   initialLogs: LogItem[];
   scheduledTickets?: TicketItem[];
+  selectedTicketId?: string | null;
+  onClearSelectedTicket?: () => void;
 }
 
 export function MaintenanceCalendar({
   initialLogs,
   scheduledTickets = [],
+  selectedTicketId = null,
+  onClearSelectedTicket,
 }: MaintenanceCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedLog, setSelectedLog] = useState<LogItem | null>(null);
@@ -72,8 +76,26 @@ export function MaintenanceCalendar({
     return scheduledTickets.filter((t) => t.scheduledAt && isSameDay(new Date(t.scheduledAt), day));
   };
 
+  const scheduleTicketForDay = async (ticketId: string, day: Date) => {
+    try {
+      const res = await fetch("/api/tickets/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: ticketId, scheduledAt: day.toISOString() }),
+      });
+
+      if (!res.ok) throw new Error("API failed");
+      toast.success(`Đã lên lịch ticket cho ngày ${format(day, "dd/MM/yyyy")}`);
+      if (onClearSelectedTicket) onClearSelectedTicket();
+      router.refresh();
+    } catch (error) {
+      toast.error("Lỗi khi lên lịch ticket");
+      console.error(error);
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // Necessary to allow dropping
+    e.preventDefault();
   };
 
   const handleDrop = async (e: React.DragEvent, day: Date) => {
@@ -83,18 +105,15 @@ export function MaintenanceCalendar({
 
     try {
       const { id } = JSON.parse(data);
-      const res = await fetch("/api/tickets/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, scheduledAt: day.toISOString() }),
-      });
-
-      if (!res.ok) throw new Error("API failed");
-      toast.success("Đã lên lịch ticket thành công");
-      router.refresh();
+      await scheduleTicketForDay(id, day);
     } catch (error) {
-      toast.error("Lỗi khi lên lịch ticket");
       console.error(error);
+    }
+  };
+
+  const handleDayClick = (day: Date) => {
+    if (selectedTicketId) {
+      scheduleTicketForDay(selectedTicketId, day);
     }
   };
 
@@ -102,6 +121,19 @@ export function MaintenanceCalendar({
 
   return (
     <div className="space-y-4">
+      {/* Touch selection banner */}
+      {selectedTicketId && (
+        <div className="p-3 bg-amber-500/15 border border-amber-500/30 rounded-lg flex items-center justify-between text-xs sm:text-sm font-medium text-amber-900 dark:text-amber-200">
+          <span className="flex items-center gap-2">
+            <CalendarPlus className="h-4 w-4 text-amber-600 animate-bounce" />
+            Đang chọn ticket để lên lịch. <strong>Chạm vào một ngày trên lịch bên dưới</strong> để xếp lịch.
+          </span>
+          <Button variant="ghost" size="xs" onClick={onClearSelectedTicket}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={prevMonth}>
@@ -141,9 +173,12 @@ export function MaintenanceCalendar({
                 key={day.toISOString()}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, day)}
-                className={`min-h-[100px] p-2 transition-colors flex flex-col justify-between ${
+                onClick={() => handleDayClick(day)}
+                className={`min-h-[100px] p-2 transition-colors flex flex-col justify-between cursor-pointer ${
                   !isCurrentMonth ? "bg-muted/20 text-muted-foreground" : "bg-card"
-                } ${isToday ? "ring-2 ring-primary ring-inset" : ""} hover:bg-accent/50`}
+                } ${isToday ? "ring-2 ring-primary ring-inset" : ""} ${
+                  selectedTicketId ? "hover:bg-amber-500/10 hover:border-amber-500/30" : "hover:bg-accent/50"
+                }`}
               >
                 <div className="flex justify-between items-center mb-1">
                   <span
@@ -165,7 +200,10 @@ export function MaintenanceCalendar({
                     <div
                       key={`ticket-${t.id}`}
                       className="w-full text-left truncate text-xs p-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-500 transition-colors border border-amber-500/20 cursor-pointer"
-                      onClick={() => router.push(`/dashboard/tickets/${t.id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/dashboard/tickets/${t.id}`);
+                      }}
                     >
                       <span className="font-semibold">#{t.id.slice(-4).toUpperCase()}</span>{" "}
                       {t.title}
@@ -174,7 +212,10 @@ export function MaintenanceCalendar({
                   {dayLogs.map((log) => (
                     <button
                       key={`log-${log.id}`}
-                      onClick={() => setSelectedLog(log)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedLog(log);
+                      }}
                       className="w-full text-left truncate text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 text-foreground transition-colors flex items-center gap-1 border border-primary/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Wrench className="h-3 w-3 shrink-0 text-primary" />

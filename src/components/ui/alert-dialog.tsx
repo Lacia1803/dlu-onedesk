@@ -86,14 +86,16 @@ function AlertDialogAction({
   children,
   className,
   variant = "default",
+  disabled,
 }: {
   onClick?: () => void;
   children: React.ReactNode;
   className?: string;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  disabled?: boolean;
 }) {
   return (
-    <Button variant={variant} onClick={onClick} className={className}>
+    <Button variant={variant} onClick={onClick} className={className} disabled={disabled}>
       {children}
     </Button>
   );
@@ -103,13 +105,15 @@ function AlertDialogCancel({
   onClick,
   children,
   className,
+  disabled,
 }: {
   onClick?: () => void;
   children?: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
-    <Button variant="outline" onClick={onClick} className={className}>
+    <Button variant="outline" onClick={onClick} className={className} disabled={disabled}>
       {children || "Hủy bỏ"}
     </Button>
   );

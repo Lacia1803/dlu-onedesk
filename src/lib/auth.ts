@@ -18,8 +18,10 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        // Chỉ bật Secure khi chạy production (HTTPS)
-        secure: process.env.NODE_ENV === "production",
+        // Chỉ bật Secure khi chạy production thật sự trên HTTPS
+        secure:
+          process.env.NODE_ENV === "production" &&
+          Boolean(process.env.NEXTAUTH_URL?.startsWith("https://")),
       },
     },
   },

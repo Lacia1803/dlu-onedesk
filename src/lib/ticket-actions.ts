@@ -104,9 +104,16 @@ export function computeResponseDeadline(priority: TicketPriority, from: Date = n
   return addWorkingHours(from, RESPONSE_SLA_HOURS[priority]);
 }
 
+/** Trạng thái ticket vẫn nằm trong tầm SLA — RESOLVED/CANCELLED/CLOSED không bao giờ bị tính quá hạn */
+export const OVERDUE_STATUSES: TicketStatus[] = [
+  TicketStatus.OPEN,
+  TicketStatus.IN_PROGRESS,
+  TicketStatus.WAITING_PARTS,
+];
+
 /** Kiểm tra ticket quá hạn SLA chưa */
 export function isOverdue(ticket: { status: TicketStatus; slaDeadline: Date | null }): boolean {
-  if (ticket.status === TicketStatus.CLOSED || !ticket.slaDeadline) return false;
+  if (!OVERDUE_STATUSES.includes(ticket.status) || !ticket.slaDeadline) return false;
   return new Date() > ticket.slaDeadline;
 }
 

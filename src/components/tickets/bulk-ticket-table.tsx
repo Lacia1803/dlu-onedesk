@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
+import { isOverdue } from "@/lib/ticket-actions";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   bulkUpdateTickets,
@@ -267,16 +268,15 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                     </TableCell>
                     <TableCell>
                       <TicketStatusBadge status={ticket.status} />
-                      {/* SLA overdue badge: dùng slaDeadline nếu có, fallback 3 ngày */}
-                      {ticket.status !== "CLOSED" &&
-                        (ticket.slaDeadline
-                          ? new Date() > new Date(ticket.slaDeadline)
-                          : new Date().getTime() - new Date(ticket.createdAt).getTime() >
-                            3 * 24 * 60 * 60 * 1000) && (
-                          <span className="ml-2 inline-block px-2 py-0.5 text-xs font-mono bg-red-100 text-red-800 rounded-full">
-                            Quá hạn SLA
-                          </span>
-                        )}
+                      {/* SLA overdue badge: chỉ áp dụng cho ticket chưa hoàn tất (không tính RESOLVED/CANCELLED/CLOSED) */}
+                      {isOverdue({
+                        status: ticket.status,
+                        slaDeadline: ticket.slaDeadline ? new Date(ticket.slaDeadline) : null,
+                      }) && (
+                        <span className="ml-2 inline-block px-2 py-0.5 text-xs font-mono bg-red-100 text-red-800 rounded-full">
+                          Quá hạn SLA
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <TicketPriorityBadge priority={ticket.priority} />

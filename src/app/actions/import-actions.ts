@@ -235,6 +235,21 @@ export async function importUsers(formData: FormData): Promise<{
     };
   }
 
+  // Giới hạn số lượng dòng tối đa để tránh cạn kiệt tài nguyên máy chủ
+  if (rows.length > 200) {
+    return {
+      success: false,
+      inserted: 0,
+      skipped: rows.length,
+      errors: [
+        {
+          row: 0,
+          message: `File có ${rows.length} dòng, vượt quá giới hạn tối đa 200 người dùng/lần import.`,
+        },
+      ],
+    };
+  }
+
   const errors: ImportRowError[] = [];
   let inserted = 0;
 
@@ -259,7 +274,7 @@ export async function importUsers(formData: FormData): Promise<{
     toCreate.push({
       name,
       email,
-      password: "", // placeholder, hash song song bên dưới
+      password: "", // placeholder, hash theo từng batch bên dưới
       role,
       phone: cellStr(raw, "phone").trim() || null,
       mustChangePassword: true,
@@ -284,13 +299,17 @@ export async function importUsers(formData: FormData): Promise<{
     return true;
   });
 
-  // Hash mật khẩu song song (bcrypt mỗi dòng ~100ms → 200 dòng song song nhanh hơn nhiều)
+  // Hash mật khẩu theo từng batch 10 phần tử để tránh nghẽn libuv thread pool
   if (valid.length > 0) {
     try {
-      const hashed = await Promise.all(valid.map((u) => bcrypt.hash(u.email, 10)));
-      valid.forEach((u, idx) => {
-        u.password = hashed[idx];
-      });
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < valid.length; i += BATCH_SIZE) {
+        const batch = valid.slice(i, i + BATCH_SIZE);
+        const hashes = await Promise.all(batch.map((u) => bcrypt.hash(u.email, 10)));
+        batch.forEach((u, idx) => {
+          u.password = hashes[idx];
+        });
+      }
 
       // Tất cả hoặc không: 1 transaction
       await db.$transaction(async (tx) => {

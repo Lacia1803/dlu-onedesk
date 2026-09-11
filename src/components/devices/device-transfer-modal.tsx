@@ -32,7 +32,9 @@ export function DeviceTransferModal({
     const res = await fetch("/api/devices/transfer", { method: "POST", body: fd });
     if (res.ok) {
       toast.success("Đã chuyển thiết bị");
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } else {
       toast.error("Chuyển thất bại");
     }

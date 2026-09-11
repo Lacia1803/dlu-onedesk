@@ -1,7 +1,6 @@
 import { getAllMaintenanceLogs } from "@/app/actions/maintenance-actions";
 import { getTicketsForTechnician } from "@/app/actions/ticket-actions";
-import { MaintenanceCalendar } from "@/components/maintenance/maintenance-calendar";
-import { TechnicianTicketList } from "@/components/maintenance/technician-ticket-list";
+import { MaintenanceDashboardClient, type TicketItem } from "./maintenance-client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -21,23 +20,24 @@ export default async function MaintenancePage() {
     myTickets = await getTicketsForTechnician(session.user.id);
   }
 
-  // Lọc ra các ticket đã được lên lịch
-  const scheduledTickets = myTickets.tickets?.filter((t) => t.scheduledAt) || [];
+  const validTickets = myTickets.tickets || [];
+  const scheduledTickets = validTickets.filter((t) => t.scheduledAt);
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Lịch bảo trì</h1>
         <p className="text-sm text-muted-foreground">
-          Xem toàn bộ lịch sử bảo trì thiết bị theo tháng. (Kéo ticket vào ngày để lên lịch)
+          Xem toàn bộ lịch sử bảo trì thiết bị theo tháng. Kéo hoặc chạm chọn ticket để lên lịch bảo trì trên mọi thiết bị.
         </p>
       </div>
 
-      {isTech && myTickets.success && myTickets.tickets.length > 0 && (
-        <TechnicianTicketList tickets={myTickets.tickets} />
-      )}
-
-      <MaintenanceCalendar initialLogs={logs} scheduledTickets={scheduledTickets} />
+      <MaintenanceDashboardClient
+        isTech={isTech}
+        logs={logs}
+        myTickets={validTickets as unknown as TicketItem[]}
+        scheduledTickets={scheduledTickets as unknown as TicketItem[]}
+      />
     </div>
   );
 }

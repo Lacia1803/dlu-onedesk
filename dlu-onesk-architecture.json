@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "DLU OneDesk — Kiến trúc Hệ thống",
+    "output": "dlu-onesk-architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [780, 730],
+    "views": [
+      { "id": "request-path", "label": "Luồng yêu cầu chính", "focus": ["users", "nextjs-app", "prisma", "postgres"], "note": "Yêu cầu từ trình duyệt qua Next.js Server Actions tới PostgreSQL." },
+      { "id": "security", "label": "Xác thực & Bảo mật", "focus": ["nextauth", "totp", "rate-limiter"], "note": "NextAuth + 2FA TOTP + Rate Limiting chống brute-force." },
+      { "id": "integrations", "label": "Tích hợp ngoài", "focus": ["nextjs-app", "gemini", "email", "guest"], "note": "AI Chatbot, email cảnh báo SLA và luồng khách vãng lai quét QR." }
+    ]
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "Người dùng", "sublabel": "ADMIN / TECH / USER", "pos": [30, 330], "size": [130, 60] },
+    { "id": "guest", "type": "external", "label": "Khách vãng lai", "sublabel": "Sinh viên quét QR", "pos": [30, 480], "size": [130, 60] },
+    { "id": "totp", "type": "security", "label": "2FA TOTP", "sublabel": "Secret AES-256-GCM", "pos": [280, 30], "size": [150, 60] },
+    { "id": "nextauth", "type": "security", "label": "NextAuth.js", "sublabel": "Credentials + Session", "pos": [280, 160], "size": [150, 60] },
+    { "id": "rate-limiter", "type": "security", "label": "Rate Limiter", "sublabel": "In-memory + Redis REST", "pos": [530, 160], "size": [150, 60], "tag": "5 req/phút" },
+    { "id": "nextjs-app", "type": "backend", "label": "Next.js 16", "sublabel": "App Router · Server Actions", "pos": [270, 330], "size": [160, 70] },
+    { "id": "prisma", "type": "backend", "label": "Prisma ORM", "sublabel": "Type-safe client", "pos": [270, 480], "size": [150, 60] },
+    { "id": "postgres", "type": "database", "label": "PostgreSQL", "sublabel": "Primary database", "pos": [270, 620], "size": [150, 60] },
+    { "id": "gemini", "type": "cloud", "label": "Gemini AI", "sublabel": "Chatbot FAQ", "pos": [545, 330], "size": [150, 60] },
+    { "id": "email", "type": "cloud", "label": "Nodemailer", "sublabel": "SMTP notifications", "pos": [545, 480], "size": [150, 60] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "Auth & Security", "wraps": ["totp", "nextauth", "rate-limiter"] }
+  ],
+  "connections": [
+    { "id": "user-access", "from": "users", "to": "nextjs-app", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "guest-report", "from": "guest", "to": "nextjs-app", "label": "QR → guest ticket", "variant": "dashed" },
+    { "id": "session-verify", "from": "nextjs-app", "to": "nextauth", "label": "getServerSession", "fromSide": "top", "toSide": "bottom" },
+    { "id": "otp-check", "from": "nextauth", "to": "totp", "label": "OTP" },
+    { "id": "throttle", "from": "nextauth", "to": "rate-limiter", "label": "check-2fa limit", "variant": "security" },
+    { "id": "orm", "from": "nextjs-app", "to": "prisma", "label": "queries", "fromSide": "bottom", "toSide": "top" },
+    { "id": "sql", "from": "prisma", "to": "postgres", "label": "SQL", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "ai-reply", "from": "nextjs-app", "to": "gemini", "label": "chat context" },
+    { "id": "smtp", "from": "nextjs-app", "to": "email", "label": "SLA reminder" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Ứng dụng", "items": ["Next.js 16 App Router + Server Actions", "shadcn/ui + Tailwind, mobile-first", "Prisma ORM → PostgreSQL có index FK"] },
+    { "dot": "rose", "title": "Bảo mật", "items": ["2FA TOTP mã hóa AES-256-GCM", "Rate limit 5 req/phút trên check-2fa", "Upload chặn XSS theo whitelist MIME"] },
+    { "dot": "emerald", "title": "Nghiệp vụ", "items": ["SLA giờ hành chính (T2–T6, 7:30–17:00)", "State machine ticket enforce server-side", "Bulk update qua validate transition"] }
+  ]
+}

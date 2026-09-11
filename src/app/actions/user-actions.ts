@@ -137,11 +137,19 @@ export async function verifyTwoFactor(code: string, userId?: string) {
   return { success: true };
 }
 
-export async function disableTwoFactor(userId?: string) {
+export async function disableTwoFactor(password: string, userId?: string) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
   const targetId = userId && session.user.role === "ADMIN" ? userId : session.user.id;
+
+  if (targetId === session.user.id) {
+    const user = await db.user.findUnique({ where: { id: targetId }, select: { password: true } });
+    if (!user) return { success: false, error: "Người dùng không tồn tại." };
+    const bcrypt = await import("bcryptjs");
+    const valid = await bcrypt.default.compare(password, user.password);
+    if (!valid) return { success: false, error: "Mật khẩu hiện tại không chính xác." };
+  }
 
   await db.user.update({
     where: { id: targetId },

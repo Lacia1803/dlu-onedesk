@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: DLU OneDesk API Contract
+  description: Tài liệu chuẩn OpenAPI v3 cho toàn bộ RESTful API endpoints của hệ thống DLU OneDesk.
+  version: 1.2.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+
+paths:
+  /tickets:
+    get:
+      summary: Lấy danh sách Ticket (có phân trang & lọc)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: priority
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+
+  /tickets/guest:
+    post:
+      summary: Khách vãng lai gửi báo cáo sự cố qua QR Code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [studentId, title, description, deviceId]
+              properties:
+                studentId:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                deviceId:
+                  type: string
+      responses:
+        "200":
+          description: Tạo ticket thành công
+        "429":
+          description: Vượt quá giới hạn lượt gửi (Rate-limited)
+
+  /notifications/sse:
+    get:
+      summary: Server-Sent Events stream đẩy thông báo trực tiếp
+      responses:
+        "200":
+          description: SSE Stream connected
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /devices/transfer:
+    post:
+      summary: Bàn giao / Điều chuyển thiết bị sang phòng khác
+      responses:
+        "200":
+          description: Điều chuyển thành công
+
+  /auth/oauth/{provider}:
+    get:
+      summary: Placeholder route cho đăng nhập SSO OAuth tương lai
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stub future integration

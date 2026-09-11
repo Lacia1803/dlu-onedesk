@@ -175,12 +175,20 @@ describe("PDF export (jsPDF smoke test)", () => {
 describe("Password change schema", () => {
   // Re-implement the schema check here to avoid deep import chains
   it("rejects mismatched passwords", () => {
-    const data = { currentPassword: "old1234", newPassword: "new12345", confirmPassword: "different1" };
+    const data = {
+      currentPassword: "old1234",
+      newPassword: "new12345",
+      confirmPassword: "different1",
+    };
     assert.notStrictEqual(data.newPassword, data.confirmPassword);
   });
 
   it("accepts matching passwords with sufficient length", () => {
-    const data = { currentPassword: "old1234", newPassword: "new12345", confirmPassword: "new12345" };
+    const data = {
+      currentPassword: "old1234",
+      newPassword: "new12345",
+      confirmPassword: "new12345",
+    };
     assert.strictEqual(data.newPassword, data.confirmPassword);
     assert.ok(data.newPassword.length >= 8);
   });

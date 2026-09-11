@@ -1,8 +1,12 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/permissions";
 
 // ponytail: resolve QR code -> device id for scan flow
 export async function GET(request: NextRequest) {
+  const session = await requireApiSession();
+  if (!session) return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
+
   const code = new URL(request.url).searchParams.get("code");
   if (!code) return NextResponse.json({ error: "Thiếu code" }, { status: 400 });
 

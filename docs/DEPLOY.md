@@ -3,6 +3,7 @@
 ## Option 1: Docker Compose (Recommended cho VPS)
 
 ### Yêu cầu
+
 - Docker + Docker Compose
 - Domain/subdomain trỏ về VPS (nếu muốn HTTPS)
 
@@ -134,12 +135,12 @@ nginx -t && systemctl reload nginx
 
 ## Troubleshooting
 
-| Lỗi | Nguyên nhân | Fix |
-|-----|-------------|-----|
+| Lỗi                                      | Nguyên nhân          | Fix                                                                |
+| ---------------------------------------- | -------------------- | ------------------------------------------------------------------ |
 | `Can't reach database server at db:5432` | Build-time DB access | Đã fix: chuyển page `/dashboard/tickets/new` sang Client Component |
-| `PrismaClientInitializationError` | Schema chưa sync | Chạy `npx prisma db push` |
-| Email không gửi | Thiếu SMTP env | Kiểm tra `.env` có đủ `SMTP_*` |
-| 404 sau deploy | Static pages fail | Check log: `docker compose logs web` |
+| `PrismaClientInitializationError`        | Schema chưa sync     | Chạy `npx prisma db push`                                          |
+| Email không gửi                          | Thiếu SMTP env       | Kiểm tra `.env` có đủ `SMTP_*`                                     |
+| 404 sau deploy                           | Static pages fail    | Check log: `docker compose logs web`                               |
 
 ---
 

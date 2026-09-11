@@ -43,8 +43,9 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  disabled,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { disabled?: boolean }) {
   return (
     <ButtonPrimitive
       data-slot="button"

@@ -87,8 +87,10 @@ export async function adminResetPassword(targetUserId: string) {
   });
   if (!user) return { success: false, error: "Người dùng không tồn tại." };
 
-  // Reset mật khẩu = hash email làm mật khẩu tạm + set mustChangePassword
-  const hashed = await bcrypt.hash(user.email, 10);
+  // Sinh mật khẩu tạm ngẫu nhiên an toàn (không dùng email tránh lộ mật khẩu)
+  const { randomBytes } = await import("crypto");
+  const tempPassword = `Dlu@${randomBytes(4).toString("hex")}`;
+  const hashed = await bcrypt.hash(tempPassword, 10);
   await db.user.update({
     where: { id: targetUserId },
     data: { password: hashed, mustChangePassword: true },
@@ -103,5 +105,5 @@ export async function adminResetPassword(targetUserId: string) {
   });
 
   revalidatePath("/admin/users");
-  return { success: true, tempPassword: user.email };
+  return { success: true, tempPassword };
 }

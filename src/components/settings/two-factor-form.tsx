@@ -40,6 +40,7 @@ export function TwoFactorForm({
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [secret, setSecret] = useState("");
   const [code, setCode] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
 
@@ -75,14 +76,19 @@ export function TwoFactorForm({
   }
 
   async function handleDisable() {
-    setDisableDialogOpen(false);
+    if (!confirmPassword.trim()) {
+      toast.error("Vui lòng nhập mật khẩu hiện tại để xác nhận.");
+      return;
+    }
     setLoading(true);
-    const res = await disableTwoFactor(userId);
+    const res = await disableTwoFactor(confirmPassword.trim(), userId);
     setLoading(false);
     if (res.success) {
       toast.success("Đã tắt xác thực 2 lớp.");
       setIsEnabled(false);
       setStage("idle");
+      setDisableDialogOpen(false);
+      setConfirmPassword("");
     } else {
       toast.error(res.error || "Không thể tắt 2FA");
     }
@@ -225,13 +231,23 @@ export function TwoFactorForm({
           <AlertDialogHeader>
             <AlertDialogTitle>Tắt xác thực 2 lớp?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn tắt xác thực 2 lớp? Tài khoản của bạn sẽ giảm bớt một lớp bảo
-              mật.
+              Vui lòng nhập mật khẩu hiện tại của bạn để xác nhận tắt tính năng xác thực 2 lớp.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="py-2">
+            <Input
+              type="password"
+              placeholder="Nhập mật khẩu hiện tại"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-2"
+            />
+          </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDisable}>Tắt 2FA</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setConfirmPassword("")}>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDisable} disabled={loading || !confirmPassword.trim()}>
+              {loading ? "Đang xử lý..." : "Xác nhận tắt 2FA"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

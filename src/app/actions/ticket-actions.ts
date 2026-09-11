@@ -14,7 +14,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
-import { Prisma, TicketPriority } from "@prisma/client";
+import { Prisma, TicketPriority, TicketStatus } from "@prisma/client";
 
 import { computeSlaDeadline, isValidTransition, VALID_TRANSITIONS } from "@/lib/ticket-actions";
 
@@ -411,53 +411,91 @@ export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdat
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 
-  if (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN") {
+  const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
+  const isAdmin = session.user.role === "ADMIN";
+
+  if (!isTech) {
     return { success: false, error: "Không có quyền thực hiện." };
   }
 
-  // Ghi transition history cho từng ticket (bulk)
-  if (data.status) {
-    const current = await db.ticket.findMany({
-      where: { id: { in: ids }, status: { not: data.status } },
-      select: { id: true, status: true },
-    });
-    await db.ticketTransition.createMany({
-      data: current.map((t) => ({
+  const tickets = await db.ticket.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, status: true, priority: true, createdAt: true },
+  });
+
+  const now = new Date();
+  const validTicketIdsToUpdate: string[] = [];
+  const transitionsToCreate: {
+    ticketId: string;
+    fromStatus: TicketStatus;
+    toStatus: TicketStatus;
+    reason: string;
+    userId: string;
+  }[] = [];
+
+  for (const t of tickets) {
+    if (data.status && data.status !== t.status) {
+      if (t.status === "CLOSED") {
+        continue; // Closed tickets cannot be updated via bulk
+      }
+      if (!isAdmin && !isValidTransition(t.status, data.status)) {
+        continue; // Invalid transition according to state machine graph
+      }
+      if (data.status === "CLOSED" && t.status !== "RESOLVED" && !isAdmin) {
+        continue; // Must be RESOLVED before CLOSED unless admin
+      }
+      transitionsToCreate.push({
         ticketId: t.id,
         fromStatus: t.status,
-        toStatus: data.status!,
+        toStatus: data.status,
         reason: "Bulk update",
         userId: session.user.id,
-      })),
-    });
+      });
+    }
+    validTicketIdsToUpdate.push(t.id);
   }
 
-  // Recalculate SLA deadline when priority changes in bulk
+  if (validTicketIdsToUpdate.length === 0) {
+    return { success: false, error: "Không có ticket nào hợp lệ để cập nhật." };
+  }
+
+  const updatePayload: Prisma.TicketUncheckedUpdateInput = { ...data };
+  if (data.status === "RESOLVED") {
+    updatePayload.resolvedAt = now;
+  }
+  if (data.status === "CLOSED") {
+    updatePayload.closedAt = now;
+  }
+
   if (data.priority) {
-    const affectedTickets = await db.ticket.findMany({
-      where: { id: { in: ids } },
-      select: { id: true, createdAt: true },
-    });
-    for (const t of affectedTickets) {
+    for (const t of tickets.filter((t) => validTicketIdsToUpdate.includes(t.id))) {
+      const prioritySla = computeSlaDeadline(data.priority as TicketPriority, t.createdAt);
       await db.ticket.update({
         where: { id: t.id },
         data: {
+          ...updatePayload,
           priority: data.priority,
-          slaDeadline: computeSlaDeadline(data.priority as TicketPriority, t.createdAt),
+          slaDeadline: prioritySla,
         },
       });
     }
-    // Remove priority from the bulk updateMany since we handled it per-ticket
-    delete data.priority;
-    await db.ticket.updateMany({ where: { id: { in: ids } }, data });
   } else {
-    await db.ticket.updateMany({ where: { id: { in: ids } }, data });
+    await db.ticket.updateMany({
+      where: { id: { in: validTicketIdsToUpdate } },
+      data: updatePayload,
+    });
+  }
+
+  if (transitionsToCreate.length > 0) {
+    await db.ticketTransition.createMany({
+      data: transitionsToCreate,
+    });
   }
 
   await logAudit({
     action: "TICKET_BULK_UPDATE",
     entity: "Ticket",
-    details: { ids, data },
+    details: { ids: validTicketIdsToUpdate, data },
     userId: session.user.id,
   });
 

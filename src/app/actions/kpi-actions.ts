@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
+import { isOverdue } from "@/lib/ticket-actions";
 
 export interface TechKPIResult {
   id: string;
@@ -38,7 +39,6 @@ export async function getTechKPI(userId?: string) {
     select: { id: true, name: true },
   });
 
-  const now = new Date();
   const results: TechKPIResult[] = [];
 
   for (const tech of techs) {
@@ -50,6 +50,7 @@ export async function getTechKPI(userId?: string) {
         resolvedAt: true,
         closedAt: true,
         status: true,
+        slaDeadline: true,
       },
     });
 
@@ -64,11 +65,10 @@ export async function getTechKPI(userId?: string) {
         }, 0) / resolved.length
       : null;
 
-    // Overdue tickets: not CLOSED and older than 3 days
+    // Overdue tickets: not CLOSED and past SLA deadline
     const overdue = tickets.filter(
       (t) =>
-        t.status !== "CLOSED" &&
-        new Date(t.createdAt).getTime() < now.getTime() - 3 * 24 * 3600 * 1000
+        isOverdue({ status: t.status, slaDeadline: t.slaDeadline })
     ).length;
     const overdueRatio = ticketCount ? overdue / ticketCount : 0;
 

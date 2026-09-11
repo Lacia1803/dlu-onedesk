@@ -4,6 +4,7 @@ import { useState } from "react";
 import { mergeTickets } from "@/app/actions/ticket-merge-actions";
 import { Button } from "@/components/ui/button";
 import { GitMerge } from "lucide-react";
+import { toast } from "sonner";
 
 export function MergeTicketDialog({ targetTicketId }: { targetTicketId: string }) {
   const [open, setOpen] = useState(false);
@@ -28,9 +29,12 @@ export function MergeTicketDialog({ targetTicketId }: { targetTicketId: string }
     setLoading(false);
 
     if (res.success) {
+      toast.success("Đã gộp ticket thành công");
       setOpen(false);
       setDuplicateIds("");
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } else {
       setError(res.error || "Có lỗi xảy ra");
     }

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
+import { isOverdue } from "@/lib/ticket-actions";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
 import { TicketComments } from "@/components/tickets/ticket-comments";
 import { InternalNoteSection } from "@/components/tickets/internal-note-section";
@@ -42,8 +43,10 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
 
   // Server component: mốc thời gian lấy 1 lần duy nhất cho mỗi request render.
   const now = Date.now();
-  const slaOverdue =
-    ticket.status !== "CLOSED" && ticket.slaDeadline && now > ticket.slaDeadline.getTime();
+  const slaOverdue = isOverdue({
+    status: ticket.status,
+    slaDeadline: ticket.slaDeadline ? new Date(ticket.slaDeadline) : null,
+  });
   const slaRemaining =
     ticket.status !== "CLOSED" && ticket.slaDeadline
       ? Math.max(0, Math.ceil((ticket.slaDeadline.getTime() - now) / (1000 * 60 * 60)))

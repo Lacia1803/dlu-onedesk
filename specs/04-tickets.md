@@ -1,10 +1,13 @@
 # Feature Spec: Hệ thống Ticket Sự cố
 
 ## Goal
+
 Quản lý vòng đời ticket: tạo, phân công, cập nhật trạng thái, comment, đóng ticket.
 
 ## Scope
+
 ### In Scope
+
 - Tạo ticket (thủ công hoặc qua scan QR thiết bị)
 - Danh sách ticket (lọc theo trạng thái, người tạo, người được giao, phòng)
 - Xem chi tiết ticket + comment thread
@@ -13,11 +16,13 @@ Quản lý vòng đời ticket: tạo, phân công, cập nhật trạng thái, 
 - Thông báo in-app (hiển thị indicator)
 
 ### Out of Scope
+
 - Gửi email/SMS notification
 - Auto-assignment (round-robin)
 - SLA tracking phức tạp (chỉ có thời gian resolvedAt)
 
 ## Dependencies
+
 - Auth (ai tạo ticket, ai comment)
 - Device (ticket liên quan thiết bị nào)
 - Prisma models: Ticket, TicketComment (đã có)
@@ -25,6 +30,7 @@ Quản lý vòng đời ticket: tạo, phân công, cập nhật trạng thái, 
 ## Technical Design
 
 ### Routes
+
 ```
 /tickets                 — Danh sách ticket (với filter)
 /tickets/new             — Form tạo ticket (hỗ trợ pre-fill deviceId)
@@ -32,6 +38,7 @@ Quản lý vòng đời ticket: tạo, phân công, cập nhật trạng thái, 
 ```
 
 ### API Endpoints
+
 ```
 GET    /api/tickets              — Danh sách (search, filter, pagination)
 POST   /api/tickets              — Tạo mới
@@ -41,6 +48,7 @@ POST   /api/tickets/[id]/comments— Thêm comment
 ```
 
 ### Ticket Flow
+
 1. **OPEN:** Mới tạo. Trống assignee.
 2. **Assign:** Admin/Kỹ thuật viên gán assignee → (tùy chọn) cập nhật status thành IN_PROGRESS.
 3. **IN_PROGRESS:** Đang xử lý. Có thể đổi qua WAITING_PARTS nếu thiếu linh kiện.
@@ -48,7 +56,8 @@ POST   /api/tickets/[id]/comments— Thêm comment
 5. **CLOSED:** Đóng ticket (hoàn tất), ghi nhận `closedAt`.
 
 ### Permissions
-- USER: 
+
+- USER:
   - Tạo ticket mới
   - Xem danh sách ticket DO MÌNH TẠO
   - Cập nhật trạng thái ticket CỦA MÌNH thành CLOSED
@@ -63,6 +72,7 @@ POST   /api/tickets/[id]/comments— Thêm comment
   - Có thể assign ticket cho người khác
 
 ### Validation (Zod)
+
 - title: required, min 5, max 150
 - description: required, min 10
 - category: enum TicketCategory
@@ -73,12 +83,14 @@ POST   /api/tickets/[id]/comments— Thêm comment
 - comment content: required, min 1
 
 ## Invariants
+
 - User thường không được xem ticket của người khác
 - Chỉ TECHNICIAN/ADMIN mới được phân công xử lý (không assign cho USER)
 - Khi status chuyển sang RESOLVED, set `resolvedAt = now()`
 - Khi status chuyển sang CLOSED, set `closedAt = now()`
 
 ## Verification Checklist
+
 - [ ] User tạo ticket thành công (có và không có deviceId)
 - [ ] User chỉ xem được ticket của mình
 - [ ] Technician xem được tất cả ticket

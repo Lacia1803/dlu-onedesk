@@ -3,7 +3,13 @@ import { describe, it } from "node:test";
 import { computeSlaDeadline, isOverdue, isValidTransition } from "../src/lib/ticket-actions.ts";
 
 // Prisma enums are plain strings at runtime in this context
-const TicketStatus = { OPEN: "OPEN", IN_PROGRESS: "IN_PROGRESS", WAITING_PARTS: "WAITING_PARTS", RESOLVED: "RESOLVED", CLOSED: "CLOSED" };
+const TicketStatus = {
+  OPEN: "OPEN",
+  IN_PROGRESS: "IN_PROGRESS",
+  WAITING_PARTS: "WAITING_PARTS",
+  RESOLVED: "RESOLVED",
+  CLOSED: "CLOSED",
+};
 const TicketPriority = { URGENT: "URGENT", HIGH: "HIGH", MEDIUM: "MEDIUM", LOW: "LOW" };
 
 // Tests use local-time Date constructors so assertions match addWorkingHours()'s local-time arithmetic.
@@ -39,7 +45,10 @@ describe("SLA Calculations", () => {
 
 describe("SLA Overdue Detection", () => {
   it("CLOSED ticket is never overdue", () => {
-    assert.strictEqual(isOverdue({ status: TicketStatus.CLOSED, slaDeadline: new Date(Date.now() - 1000) }), false);
+    assert.strictEqual(
+      isOverdue({ status: TicketStatus.CLOSED, slaDeadline: new Date(Date.now() - 1000) }),
+      false
+    );
   });
 
   it("ticket without slaDeadline is not overdue", () => {
@@ -47,11 +56,17 @@ describe("SLA Overdue Detection", () => {
   });
 
   it("ticket past deadline is overdue", () => {
-    assert.strictEqual(isOverdue({ status: TicketStatus.OPEN, slaDeadline: new Date(Date.now() - 1000) }), true);
+    assert.strictEqual(
+      isOverdue({ status: TicketStatus.OPEN, slaDeadline: new Date(Date.now() - 1000) }),
+      true
+    );
   });
 
   it("ticket with future deadline is not overdue", () => {
-    assert.strictEqual(isOverdue({ status: TicketStatus.OPEN, slaDeadline: new Date(Date.now() + 3600000) }), false);
+    assert.strictEqual(
+      isOverdue({ status: TicketStatus.OPEN, slaDeadline: new Date(Date.now() + 3600000) }),
+      false
+    );
   });
 });
 
@@ -63,7 +78,10 @@ describe("Ticket Transition Validation", () => {
   });
 
   it("IN_PROGRESS can transition to WAITING_PARTS or RESOLVED", () => {
-    assert.strictEqual(isValidTransition(TicketStatus.IN_PROGRESS, TicketStatus.WAITING_PARTS), true);
+    assert.strictEqual(
+      isValidTransition(TicketStatus.IN_PROGRESS, TicketStatus.WAITING_PARTS),
+      true
+    );
     assert.strictEqual(isValidTransition(TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED), true);
     assert.strictEqual(isValidTransition(TicketStatus.IN_PROGRESS, TicketStatus.OPEN), false);
   });

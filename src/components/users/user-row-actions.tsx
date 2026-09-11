@@ -187,13 +187,13 @@ export function UserRowActions({
           <AlertDialogHeader>
             <AlertDialogTitle>Đặt lại mật khẩu</AlertDialogTitle>
             <AlertDialogDescription>
-              Đặt lại mật khẩu người dùng này về mặc định (chính là email của họ)? Họ sẽ được yêu
-              cầu đổi mật khẩu ở lần đăng nhập tiếp theo.
+              Hệ thống sẽ sinh một mật khẩu tạm thời ngẫu nhiên cho người dùng này. Họ sẽ được yêu
+              cầu đổi mật khẩu mới ở lần đăng nhập tiếp theo.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAdminReset}>Đặt lại</AlertDialogAction>
+            <AlertDialogAction onClick={handleAdminReset}>Đặt lại mật khẩu</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

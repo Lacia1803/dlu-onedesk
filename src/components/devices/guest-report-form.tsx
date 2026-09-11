@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -64,8 +65,18 @@ export function GuestReportForm({ deviceId }: Props) {
             Báo cáo đã được ghi nhận. Kỹ thuật viên sẽ xử lý sớm nhất.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-center text-sm text-muted-foreground">
-          Mã ticket: <code className="font-mono">{ticketId.slice(-6).toUpperCase()}</code>
+        <CardContent className="text-center text-sm text-muted-foreground space-y-4">
+          <p>
+            Mã ticket: <code className="font-mono text-base font-bold text-foreground">#{ticketId.slice(-6).toUpperCase()}</code>
+          </p>
+          <div className="pt-2">
+            <Link
+              href={`/tickets/track?q=${ticketId}`}
+              className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold px-4 py-2 w-full text-center hover:bg-primary/90 text-sm"
+            >
+              Theo dõi tiến độ xử lý trực tiếp →
+            </Link>
+          </div>
         </CardContent>
       </Card>
     );
