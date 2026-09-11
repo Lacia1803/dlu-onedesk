@@ -2,7 +2,7 @@
 
 ## Trạng thái hiện tại
 
-**Phase:** Sẵn sàng Deploy
+**Phase:** Hoàn thành — CI xanh, chỉ còn Deploy + kiểm thử người thật
 **Ngày cập nhật:** 2026-09-11
 
 ## Completed
@@ -28,6 +28,14 @@
 ## In Progress
 
 - (none)
+
+## Recently Completed (đợt exceljs + Playwright E2E thật + CI PostgreSQL — 2026-09-11)
+
+- [x] **Thay thế `xlsx` bằng `exceljs` 4.4.0**: Thư viện cũ dính CVE không thể vá. Excel build giờ chạy server-side (`src/lib/xlsx.ts`) nên exceljs ~1MB không bundle ra client; client chỉ nhận base64 qua `src/lib/download.ts`. Import Excel/CSV rewrite bằng `ExcelJS.Workbook` + parser CSV tự viết (BOM, quoted fields, `,`/`;`). Bỏ hỗ trợ `.xls` cũ. `npm audit` = **0 vulnerabilities**.
+- [x] **Viết 20 Playwright e2e test hành vi thật** (`tests/playwright-e2e.test.ts`): Auth (đăng nhập sai/sai vai trò), RBAC (trang admin chặn non-admin, API register 403), tạo ticket (thành công + validate ≥10 ký tự), state machine (OPEN→RESOLVED bị chặn, chuỗi hợp lệ OPEN→IN_PROGRESS→RESOLVED→CLOSED, CLOSED khóa mọi chuyển qua dropdown, chỉ Reopen), tra cứu công khai `/tickets/track`, dashboard smoke. **20/20 pass** trên production build.
+- [x] **CI chạy e2e thật với PostgreSQL service**: `ci.yml` + `pr.yml` thêm postgres:15-alpine (healthcheck) → `prisma db push` → `node seed-data.js` → lint → 40 unit tests → build → `npx playwright test` (webServer tự start) → upload report artifact khi fail. **Run đầu tiên pass xanh toàn bộ** (run 34612714873).
+- [x] **README đồng bộ thực tế**: badge 40/40 unit + 20/20 e2e, lệnh `npm run test:e2e` (bỏ `test-e2e-all.js` cũ), `src/proxy.ts` thay `middleware.ts`, 16 models, Node 22, mật khẩu seed đúng (admin/tech/user).
+- [x] **Dọn 3 lint warnings** (unused imports `TicketStatus`, `CardDescription`, `CardTitle`) → 0 errors, 0 warnings.
 
 ## Pending
 
