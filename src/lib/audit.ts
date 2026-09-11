@@ -9,13 +9,7 @@ interface LogAuditParams {
   userId?: string;
 }
 
-export async function logAudit({
-  action,
-  entity,
-  entityId,
-  details,
-  userId,
-}: LogAuditParams) {
+export async function logAudit({ action, entity, entityId, details, userId }: LogAuditParams) {
   try {
     return await db.auditLog.create({
       data: {

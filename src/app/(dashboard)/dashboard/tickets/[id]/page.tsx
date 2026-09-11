@@ -40,21 +40,25 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
   const isCreator = ticket.creatorId === session.user.id;
   const isTech = session.user.role === "ADMIN" || session.user.role === "TECHNICIAN";
 
-  // eslint-disable-next-line react-hooks/purity -- server component, Date.now() is stable per-request
+  // Server component: mốc thời gian lấy 1 lần duy nhất cho mỗi request render.
   const now = Date.now();
-  const slaOverdue = ticket.status !== "CLOSED" && ticket.slaDeadline && now > ticket.slaDeadline.getTime();
-  const slaRemaining = ticket.status !== "CLOSED" && ticket.slaDeadline
-    ? Math.max(0, Math.ceil((ticket.slaDeadline.getTime() - now) / (1000 * 60 * 60)))
-    : null;
+  const slaOverdue =
+    ticket.status !== "CLOSED" && ticket.slaDeadline && now > ticket.slaDeadline.getTime();
+  const slaRemaining =
+    ticket.status !== "CLOSED" && ticket.slaDeadline
+      ? Math.max(0, Math.ceil((ticket.slaDeadline.getTime() - now) / (1000 * 60 * 60)))
+      : null;
 
   if (!isCreator && !isTech) {
     return notFound();
   }
 
-  const technicians = isTech ? await db.user.findMany({
-    where: { role: { in: ["ADMIN", "TECHNICIAN"] } },
-    select: { id: true, name: true },
-  }) : [];
+  const technicians = isTech
+    ? await db.user.findMany({
+        where: { role: { in: ["ADMIN", "TECHNICIAN"] } },
+        select: { id: true, name: true },
+      })
+    : [];
 
   const cannedReplies = isTech ? await getCannedReplies() : [];
 
@@ -95,28 +99,43 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
           <div className="border rounded-sm bg-card p-6 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm border-b border-border pb-4">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Người tạo</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  Người tạo
+                </p>
                 <p className="mt-1 font-medium">{ticket.creator.name}</p>
               </div>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Người xử lý</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  Người xử lý
+                </p>
                 <p className="mt-1 font-medium">{ticket.assignee?.name || "Chưa phân công"}</p>
               </div>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Danh mục</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  Danh mục
+                </p>
                 <p className="mt-1 font-medium">{ticket.category}</p>
               </div>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Ngày tạo</p>
-                <p className="mt-1 font-medium">{format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm")}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  Ngày tạo
+                </p>
+                <p className="mt-1 font-medium">
+                  {format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm")}
+                </p>
               </div>
             </div>
 
             {ticket.deviceId && ticket.device && (
               <div className="border rounded-sm bg-muted/50 p-3 flex items-center justify-between text-sm">
                 <div>
-                  <span className="font-mono text-[10px] uppercase text-muted-foreground mr-2">THIẾT BỊ</span>
-                  <Link href={`/dashboard/devices/${ticket.deviceId}`} className="font-medium text-primary hover:underline">
+                  <span className="font-mono text-[10px] uppercase text-muted-foreground mr-2">
+                    THIẾT BỊ
+                  </span>
+                  <Link
+                    href={`/dashboard/devices/${ticket.deviceId}`}
+                    className="font-medium text-primary hover:underline"
+                  >
                     {ticket.device.name} ({ticket.device.qrCode})
                   </Link>
                 </div>
@@ -124,7 +143,9 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
             )}
 
             <div>
-              <h3 className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">MÔ TẢ CHI TIẾT</h3>
+              <h3 className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
+                MÔ TẢ CHI TIẾT
+              </h3>
               <div className="whitespace-pre-wrap text-sm text-foreground/90 p-4 bg-muted/30 rounded-sm border font-mono">
                 {ticket.description}
               </div>
@@ -137,8 +158,13 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                 </h3>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                   {ticket.images.map((url, idx) => (
-                    <a key={url + idx} href={url} target="_blank" rel="noopener noreferrer" className="block">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <a
+                      key={url + idx}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
                       <img
                         src={url}
                         alt={`Ảnh đính kèm ${idx + 1}`}
@@ -151,10 +177,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
             )}
 
             {isTech && (
-              <InternalNoteSection
-                ticketId={ticket.id}
-                initialNote={ticket.internalNote || null}
-              />
+              <InternalNoteSection ticketId={ticket.id} initialNote={ticket.internalNote || null} />
             )}
 
             {ticket.status === "CLOSED" && (
@@ -166,15 +189,23 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                   ticketId={ticket.id}
                   rating={ticket.rating}
                   feedback={ticket.feedback}
-                  canReopen={isCreator && !!ticket.closedAt && now - new Date(ticket.closedAt).getTime() < 7 * 24 * 3600 * 1000}
+                  canReopen={
+                    isCreator &&
+                    !!ticket.closedAt &&
+                    now - new Date(ticket.closedAt).getTime() < 7 * 24 * 3600 * 1000
+                  }
                 />
               </div>
             )}
 
             {(ticket.resolvedAt || ticket.closedAt) && (
               <div className="font-mono text-xs text-muted-foreground pt-4 border-t border-border flex gap-4">
-                {ticket.resolvedAt && <p>XỬ LÝ LÚC: {format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm")}</p>}
-                {ticket.closedAt && <p>ĐÓNG LÚC: {format(new Date(ticket.closedAt), "dd/MM/yyyy HH:mm")}</p>}
+                {ticket.resolvedAt && (
+                  <p>XỬ LÝ LÚC: {format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm")}</p>
+                )}
+                {ticket.closedAt && (
+                  <p>ĐÓNG LÚC: {format(new Date(ticket.closedAt), "dd/MM/yyyy HH:mm")}</p>
+                )}
               </div>
             )}
 
@@ -191,8 +222,12 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                       </span>
                       <span className="font-medium">{tr.user.name}</span>
                       <span className="text-muted-foreground">→</span>
-                      <span className="font-mono text-xs">{tr.fromStatus} → {tr.toStatus}</span>
-                      {tr.reason && <span className="text-muted-foreground italic">({tr.reason})</span>}
+                      <span className="font-mono text-xs">
+                        {tr.fromStatus} → {tr.toStatus}
+                      </span>
+                      {tr.reason && (
+                        <span className="text-muted-foreground italic">({tr.reason})</span>
+                      )}
                     </li>
                   ))}
                 </ol>

@@ -20,7 +20,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type FormData = z.infer<typeof loginSchema>;
 
@@ -65,7 +72,9 @@ export default function LoginPage() {
       });
 
       if (signInResult?.error) {
-        toast.error(needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác");
+        toast.error(
+          needOtp ? "Mã xác thực OTP không chính xác" : "Email hoặc mật khẩu không chính xác"
+        );
       } else {
         toast.success("Đăng nhập thành công!");
         router.push("/dashboard");
@@ -83,9 +92,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
-          <CardDescription>
-            Đăng nhập vào hệ thống DLU OneDesk
-          </CardDescription>
+          <CardDescription>Đăng nhập vào hệ thống DLU OneDesk</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -97,7 +104,12 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" type="email" disabled={isLoading} {...field} />
+                      <Input
+                        placeholder="name@example.com"
+                        type="email"
+                        disabled={isLoading}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

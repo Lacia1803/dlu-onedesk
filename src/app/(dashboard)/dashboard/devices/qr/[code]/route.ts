@@ -2,13 +2,10 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   const device = await db.device.findUnique({
     where: { qrCode: (await params).code },
-    select: { id: true, deletedAt: true }
+    select: { id: true, deletedAt: true },
   });
 
   if (!device || device.deletedAt) {

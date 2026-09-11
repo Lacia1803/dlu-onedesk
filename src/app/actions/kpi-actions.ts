@@ -24,7 +24,10 @@ export async function getTechKPI(userId?: string) {
   // If specific userId requested, non-admin can only view their own
   const targetId = userId ?? (session.user.role === "USER" ? session.user.id : undefined);
 
-  const whereClause: Prisma.UserWhereInput = { role: { in: ["ADMIN", "TECHNICIAN"] }, deletedAt: null };
+  const whereClause: Prisma.UserWhereInput = {
+    role: { in: ["ADMIN", "TECHNICIAN"] },
+    deletedAt: null,
+  };
   if (targetId) {
     whereClause.id = targetId;
   }
@@ -52,7 +55,7 @@ export async function getTechKPI(userId?: string) {
 
     const ticketCount = tickets.length;
     // Average resolution time in hours (only RESOLVED or CLOSED)
-    const resolved = tickets.filter(t => t.resolvedAt || t.closedAt);
+    const resolved = tickets.filter((t) => t.resolvedAt || t.closedAt);
     const avgResolutionHours = resolved.length
       ? resolved.reduce((sum, t) => {
           const end = t.resolvedAt ?? t.closedAt!;
@@ -62,7 +65,11 @@ export async function getTechKPI(userId?: string) {
       : null;
 
     // Overdue tickets: not CLOSED and older than 3 days
-    const overdue = tickets.filter(t => t.status !== "CLOSED" && new Date(t.createdAt).getTime() < now.getTime() - 3 * 24 * 3600 * 1000).length;
+    const overdue = tickets.filter(
+      (t) =>
+        t.status !== "CLOSED" &&
+        new Date(t.createdAt).getTime() < now.getTime() - 3 * 24 * 3600 * 1000
+    ).length;
     const overdueRatio = ticketCount ? overdue / ticketCount : 0;
 
     results.push({

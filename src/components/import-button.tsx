@@ -21,7 +21,8 @@ export function ImportButton({ label, subdir }: ImportButtonProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const result = subdir === "devices" ? await importDevices(formData) : await importUsers(formData);
+      const result =
+        subdir === "devices" ? await importDevices(formData) : await importUsers(formData);
       if (result.success) {
         toast.success(`${label} thành công: ${result.inserted} mục, bỏ qua ${result.skipped}`);
       } else {

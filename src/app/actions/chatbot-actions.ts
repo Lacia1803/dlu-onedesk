@@ -82,9 +82,13 @@ export async function chatWithBot(
     // Persist last Q/A pair to chat history (logged-in users only)
     const lastUserMsg = messages[messages.length - 1];
     if (session?.user?.id && lastUserMsg?.role === "user") {
-      db.chatLog.create({
-        data: { userId: session.user.id, question: lastUserMsg.text, answer: reply },
-      }).catch(() => { /* ponytail: fire-and-forget; upgrade to queue if logging failures matter */ });
+      db.chatLog
+        .create({
+          data: { userId: session.user.id, question: lastUserMsg.text, answer: reply },
+        })
+        .catch(() => {
+          /* ponytail: fire-and-forget; upgrade to queue if logging failures matter */
+        });
     }
 
     return { reply, shouldCreateTicket };

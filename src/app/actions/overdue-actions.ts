@@ -22,7 +22,12 @@ export async function sendOverdueReminder() {
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
   const overdueTickets = await db.ticket.findMany({
     where: { status: { not: TicketStatus.CLOSED }, createdAt: { lt: threeDaysAgo } },
-    select: { id: true, title: true, createdAt: true, assignee: { select: { email: true, name: true } } },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      assignee: { select: { email: true, name: true } },
+    },
   });
 
   if (overdueTickets.length === 0) {

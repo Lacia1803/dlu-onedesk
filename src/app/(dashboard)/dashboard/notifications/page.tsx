@@ -52,10 +52,16 @@ export default function NotificationCenter() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [stats, setStats] = useState<{ unread: number; openTickets: number; pendingFaqs: number } | null>(null);
+  const [stats, setStats] = useState<{
+    unread: number;
+    openTickets: number;
+    pendingFaqs: number;
+  } | null>(null);
 
   async function fetchNotificationsData(filterValue: string, pageValue: number) {
-    const res = await fetch(`/api/notifications?filter=${filterValue}&page=${pageValue}&stats=true`);
+    const res = await fetch(
+      `/api/notifications?filter=${filterValue}&page=${pageValue}&stats=true`
+    );
     if (!res.ok) return null;
     return res.json();
   }
@@ -128,15 +134,21 @@ export default function NotificationCenter() {
       {stats && (
         <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="border rounded-lg p-4 bg-card">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Chưa đọc</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Chưa đọc
+            </p>
             <p className="text-2xl font-bold mt-1">{stats.unread}</p>
           </div>
           <div className="border rounded-lg p-4 bg-card">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Ticket chờ xử lý</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Ticket chờ xử lý
+            </p>
             <p className="text-2xl font-bold mt-1">{stats.openTickets}</p>
           </div>
           <div className="border rounded-lg p-4 bg-card">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">FAQ chờ duyệt</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              FAQ chờ duyệt
+            </p>
             <p className="text-2xl font-bold mt-1">{stats.pendingFaqs}</p>
           </div>
         </div>
@@ -193,13 +205,23 @@ export default function NotificationCenter() {
       </div>
       {totalPages > 1 && (
         <div className="mt-4 flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
             Trang trước
           </Button>
           <span className="text-sm text-muted-foreground">
             Trang {page} / {totalPages}
           </span>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
             Trang sau
           </Button>
         </div>

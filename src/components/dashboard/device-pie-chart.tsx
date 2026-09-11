@@ -22,13 +22,17 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function DevicePieChart({ data }: DevicePieChartProps) {
   if (data.length === 0) {
-    return <div className="h-full flex items-center justify-center text-muted-foreground">Chưa có dữ liệu thiết bị</div>;
+    return (
+      <div className="h-full flex items-center justify-center text-muted-foreground">
+        Chưa có dữ liệu thiết bị
+      </div>
+    );
   }
 
-  const formattedData = data.map(d => ({
+  const formattedData = data.map((d) => ({
     name: STATUS_LABELS[d.name] || d.name,
     value: d.value,
-    color: STATUS_COLORS[d.name] || "#ccc"
+    color: STATUS_COLORS[d.name] || "#ccc",
   }));
 
   return (

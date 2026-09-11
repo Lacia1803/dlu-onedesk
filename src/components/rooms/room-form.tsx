@@ -20,26 +20,30 @@ export function RoomForm({ initialData }: RoomFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(roomSchema),
-    defaultValues: initialData ? {
-      name: initialData.name,
-      location: initialData.location,
-      capacity: initialData.capacity,
-      description: initialData.description || "",
-    } : {
-      name: "",
-      location: "",
-      capacity: 30,
-      description: "",
-    },
+    defaultValues: initialData
+      ? {
+          name: initialData.name,
+          location: initialData.location,
+          capacity: initialData.capacity,
+          description: initialData.description || "",
+        }
+      : {
+          name: "",
+          location: "",
+          capacity: 30,
+          description: "",
+        },
   });
 
   async function onSubmit(data: RoomFormValues) {
     setLoading(true);
-    const result = initialData
-      ? await updateRoom(initialData.id, data)
-      : await createRoom(data);
+    const result = initialData ? await updateRoom(initialData.id, data) : await createRoom(data);
 
     setLoading(false);
 
@@ -63,25 +67,35 @@ export function RoomForm({ initialData }: RoomFormProps) {
         <div>
           <label className="text-sm font-medium">Vị trí</label>
           <Input placeholder="Tầng 1, Nhà A" disabled={loading} {...register("location")} />
-          {errors.location && <p className="text-sm text-destructive">{errors.location.message as string}</p>}
+          {errors.location && (
+            <p className="text-sm text-destructive">{errors.location.message as string}</p>
+          )}
         </div>
         <div>
           <label className="text-sm font-medium">Sức chứa (Máy)</label>
           <Input type="number" disabled={loading} {...register("capacity")} />
-          {errors.capacity && <p className="text-sm text-destructive">{errors.capacity.message as string}</p>}
+          {errors.capacity && (
+            <p className="text-sm text-destructive">{errors.capacity.message as string}</p>
+          )}
         </div>
       </div>
       <div>
         <label className="text-sm font-medium">Mô tả chi tiết</label>
-        <Textarea placeholder="Ghi chú thêm về phòng máy này..." disabled={loading} {...register("description")} />
-        {errors.description && <p className="text-sm text-destructive">{errors.description.message as string}</p>}
+        <Textarea
+          placeholder="Ghi chú thêm về phòng máy này..."
+          disabled={loading}
+          {...register("description")}
+        />
+        {errors.description && (
+          <p className="text-sm text-destructive">{errors.description.message as string}</p>
+        )}
       </div>
       <div className="flex gap-2 pt-4">
         <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
           Hủy
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading ? "Đang lưu..." : (initialData ? "Cập nhật" : "Tạo mới")}
+          {loading ? "Đang lưu..." : initialData ? "Cập nhật" : "Tạo mới"}
         </Button>
       </div>
     </form>

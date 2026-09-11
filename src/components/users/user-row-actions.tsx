@@ -157,7 +157,11 @@ export function UserRowActions({
       </Button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50" title="Vô hiệu hóa" disabled={isSelf}>
+        <DialogTrigger
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+          title="Vô hiệu hóa"
+          disabled={isSelf}
+        >
           <Trash2 className="h-4 w-4" />
         </DialogTrigger>
         <DialogContent>
@@ -168,7 +172,9 @@ export function UserRowActions({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={deleting}>Hủy</Button>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={deleting}>
+              Hủy
+            </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
               {deleting ? "Đang xử lý..." : "Vô hiệu hóa"}
             </Button>
@@ -181,14 +187,13 @@ export function UserRowActions({
           <AlertDialogHeader>
             <AlertDialogTitle>Đặt lại mật khẩu</AlertDialogTitle>
             <AlertDialogDescription>
-              Đặt lại mật khẩu người dùng này về mặc định (chính là email của họ)? Họ sẽ được yêu cầu đổi mật khẩu ở lần đăng nhập tiếp theo.
+              Đặt lại mật khẩu người dùng này về mặc định (chính là email của họ)? Họ sẽ được yêu
+              cầu đổi mật khẩu ở lần đăng nhập tiếp theo.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAdminReset}>
-              Đặt lại
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleAdminReset}>Đặt lại</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

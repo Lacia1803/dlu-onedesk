@@ -10,14 +10,19 @@ const TRANSFER_LIMIT = 10; // per minute per user
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TECHNICIAN")) {
-    return new Response(JSON.stringify({ success: false, error: "Không có quyền" }), { status: 403 });
+    return new Response(JSON.stringify({ success: false, error: "Không có quyền" }), {
+      status: 403,
+    });
   }
 
   // Rate limit check
   const rlKey = `${session.user.id}:transfer`;
   const { allowed } = rateLimit(rlKey, TRANSFER_LIMIT, 60 * 1000);
   if (!allowed) {
-    return new Response(JSON.stringify({ success: false, error: "Quá nhiều yêu cầu, vui lòng chờ" }), { status: 429 });
+    return new Response(
+      JSON.stringify({ success: false, error: "Quá nhiều yêu cầu, vui lòng chờ" }),
+      { status: 429 }
+    );
   }
 
   const form = await req.formData();
@@ -25,12 +30,16 @@ export async function POST(req: Request) {
   const roomId = form.get("roomId")?.toString();
 
   if (!deviceId || !roomId) {
-    return new Response(JSON.stringify({ success: false, error: "Thiếu dữ liệu" }), { status: 400 });
+    return new Response(JSON.stringify({ success: false, error: "Thiếu dữ liệu" }), {
+      status: 400,
+    });
   }
 
   const device = await db.device.findUnique({ where: { id: deviceId } });
   if (!device) {
-    return new Response(JSON.stringify({ success: false, error: "Không tìm thấy thiết bị" }), { status: 404 });
+    return new Response(JSON.stringify({ success: false, error: "Không tìm thấy thiết bị" }), {
+      status: 404,
+    });
   }
 
   await db.device.update({ where: { id: deviceId }, data: { roomId } });

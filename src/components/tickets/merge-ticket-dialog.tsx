@@ -50,7 +50,8 @@ export function MergeTicketDialog({ targetTicketId }: { targetTicketId: string }
       <div className="w-full max-w-md bg-card p-6 rounded-lg shadow-lg border space-y-4">
         <h3 className="text-lg font-bold">Gộp ticket trùng lặp</h3>
         <p className="text-xs text-muted-foreground">
-          Nhập các mã ID ticket cần gộp vào ticket này (cách nhau bằng dấu phẩy hoặc xuống dòng). Các ticket này sẽ tự động đóng và điều hướng người tạo về ticket gốc.
+          Nhập các mã ID ticket cần gộp vào ticket này (cách nhau bằng dấu phẩy hoặc xuống dòng).
+          Các ticket này sẽ tự động đóng và điều hướng người tạo về ticket gốc.
         </p>
         <textarea
           rows={3}

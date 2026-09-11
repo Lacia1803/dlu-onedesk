@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 
   const stream = new ReadableStream({
     start(controller) {
-      const listener = (data: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      const listener = (data: unknown) => {
         const payload = `data: ${JSON.stringify(data)}\n\n`;
         controller.enqueue(new TextEncoder().encode(payload));
       };

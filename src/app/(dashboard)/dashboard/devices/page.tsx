@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -38,7 +39,7 @@ export default async function DevicesPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where: any = { deletedAt: null }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const where: Prisma.DeviceWhereInput = { deletedAt: null };
   if (keyword) {
     where.OR = [
       { name: { contains: keyword, mode: "insensitive" } },
@@ -62,20 +63,29 @@ export default async function DevicesPage({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "ACTIVE": return <Badge className="bg-green-500">Hoạt động</Badge>;
-      case "BROKEN": return <Badge variant="destructive">Hỏng</Badge>;
-      case "MAINTENANCE": return <Badge className="bg-yellow-500">Bảo trì</Badge>;
-      case "RETIRED": return <Badge variant="secondary">Thanh lý</Badge>;
-      default: return <Badge>{status}</Badge>;
+      case "ACTIVE":
+        return <Badge className="bg-green-500">Hoạt động</Badge>;
+      case "BROKEN":
+        return <Badge variant="destructive">Hỏng</Badge>;
+      case "MAINTENANCE":
+        return <Badge className="bg-yellow-500">Bảo trì</Badge>;
+      case "RETIRED":
+        return <Badge variant="secondary">Thanh lý</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
     }
   };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case "COMPUTER": return "Máy tính";
-      case "NETWORK": return "Mạng";
-      case "PERIPHERAL": return "Ngoại vi";
-      default: return "Khác";
+      case "COMPUTER":
+        return "Máy tính";
+      case "NETWORK":
+        return "Mạng";
+      case "PERIPHERAL":
+        return "Ngoại vi";
+      default:
+        return "Khác";
     }
   };
 
@@ -84,12 +94,18 @@ export default async function DevicesPage({
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Quản lý Thiết bị</h1>
         <div className="flex gap-2">
-          <Link href="/dashboard/devices/scan" className="inline-flex h-10 items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary/80">
+          <Link
+            href="/dashboard/devices/scan"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary/80"
+          >
             <QrCode className="mr-2 h-4 w-4" />
             Quét QR
           </Link>
           {canEdit && (
-            <Link href="/dashboard/devices/new" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Link
+              href="/dashboard/devices/new"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Thêm thiết bị
             </Link>
@@ -133,17 +149,27 @@ export default async function DevicesPage({
               devices.map((device) => (
                 <TableRow key={device.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/dashboard/devices/${device.id}`} className="hover:underline text-primary">
+                    <Link
+                      href={`/dashboard/devices/${device.id}`}
+                      className="hover:underline text-primary"
+                    >
                       {device.name}
                     </Link>
-                    {device.serialNumber && <div className="text-xs text-muted-foreground">SN: {device.serialNumber}</div>}
+                    {device.serialNumber && (
+                      <div className="text-xs text-muted-foreground">SN: {device.serialNumber}</div>
+                    )}
                   </TableCell>
                   <TableCell>{getTypeLabel(device.type)}</TableCell>
                   <TableCell>{device.room.name}</TableCell>
                   <TableCell>{getStatusBadge(device.status)}</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/devices/${device.id}/edit`} aria-label="Chỉnh sửa thiết bị" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
+                      <Link
+                        href={`/dashboard/devices/${device.id}/edit`}
+                        aria-label="Chỉnh sửa thiết bị"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                        title="Chỉnh sửa"
+                      >
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}

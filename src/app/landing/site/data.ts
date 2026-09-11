@@ -67,13 +67,17 @@ export const VALUES: ValueItem[] = [
     no: "02",
     icon: Headset,
     title: "Xử lý minh bạch",
-    desc: "Mỗi sự cố là một ticket có trạng thái rõ ràng. Ngườ" + "i báo theo dõi tiến độ và trao đổi trực tiếp với kỹ thuật viên trong suốt quá trình hỗ trợ.",
+    desc:
+      "Mỗi sự cố là một ticket có trạng thái rõ ràng. Ngườ" +
+      "i báo theo dõi tiến độ và trao đổi trực tiếp với kỹ thuật viên trong suốt quá trình hỗ trợ.",
   },
   {
     no: "03",
     icon: Boxes,
     title: "Quản lý tập trung",
-    desc: "Hồ sơ thiết bị theo từng phòng máy, lịch bảo trì định kỳ và báo cáo vận hành nằm trên một hệ thống duy nhất, không còn rờ" + "i rạc giữa nhiều kênh.",
+    desc:
+      "Hồ sơ thiết bị theo từng phòng máy, lịch bảo trì định kỳ và báo cáo vận hành nằm trên một hệ thống duy nhất, không còn rờ" +
+      "i rạc giữa nhiều kênh.",
   },
 ];
 
@@ -102,7 +106,8 @@ export const STEPS: Step[] = [
     no: "03",
     icon: Headset,
     title: "Kỹ thuật viên tiếp nhận",
-    desc: "Ticket được phân loại, gán cho kỹ thuật viên phụ trách kèm cam kết thờ" + "i gian phản hồi.",
+    desc:
+      "Ticket được phân loại, gán cho kỹ thuật viên phụ trách kèm cam kết thờ" + "i gian phản hồi.",
   },
   {
     no: "04",
@@ -130,7 +135,11 @@ export const FEATURES: Feature[] = [
     kicker: "Ticket",
     icon: TicketCheck,
     title: "Tiếp nhận và xử lý ticket",
-    desc: "Mọi sự cố trở thành một ticket có vòng đờ" + "i rõ ràng: tiếp nhận, phân công, xử lý, chờ ngườ" + "i dùng xác nhận rồ" + "i mới đóng.",
+    desc:
+      "Mọi sự cố trở thành một ticket có vòng đờ" +
+      "i rõ ràng: tiếp nhận, phân công, xử lý, chờ ngườ" +
+      "i dùng xác nhận rồ" +
+      "i mới đóng.",
     bullets: [
       "Phân công theo kỹ thuật viên và phòng máy",
       "Trao đổi ngay trong ticket, giữ nguyên lịch sử",
@@ -158,7 +167,11 @@ export const FEATURES: Feature[] = [
     kicker: "Trợ lý AI",
     icon: Bot,
     title: "FAQ và trợ lý AI",
-    desc: "Trước khi tạo ticket, ngườ" + "i dùng có thể hỏi trợ lý AI. Câu trả lờ" + "i được gợi ý từ kho FAQ nộ" + "i bộ của đội kỹ thuật, kèm nguồn tham chiếu.",
+    desc:
+      "Trước khi tạo ticket, ngườ" +
+      "i dùng có thể hỏi trợ lý AI. Câu trả lờ" +
+      "i được gợi ý từ kho FAQ nộ" +
+      "i bộ của đội kỹ thuật, kèm nguồn tham chiếu.",
     bullets: [
       "Gợi ý câu trả lờ" + "i từ tài liệu FAQ có sẵn",
       "Giảm ticket lặp lại với các lỗi thường gặp",
@@ -187,11 +200,16 @@ export const FEATURES: Feature[] = [
 export const FAQS = [
   {
     q: "Ai có thể sử dụng hệ thống?",
-    a: "Hệ thống hướng tới ba nhóm ngườ" + "i dùng tại Trường Đại học Đà Lạt: giảng viên và sinh viên sử dụng phòng máy, đội ngũ kỹ thuật viên, và quản trị viên phụ trách thiết bị. Khi triển khai thử nghiệm, tài khoản sẽ được cấp theo danh sách tham gia.",
+    a:
+      "Hệ thống hướng tới ba nhóm ngườ" +
+      "i dùng tại Trường Đại học Đà Lạt: giảng viên và sinh viên sử dụng phòng máy, đội ngũ kỹ thuật viên, và quản trị viên phụ trách thiết bị. Khi triển khai thử nghiệm, tài khoản sẽ được cấp theo danh sách tham gia.",
   },
   {
     q: "Làm thế nào để có tài khoản?",
-    a: "DLU OneDesk không mở đăng ký công khai. Tài khoản do quản trị viên tạo và cấp cho ngườ" + "i tham gia thử nghiệm. Nếu bạn muốn trả" + "i nghiệm bản demo, hãy liên hệ nhóm phát triển qua thông tin ở cuối trang.",
+    a:
+      "DLU OneDesk không mở đăng ký công khai. Tài khoản do quản trị viên tạo và cấp cho ngườ" +
+      "i tham gia thử nghiệm. Nếu bạn muốn trả" +
+      "i nghiệm bản demo, hãy liên hệ nhóm phát triển qua thông tin ở cuối trang.",
   },
   {
     q: "Có thể báo lỗi bằng điện thoại không?",
@@ -199,11 +217,17 @@ export const FAQS = [
   },
   {
     q: "Tôi theo dõi tiến độ xử lý ở đâu?",
-    a: "Ở mục “Ticket của tôi” sau khi đăng nhập. Mỗi ticket hiển thị trạng thái theo thờ" + "i gian thực, kỹ thuật viên phụ trách, toàn bộ lịch sử trao đổi và thờ" + "i điểm dự kiến hoàn thành.",
+    a:
+      "Ở mục “Ticket của tôi” sau khi đăng nhập. Mỗi ticket hiển thị trạng thái theo thờ" +
+      "i gian thực, kỹ thuật viên phụ trách, toàn bộ lịch sử trao đổi và thờ" +
+      "i điểm dự kiến hoàn thành.",
   },
   {
     q: "Dữ liệu và hình ảnh trên trang này có phải dữ liệu thật không?",
-    a: "Không. Toàn bộ số liệu, tên ngườ" + "i dùng và nộ" + "i dung trong ảnh chụp giao diện chỉ mang tính minh họa cho đồ án. DLU OneDesk là sản phẩm đồ án học phần, không phải hệ thống chính thức của Trường Đại học Đà Lạt.",
+    a:
+      "Không. Toàn bộ số liệu, tên ngườ" +
+      "i dùng và nộ" +
+      "i dung trong ảnh chụp giao diện chỉ mang tính minh họa cho đồ án. DLU OneDesk là sản phẩm đồ án học phần, không phải hệ thống chính thức của Trường Đại học Đà Lạt.",
   },
 ] as const;
 

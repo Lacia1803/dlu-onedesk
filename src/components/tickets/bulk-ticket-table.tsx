@@ -34,7 +34,11 @@ import {
 } from "@/components/ui/select";
 import { TicketStatusBadge, TicketPriorityBadge } from "@/components/tickets/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { bulkUpdateTickets, assignTicketToMe, autoAssignTicket } from "@/app/actions/ticket-actions";
+import {
+  bulkUpdateTickets,
+  assignTicketToMe,
+  autoAssignTicket,
+} from "@/app/actions/ticket-actions";
 import { CheckCheck, XSquare } from "lucide-react";
 
 interface TicketItem {
@@ -69,12 +73,14 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
   };
 
   const toggleSelectOne = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status?: TicketStatus; priority?: TicketPriority }>({ open: false });
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    status?: TicketStatus;
+    priority?: TicketPriority;
+  }>({ open: false });
 
   const handleBulkStatus = async (status: TicketStatus) => {
     if (selectedIds.length === 0) return;
@@ -124,11 +130,16 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-primary/40 bg-primary/5 p-3">
           <div className="flex items-center gap-2 font-mono text-xs text-primary">
             <CheckCheck className="h-4 w-4" />
-            <span>Đã chọn <strong>{selectedIds.length}</strong> ticket</span>
+            <span>
+              Đã chọn <strong>{selectedIds.length}</strong> ticket
+            </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Select onValueChange={(val) => handleBulkStatus(val as TicketStatus)} disabled={loading}>
+            <Select
+              onValueChange={(val) => handleBulkStatus(val as TicketStatus)}
+              disabled={loading}
+            >
               <SelectTrigger className="h-8 w-[160px] text-xs font-mono">
                 <SelectValue placeholder="Đổi trạng thái..." />
               </SelectTrigger>
@@ -141,7 +152,10 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
               </SelectContent>
             </Select>
 
-            <Select onValueChange={(val) => handleBulkPriority(val as TicketPriority)} disabled={loading}>
+            <Select
+              onValueChange={(val) => handleBulkPriority(val as TicketPriority)}
+              disabled={loading}
+            >
               <SelectTrigger className="h-8 w-[150px] text-xs font-mono">
                 <SelectValue placeholder="Đổi ưu tiên..." />
               </SelectTrigger>
@@ -176,7 +190,9 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                   if (res.success) count++;
                 }
                 setLoading(false);
-                toast.success(`Đã tự động gán ${count}/${selectedIds.length} ticket cho kỹ thuật viên ít việc nhất.`);
+                toast.success(
+                  `Đã tự động gán ${count}/${selectedIds.length} ticket cho kỹ thuật viên ít việc nhất.`
+                );
                 setSelectedIds([]);
                 router.refresh();
               }}
@@ -227,10 +243,7 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
               tickets.map((ticket) => {
                 const isSelected = selectedIds.includes(ticket.id);
                 return (
-                  <TableRow
-                    key={ticket.id}
-                    className={isSelected ? "bg-primary/5" : undefined}
-                  >
+                  <TableRow key={ticket.id} className={isSelected ? "bg-primary/5" : undefined}>
                     {!isUser && (
                       <TableCell>
                         <input
@@ -255,15 +268,15 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                     <TableCell>
                       <TicketStatusBadge status={ticket.status} />
                       {/* SLA overdue badge: dùng slaDeadline nếu có, fallback 3 ngày */}
-                      {ticket.status !== "CLOSED" && (
-                        ticket.slaDeadline
+                      {ticket.status !== "CLOSED" &&
+                        (ticket.slaDeadline
                           ? new Date() > new Date(ticket.slaDeadline)
-                          : new Date().getTime() - new Date(ticket.createdAt).getTime() > 3 * 24 * 60 * 60 * 1000
-                      ) && (
-                        <span className="ml-2 inline-block px-2 py-0.5 text-xs font-mono bg-red-100 text-red-800 rounded-full">
-                          Quá hạn SLA
-                        </span>
-                      )}
+                          : new Date().getTime() - new Date(ticket.createdAt).getTime() >
+                            3 * 24 * 60 * 60 * 1000) && (
+                          <span className="ml-2 inline-block px-2 py-0.5 text-xs font-mono bg-red-100 text-red-800 rounded-full">
+                            Quá hạn SLA
+                          </span>
+                        )}
                     </TableCell>
                     <TableCell>
                       <TicketPriorityBadge priority={ticket.priority} />
@@ -296,9 +309,7 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
                         ) : null}
                       </TableCell>
                     )}
-                    <TableCell>
-                      {format(new Date(ticket.createdAt), "dd/MM/yyyy")}
-                    </TableCell>
+                    <TableCell>{format(new Date(ticket.createdAt), "dd/MM/yyyy")}</TableCell>
                   </TableRow>
                 );
               })
@@ -307,7 +318,10 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
         </Table>
       </div>
 
-      <AlertDialog open={confirmDialog.open} onOpenChange={(open: boolean) => !open && setConfirmDialog({ open: false })}>
+      <AlertDialog
+        open={confirmDialog.open}
+        onOpenChange={(open: boolean) => !open && setConfirmDialog({ open: false })}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận thay đổi hàng loạt</AlertDialogTitle>
@@ -321,7 +335,9 @@ export function BulkTicketTable({ tickets, isUser }: BulkTicketTableProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={() => confirmDialog.status ? confirmBulkStatus() : confirmBulkPriority()}>
+            <AlertDialogAction
+              onClick={() => (confirmDialog.status ? confirmBulkStatus() : confirmBulkPriority())}
+            >
               Xác nhận
             </AlertDialogAction>
           </AlertDialogFooter>

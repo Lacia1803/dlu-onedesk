@@ -19,16 +19,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Edit } from "lucide-react";
+import type { FaqRecord } from "@/types";
 
 interface FaqFormProps {
-  initialData?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  initialData?: FaqRecord;
 }
 
 export function FaqForm({ initialData }: FaqFormProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FaqFormValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<FaqFormValues>({
     resolver: zodResolver(faqSchema) as Resolver<FaqFormValues>,
     defaultValues: {
       question: initialData?.question || "",
@@ -61,8 +69,16 @@ export function FaqForm({ initialData }: FaqFormProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={`inline-flex items-center justify-center rounded-md text-sm font-medium ${initialData ? 'h-9 w-9 border border-input hover:bg-accent hover:text-accent-foreground' : 'h-10 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2'}`}>
-        {initialData ? <Edit className="h-4 w-4" /> : <><Plus className="mr-2 h-4 w-4" /> Thêm câu hỏi mới</>}
+      <DialogTrigger
+        className={`inline-flex items-center justify-center rounded-md text-sm font-medium ${initialData ? "h-9 w-9 border border-input hover:bg-accent hover:text-accent-foreground" : "h-10 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2"}`}
+      >
+        {initialData ? (
+          <Edit className="h-4 w-4" />
+        ) : (
+          <>
+            <Plus className="mr-2 h-4 w-4" /> Thêm câu hỏi mới
+          </>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -71,34 +87,64 @@ export function FaqForm({ initialData }: FaqFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
           <div className="space-y-2">
             <Label htmlFor="question">Câu hỏi *</Label>
-            <Input id="question" {...register("question")} placeholder="VD: Làm sao để cài máy in?" />
-            {errors.question && <p className="text-sm text-destructive">{errors.question?.message as string}</p>}
+            <Input
+              id="question"
+              {...register("question")}
+              placeholder="VD: Làm sao để cài máy in?"
+            />
+            {errors.question && (
+              <p className="text-sm text-destructive">{errors.question?.message as string}</p>
+            )}
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="category">Danh mục *</Label>
-            <Input id="category" {...register("category")} placeholder="VD: Phần mềm, Máy in, Mạng..." />
-            {errors.category && <p className="text-sm text-destructive">{errors.category?.message as string}</p>}
+            <Input
+              id="category"
+              {...register("category")}
+              placeholder="VD: Phần mềm, Máy in, Mạng..."
+            />
+            {errors.category && (
+              <p className="text-sm text-destructive">{errors.category?.message as string}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="answer">Câu trả lời / Hướng dẫn *</Label>
-            <Textarea id="answer" {...register("answer")} rows={6} placeholder="Nhập các bước hướng dẫn xử lý..." />
-            {errors.answer && <p className="text-sm text-destructive">{errors.answer?.message as string}</p>}
+            <Textarea
+              id="answer"
+              {...register("answer")}
+              rows={6}
+              placeholder="Nhập các bước hướng dẫn xử lý..."
+            />
+            {errors.answer && (
+              <p className="text-sm text-destructive">{errors.answer?.message as string}</p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2 pt-2">
-            <Checkbox 
-              id="isActive" 
-              checked={isActive} 
-              onCheckedChange={(checked) => setValue("isActive", checked as boolean)} 
+            <Checkbox
+              id="isActive"
+              checked={isActive}
+              onCheckedChange={(checked) => setValue("isActive", checked as boolean)}
             />
-            <Label htmlFor="isActive" className="cursor-pointer">Hiển thị (Active)</Label>
+            <Label htmlFor="isActive" className="cursor-pointer">
+              Hiển thị (Active)
+            </Label>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>Hủy</Button>
-            <Button type="submit" disabled={loading}>{loading ? "Đang lưu..." : "Lưu"}</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+            >
+              Hủy
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Đang lưu..." : "Lưu"}
+            </Button>
           </div>
         </form>
       </DialogContent>

@@ -93,10 +93,14 @@ export function DeviceSoftwareList({
                   <Label>Chọn phần mềm</Label>
                   {availableSoftware.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      Tất cả phần mềm có sẵn đã được gán cho thiết bị này hoặc chưa có phần mềm trong hệ thống.
+                      Tất cả phần mềm có sẵn đã được gán cho thiết bị này hoặc chưa có phần mềm
+                      trong hệ thống.
                     </p>
                   ) : (
-                    <Select value={selectedSoftwareId} onValueChange={(val) => setSelectedSoftwareId(val ?? "")}>
+                    <Select
+                      value={selectedSoftwareId}
+                      onValueChange={(val) => setSelectedSoftwareId(val ?? "")}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn phần mềm..." />
                       </SelectTrigger>
@@ -112,13 +116,15 @@ export function DeviceSoftwareList({
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                    disabled={loading}
+                  >
                     Hủy
                   </Button>
-                  <Button
-                    onClick={handleAdd}
-                    disabled={loading || availableSoftware.length === 0}
-                  >
+                  <Button onClick={handleAdd} disabled={loading || availableSoftware.length === 0}>
                     {loading ? "Đang thêm..." : "Thêm"}
                   </Button>
                 </div>

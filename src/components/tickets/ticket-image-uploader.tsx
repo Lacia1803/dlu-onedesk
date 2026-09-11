@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
-import { Upload, X, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
+import { Upload, X, Loader2 } from "lucide-react";
 
 interface TicketImageUploaderProps {
   value: string[];
@@ -118,7 +119,8 @@ export function TicketImageUploader({
               <span className="text-primary font-medium">ĐANG TẢI ẢNH LÊN...</span>
             ) : (
               <span>
-                <span className="text-primary font-medium">Nhấn để chọn ảnh</span> hoặc kéo thả vào đây
+                <span className="text-primary font-medium">Nhấn để chọn ảnh</span> hoặc kéo thả vào
+                đây
               </span>
             )}
           </div>
@@ -135,10 +137,12 @@ export function TicketImageUploader({
               key={url + idx}
               className="group relative aspect-square rounded-sm border border-border bg-card overflow-hidden"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={url}
                 alt={`Ảnh đính kèm ${idx + 1}`}
+                width={120}
+                height={120}
+                unoptimized
                 className="h-full w-full object-cover"
               />
               <button

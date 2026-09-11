@@ -33,7 +33,7 @@ export async function updateRoom(id: string, data: RoomFormValues) {
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
 
   const exists = await db.room.findFirst({
-    where: { name: parsed.data.name, deletedAt: null, id: { not: id } }
+    where: { name: parsed.data.name, deletedAt: null, id: { not: id } },
   });
   if (exists) return { success: false, error: "Tên phòng máy đã tồn tại." };
 
@@ -50,10 +50,14 @@ export async function deleteRoom(id: string) {
   }
 
   const activeDevices = await db.device.count({
-    where: { roomId: id, deletedAt: null, status: { not: "RETIRED" } }
+    where: { roomId: id, deletedAt: null, status: { not: "RETIRED" } },
   });
   if (activeDevices > 0) {
-    return { success: false, error: "Không thể xóa. Phòng này đang còn thiết bị (không bao gồm thanh lý). Vui lòng chuyển hoặc thanh lý tất cả thiết bị trước." };
+    return {
+      success: false,
+      error:
+        "Không thể xóa. Phòng này đang còn thiết bị (không bao gồm thanh lý). Vui lòng chuyển hoặc thanh lý tất cả thiết bị trước.",
+    };
   }
 
   await db.room.update({ where: { id }, data: { deletedAt: new Date() } });

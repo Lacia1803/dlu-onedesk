@@ -32,8 +32,8 @@ export function Values() {
               }
             />
             <p className="max-w-sm text-[14.5px] leading-relaxed text-ink/60">
-              Không chạy theo con số quảng cáo — OneDesk tập trung vào ba việc một hệ thống hỗ
-              trợ kỹ thuật cần làm thật tốt.
+              Không chạy theo con số quảng cáo — OneDesk tập trung vào ba việc một hệ thống hỗ trợ
+              kỹ thuật cần làm thật tốt.
             </p>
           </div>
         </Reveal>
@@ -74,8 +74,7 @@ export function Process() {
       <div
         className="relative mx-auto max-w-[88rem] overflow-hidden rounded-[40px] border border-pine-950/8 bg-gradient-to-b from-pine-100/80 to-pine-50 px-5 py-20 sm:px-10 sm:py-24 lg:px-16"
         style={{
-          backgroundImage:
-            "radial-gradient(rgb(23 63 53 / 0.1) 1px, transparent 1.6px)",
+          backgroundImage: "radial-gradient(rgb(23 63 53 / 0.1) 1px, transparent 1.6px)",
           backgroundSize: "24px 24px",
         }}
       >
@@ -143,8 +142,8 @@ export function Features() {
               }
             />
             <p className="max-w-sm text-[14.5px] leading-relaxed text-ink/60">
-              Các khung giao diện bên dưới được dựng lại nguyên trạng từ ứng dụng OneDesk — toàn
-              bộ tên và số liệu là dữ liệu minh họa.
+              Các khung giao diện bên dưới được dựng lại nguyên trạng từ ứng dụng OneDesk — toàn bộ
+              tên và số liệu là dữ liệu minh họa.
             </p>
           </div>
         </Reveal>
@@ -157,7 +156,7 @@ export function Features() {
                 key={f.index}
                 className={cn(
                   "grid items-center gap-10 py-14 lg:grid-cols-12 lg:gap-16",
-                  i > 0 && "border-t border-pine-950/8",
+                  i > 0 && "border-t border-pine-950/8"
                 )}
               >
                 {/* Text */}
@@ -198,7 +197,7 @@ export function Features() {
                           "absolute -inset-6 -z-10 rounded-[36px] blur-2xl",
                           flip
                             ? "bg-gradient-to-tr from-gold-200/50 via-pine-100/40 to-transparent"
-                            : "bg-gradient-to-tl from-gold-200/50 via-pine-100/40 to-transparent",
+                            : "bg-gradient-to-tl from-gold-200/50 via-pine-100/40 to-transparent"
                         )}
                       />
                       <div className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform hover:-translate-y-1.5">
@@ -259,7 +258,10 @@ export function Identity() {
               light
               eyebrow="Bản sắc địa phương"
               title="Được xây dựng cho môi trường học tập tại DLU"
-              desc={"Lấy bối cảnh vận hành phòng máy tại Trường Đại học Đà Lạt, DLU OneDesk hướng tới việc tập trung thông tin sự cố và giúp đội ngũ kỹ thuật theo dõi công việc rõ ràng hơn — thay cho những cuộc gọi và tin nhắn rờ" + "i rạc."}
+              desc={
+                "Lấy bối cảnh vận hành phòng máy tại Trường Đại học Đà Lạt, DLU OneDesk hướng tới việc tập trung thông tin sự cố và giúp đội ngũ kỹ thuật theo dõi công việc rõ ràng hơn — thay cho những cuộc gọi và tin nhắn rờ" +
+                "i rạc."
+              }
             />
           </Reveal>
 

@@ -28,7 +28,12 @@ function renderBotText(text: string) {
       return part;
     }
     return (
-      <a key={i} href={url} className="underline underline-offset-2 font-semibold" rel="noopener noreferrer">
+      <a
+        key={i}
+        href={url}
+        className="underline underline-offset-2 font-semibold"
+        rel="noopener noreferrer"
+      >
         {m[1]}
       </a>
     );
@@ -66,15 +71,13 @@ export function ChatWidget() {
 
       let finalReply = reply;
       if (shouldCreateTicket) {
-        finalReply += "\n\n💡 Nếu cần hỗ trợ thêm, bạn có thể [tạo ticket](/dashboard/tickets/new) để kỹ thuật viên kiểm tra trực tiếp.";
+        finalReply +=
+          "\n\n💡 Nếu cần hỗ trợ thêm, bạn có thể [tạo ticket](/dashboard/tickets/new) để kỹ thuật viên kiểm tra trực tiếp.";
       }
 
       setMessages((prev) => [...prev, { role: "model", text: finalReply }]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "model", text: "Đã xảy ra lỗi. Vui lòng thử lại." },
-      ]);
+      setMessages((prev) => [...prev, { role: "model", text: "Đã xảy ra lỗi. Vui lòng thử lại." }]);
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +128,7 @@ export function ChatWidget() {
                   <div
                     className={cn(
                       "rounded-lg px-3 py-2 text-sm max-w-[280px] whitespace-pre-wrap break-words",
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                      msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                     )}
                   >
                     {msg.role === "model" ? renderBotText(msg.text) : msg.text}

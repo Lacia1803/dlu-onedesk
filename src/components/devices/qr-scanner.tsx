@@ -81,7 +81,14 @@ export function QrScanner() {
             <AlertTriangle className="mr-2 h-4 w-4" />
             Báo cáo sự cố thiết bị này
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => { setDeviceId(null); setScanning(true); }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setDeviceId(null);
+              setScanning(true);
+            }}
+          >
             Quét lại
           </Button>
         </div>

@@ -33,7 +33,11 @@ export function FaqDeleteButton({ id }: { id: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2" aria-label="Xóa FAQ" title="Xóa">
+      <DialogTrigger
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+        aria-label="Xóa FAQ"
+        title="Xóa"
+      >
         <Trash2 className="h-4 w-4" />
       </DialogTrigger>
       <DialogContent>
@@ -44,7 +48,9 @@ export function FaqDeleteButton({ id }: { id: string }) {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>Hủy</Button>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            Hủy
+          </Button>
           <Button variant="destructive" onClick={handleDelete} disabled={loading}>
             {loading ? "Đang xóa..." : "Xóa"}
           </Button>

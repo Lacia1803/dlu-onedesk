@@ -3,7 +3,13 @@
   overflow-x: hidden;
   background-color: var(--color-ivory);
   color: var(--color-ink);
-  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    "Be Vietnam Pro",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -38,11 +44,21 @@
     transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
-.reveal-up { transform: translateY(30px); }
-.reveal-left { transform: translateX(-30px); }
-.reveal-right { transform: translateX(30px); }
-.reveal-zoom { transform: scale(0.94); }
-.reveal-fade { transform: none; }
+.reveal-up {
+  transform: translateY(30px);
+}
+.reveal-left {
+  transform: translateX(-30px);
+}
+.reveal-right {
+  transform: translateX(30px);
+}
+.reveal-zoom {
+  transform: scale(0.94);
+}
+.reveal-fade {
+  transform: none;
+}
 .reveal.is-visible {
   opacity: 1;
   transform: none;
@@ -90,7 +106,9 @@
   animation: flow 1.4s linear infinite;
 }
 @keyframes flow {
-  to { background-position-x: 32px; }
+  to {
+    background-position-x: 32px;
+  }
 }
 
 /* ---------- Reduced motion ---------- */

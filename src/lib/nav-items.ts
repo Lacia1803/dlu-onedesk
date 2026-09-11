@@ -38,7 +38,12 @@ export function getNavRoutes(role: string | undefined): NavItem[] {
     { label: "KPI của tôi", icon: Gauge, href: "/dashboard/my-kpi", show: isStaff },
     { label: "Bảo trì", icon: CalendarDays, href: "/dashboard/maintenance", show: isStaff },
     { label: "Người dùng", icon: Users, href: "/admin/users", show: role === "ADMIN" },
-    { label: "Nhật ký hệ thống", icon: ScrollText, href: "/admin/audit-logs", show: role === "ADMIN" },
+    {
+      label: "Nhật ký hệ thống",
+      icon: ScrollText,
+      href: "/admin/audit-logs",
+      show: role === "ADMIN",
+    },
     { label: "Thông báo", icon: Bell, href: "/dashboard/notifications", show: true },
   ];
 }

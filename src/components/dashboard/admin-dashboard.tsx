@@ -62,7 +62,7 @@ export async function AdminDashboard() {
                 {"// Chưa có ticket nào."}
               </p>
             ) : (
-              stats.recentTickets.map(ticket => (
+              stats.recentTickets.map((ticket) => (
                 <div key={ticket.id} className="py-3 flex justify-between items-start gap-4">
                   <div className="min-w-0">
                     <Link
@@ -72,7 +72,8 @@ export async function AdminDashboard() {
                       {ticket.title}
                     </Link>
                     <p className="mt-1 font-mono text-xs text-muted-foreground">
-                      by {ticket.creator.name ?? "unknown"} • {format(new Date(ticket.createdAt), "dd/MM HH:mm")}
+                      by {ticket.creator.name ?? "unknown"} •{" "}
+                      {format(new Date(ticket.createdAt), "dd/MM HH:mm")}
                     </p>
                   </div>
                   <TicketStatusBadge status={ticket.status} />

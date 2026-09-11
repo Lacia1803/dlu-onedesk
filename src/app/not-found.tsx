@@ -15,8 +15,8 @@ export default function NotFound() {
           </p>
           <h1 className="text-4xl font-bold tracking-tight">404 — Không tìm thấy trang</h1>
           <p className="text-muted-foreground">
-            Trang bạn truy cập không tồn tại hoặc đã bị di chuyển.
-            Vui lòng kiểm tra lại đường dẫn hoặc quay về trang chủ.
+            Trang bạn truy cập không tồn tại hoặc đã bị di chuyển. Vui lòng kiểm tra lại đường dẫn
+            hoặc quay về trang chủ.
           </p>
         </div>
 

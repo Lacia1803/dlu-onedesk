@@ -34,14 +34,10 @@ export function ExportUsersButton() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formatType, setFormatType] = useState<"xlsx" | "csv">("xlsx");
-  const [selected, setSelected] = useState<ColumnKey[]>(
-    COLUMNS.map((c) => c.key)
-  );
+  const [selected, setSelected] = useState<ColumnKey[]>(COLUMNS.map((c) => c.key));
 
   function toggleColumn(key: ColumnKey) {
-    setSelected((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
+    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   }
 
   async function handleExport() {
@@ -61,7 +57,8 @@ export function ExportUsersButton() {
         const row: Record<string, string> = {};
         for (const key of selected) {
           const v = u[key];
-          if (key === "createdAt") row["Ngày tham gia"] = format(new Date(v as string), "dd/MM/yyyy HH:mm");
+          if (key === "createdAt")
+            row["Ngày tham gia"] = format(new Date(v as string), "dd/MM/yyyy HH:mm");
           else if (key === "deletedAt") row["Trạng thái"] = v ? "Đã vô hiệu hóa" : "Hoạt động";
           else if (key === "phone") row["Số điện thoại"] = (v as string) || "";
           else row[COLUMNS.find((c) => c.key === key)!.label] = (v as string) || "";

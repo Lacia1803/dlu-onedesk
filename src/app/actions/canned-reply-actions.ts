@@ -34,7 +34,8 @@ export async function getCannedReplies(): Promise<CannedReplyItem[]> {
 export async function createCannedReply(title: string, content: string) {
   const session = await requireTech();
   if (!session) return { success: false, error: "Không có quyền." };
-  if (!title.trim() || !content.trim()) return { success: false, error: "Thiếu tiêu đề hoặc nội dung." };
+  if (!title.trim() || !content.trim())
+    return { success: false, error: "Thiếu tiêu đề hoặc nội dung." };
 
   await db.cannedReply.create({ data: { title: title.trim(), content: content.trim() } });
   revalidatePath("/dashboard/settings/canned-replies");

@@ -1,17 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+} from "date-fns";
 import { vi } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Wrench, DollarSign, User, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -39,7 +45,10 @@ interface MaintenanceCalendarProps {
   scheduledTickets?: TicketItem[];
 }
 
-export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: MaintenanceCalendarProps) {
+export function MaintenanceCalendar({
+  initialLogs,
+  scheduledTickets = [],
+}: MaintenanceCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedLog, setSelectedLog] = useState<LogItem | null>(null);
   const router = useRouter();
@@ -56,15 +65,11 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
   const today = () => setCurrentDate(new Date());
 
   const getLogsForDay = (day: Date) => {
-    return initialLogs.filter((log) =>
-      isSameDay(new Date(log.performedAt), day)
-    );
+    return initialLogs.filter((log) => isSameDay(new Date(log.performedAt), day));
   };
 
   const getTicketsForDay = (day: Date) => {
-    return scheduledTickets.filter((t) =>
-      t.scheduledAt && isSameDay(new Date(t.scheduledAt), day)
-    );
+    return scheduledTickets.filter((t) => t.scheduledAt && isSameDay(new Date(t.scheduledAt), day));
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -81,7 +86,7 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
       const res = await fetch("/api/tickets/schedule", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, scheduledAt: day.toISOString() })
+        body: JSON.stringify({ id, scheduledAt: day.toISOString() }),
       });
 
       if (!res.ok) throw new Error("API failed");
@@ -117,7 +122,9 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
       <div className="border rounded-lg overflow-hidden bg-card">
         <div className="grid grid-cols-7 border-b bg-muted/50 text-center text-sm font-medium py-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-muted-foreground">{day}</div>
+            <div key={day} className="text-muted-foreground">
+              {day}
+            </div>
           ))}
         </div>
 
@@ -160,7 +167,8 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
                       className="w-full text-left truncate text-xs p-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-500 transition-colors border border-amber-500/20 cursor-pointer"
                       onClick={() => router.push(`/dashboard/tickets/${t.id}`)}
                     >
-                      <span className="font-semibold">#{t.id.slice(-4).toUpperCase()}</span> {t.title}
+                      <span className="font-semibold">#{t.id.slice(-4).toUpperCase()}</span>{" "}
+                      {t.title}
                     </div>
                   ))}
                   {dayLogs.map((log) => (
@@ -170,7 +178,9 @@ export function MaintenanceCalendar({ initialLogs, scheduledTickets = [] }: Main
                       className="w-full text-left truncate text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 text-foreground transition-colors flex items-center gap-1 border border-primary/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Wrench className="h-3 w-3 shrink-0 text-primary" />
-                      <span className="truncate">{log.device.name}: {log.type}</span>
+                      <span className="truncate">
+                        {log.device.name}: {log.type}
+                      </span>
                     </button>
                   ))}
                 </div>

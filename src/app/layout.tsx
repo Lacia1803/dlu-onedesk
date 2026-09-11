@@ -23,7 +23,8 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 export const metadata: Metadata = {
   title: "DLU OneDesk — Hỗ trợ kỹ thuật phòng máy · Đại học Đà Lạt",
-  description: "DLU OneDesk — hệ thống tiếp nhận và xử lý yêu cầu hỗ trợ kỹ thuật phòng máy. Đồ án thực tập tại Trường Đại học Đà Lạt.",
+  description:
+    "DLU OneDesk — hệ thống tiếp nhận và xử lý yêu cầu hỗ trợ kỹ thuật phòng máy. Đồ án thực tập tại Trường Đại học Đà Lạt.",
 };
 
 export default function RootLayout({

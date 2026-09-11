@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 type FAQ = { id: string; question: string; answer: string };
 type Device = { id: string; name: string; qrCode: string };
 
-export default function NewTicketPage({ searchParams }: { searchParams: Promise<{ deviceId?: string }> }) {
+export default function NewTicketPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deviceId?: string }>;
+}) {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);

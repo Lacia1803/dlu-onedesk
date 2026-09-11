@@ -9,11 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/lib/audit";
 
-export async function updateUserSettings(data: {
-  name: string;
-  phone?: string;
-  avatar?: string;
-}) {
+export async function updateUserSettings(data: { name: string; phone?: string; avatar?: string }) {
   const session = await getServerSession(authOptions);
   if (!session) return { success: false, error: "Vui lòng đăng nhập." };
 

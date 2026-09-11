@@ -73,7 +73,10 @@ export async function deleteSoftware(id: string) {
 
   const deviceCount = await db.deviceSoftware.count({ where: { softwareId: id } });
   if (deviceCount > 0) {
-    return { success: false, error: `Không thể xóa. Còn ${deviceCount} thiết bị đang cài đặt phần mềm này.` };
+    return {
+      success: false,
+      error: `Không thể xóa. Còn ${deviceCount} thiết bị đang cài đặt phần mềm này.`,
+    };
   }
 
   await db.software.delete({ where: { id } });

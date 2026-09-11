@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Activity,
   ArrowDown,
@@ -78,8 +79,8 @@ export function Hero({ onLogin }: { onLogin: () => void }) {
 
           <Reveal delay={180}>
             <p className="mt-6 max-w-lg text-[16.5px] leading-relaxed text-ink/65">
-              DLU OneDesk kết nối ngườ{"i"} dùng và đội ngũ kỹ thuật trong một hệ thống — từ báo
-              sự cố, theo dõi xử lý đến quản lý thiết bị phòng máy.
+              DLU OneDesk kết nối ngườ{"i"} dùng và đội ngũ kỹ thuật trong một hệ thống — từ báo sự
+              cố, theo dõi xử lý đến quản lý thiết bị phòng máy.
             </p>
           </Reveal>
 
@@ -112,7 +113,10 @@ export function Hero({ onLogin }: { onLogin: () => void }) {
                 { icon: Activity, label: "Cập nhật theo thờ" + "i gian thực" },
                 { icon: Boxes, label: "Thiết bị tập trung một nơ" + "i" },
               ].map((c) => (
-                <span key={c.label} className="flex items-center gap-2 text-[13px] font-semibold text-pine-900/75">
+                <span
+                  key={c.label}
+                  className="flex items-center gap-2 text-[13px] font-semibold text-pine-900/75"
+                >
                   <c.icon className="size-4 text-gold-700" />
                   {c.label}
                 </span>
@@ -127,11 +131,13 @@ export function Hero({ onLogin }: { onLogin: () => void }) {
             <div className="relative mx-auto max-w-[560px] pb-14 pl-6 sm:pl-10 lg:pb-10">
               {/* Ảnh khuôn viên */}
               <div className="group relative overflow-hidden rounded-[34px] shadow-lift ring-1 ring-pine-950/15">
-                <img
+                <Image
                   src={IMAGES.heroCampus}
                   alt="Đồi thông trong sương sớm — bối cảnh quanh Trường Đại học Đà Lạt"
+                  width={560}
+                  height={700}
+                  priority
                   className="aspect-[4/5] w-full scale-[1.02] object-cover transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
-                  fetchPriority="high"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-pine-950/55 via-pine-900/8 to-pine-800/30" />
                 <div className="absolute inset-0 bg-pine-800/12 mix-blend-multiply" />
@@ -181,7 +187,10 @@ export function Hero({ onLogin }: { onLogin: () => void }) {
               {/* Con dấu xoay */}
               <div aria-hidden="true" className="absolute -top-9 left-2 hidden sm:block">
                 <div className="relative size-24">
-                  <svg viewBox="0 0 100 100" className="size-full animate-spin-slower text-pine-800/85">
+                  <svg
+                    viewBox="0 0 100 100"
+                    className="size-full animate-spin-slower text-pine-800/85"
+                  >
                     <defs>
                       <path
                         id="seal-circle"
@@ -190,7 +199,9 @@ export function Hero({ onLogin }: { onLogin: () => void }) {
                       />
                     </defs>
                     <text fontSize="9.2" fontWeight="700" letterSpacing="2.6" fill="currentColor">
-                      <textPath href="#seal-circle">DLU ONEDESK · ĐÀ LẠT · SƯƠNG VÀ THÔNG ·</textPath>
+                      <textPath href="#seal-circle">
+                        DLU ONEDESK · ĐÀ LẠT · SƯƠNG VÀ THÔNG ·
+                      </textPath>
                     </text>
                   </svg>
                   <PineMark className="absolute inset-0 m-auto size-5 text-gold-600" />
@@ -210,7 +221,11 @@ export function Ticker() {
     <div className="relative z-10 overflow-hidden border-y border-pine-950/25 bg-pine-900 py-4">
       <div className="flex w-max animate-marquee">
         {[...TICKER, ...TICKER, ...TICKER, ...TICKER].map((t, i) => (
-          <span key={i} className="flex items-center whitespace-nowrap" aria-hidden={i >= TICKER.length}>
+          <span
+            key={i}
+            className="flex items-center whitespace-nowrap"
+            aria-hidden={i >= TICKER.length}
+          >
             <span className="px-7 text-[12.5px] font-bold tracking-[0.18em] text-pine-100/80 uppercase">
               {t}
             </span>

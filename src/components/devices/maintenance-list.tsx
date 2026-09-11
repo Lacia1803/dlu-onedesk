@@ -40,14 +40,20 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Sort newest first
-  const sortedLogs = [...logs].sort((a, b) => new Date(b.performedAt).getTime() - new Date(a.performedAt).getTime());
+  const sortedLogs = [...logs].sort(
+    (a, b) => new Date(b.performedAt).getTime() - new Date(a.performedAt).getTime()
+  );
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg border-b pb-2">Lịch sử bảo trì</h3>
         {canEdit && (
-          <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/maintenance/new?deviceId=${deviceId}`)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/dashboard/maintenance/new?deviceId=${deviceId}`)}
+          >
             <Plus className="h-4 w-4 mr-1" />
             Thêm mới
           </Button>
@@ -77,7 +83,9 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
             ) : (
               sortedLogs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell>{format(new Date(log.performedAt), "dd/MM/yyyy HH:mm", { locale: vi })}</TableCell>
+                  <TableCell>
+                    {format(new Date(log.performedAt), "dd/MM/yyyy HH:mm", { locale: vi })}
+                  </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{log.type}</Badge>
                   </TableCell>
@@ -91,7 +99,11 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
                         <Button variant="ghost" size="icon" onClick={() => setIsEditing(log.id)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteDialogOpen(true)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeleteDialogOpen(true)}
+                        >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -108,11 +120,18 @@ export function MaintenanceList({ deviceId, logs, canEdit }: Props) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-            <AlertDialogDescription>Bạn có chắc muốn xóa lịch sử bảo trì này?</AlertDialogDescription>
+            <AlertDialogDescription>
+              Bạn có chắc muốn xóa lịch sử bảo trì này?
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setDeleteDialogOpen(false); toast.error("Tính năng xóa đang phát triển"); }}>
+            <AlertDialogAction
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                toast.error("Tính năng xóa đang phát triển");
+              }}
+            >
               Xác nhận
             </AlertDialogAction>
           </AlertDialogFooter>

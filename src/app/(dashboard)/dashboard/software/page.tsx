@@ -62,7 +62,10 @@ export default async function SoftwarePage({
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Quản lý Phần mềm</h1>
         {canEdit && (
-          <Link href="/dashboard/software/new" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+          <Link
+            href="/dashboard/software/new"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Thêm phần mềm
           </Link>
@@ -94,14 +97,20 @@ export default async function SoftwarePage({
             {softwareList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-12">
-                  <EmptyState title="Chưa có phần mềm nào" description="Hiện chưa có phần mềm nào được ghi nhận." />
+                  <EmptyState
+                    title="Chưa có phần mềm nào"
+                    description="Hiện chưa có phần mềm nào được ghi nhận."
+                  />
                 </TableCell>
               </TableRow>
             ) : (
               softwareList.map((sw) => (
                 <TableRow key={sw.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/dashboard/software/${sw.id}`} className="hover:underline text-primary">
+                    <Link
+                      href={`/dashboard/software/${sw.id}`}
+                      className="hover:underline text-primary"
+                    >
                       {sw.name}
                     </Link>
                   </TableCell>
@@ -110,7 +119,12 @@ export default async function SoftwarePage({
                   <TableCell>{sw._count.devices} máy</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/software/${sw.id}/edit`} aria-label="Chỉnh sửa phần mềm" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
+                      <Link
+                        href={`/dashboard/software/${sw.id}/edit`}
+                        aria-label="Chỉnh sửa phần mềm"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                        title="Chỉnh sửa"
+                      >
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}

@@ -28,7 +28,7 @@ export default async function ManageFaqPage() {
 
   const faqs = await db.faq.findMany({
     orderBy: [{ category: "asc" }, { createdAt: "desc" }],
-    include: { author: { select: { name: true } } }
+    include: { author: { select: { name: true } } },
   });
 
   return (
@@ -58,7 +58,10 @@ export default async function ManageFaqPage() {
             {faqs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-12">
-                  <EmptyState title="Chưa có dữ liệu FAQ" description="Hiện chưa có bài viết nào trong cẩm nang hỗ trợ." />
+                  <EmptyState
+                    title="Chưa có dữ liệu FAQ"
+                    description="Hiện chưa có bài viết nào trong cẩm nang hỗ trợ."
+                  />
                 </TableCell>
               </TableRow>
             ) : (

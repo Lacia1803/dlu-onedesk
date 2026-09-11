@@ -1,12 +1,15 @@
+import Image from "next/image";
 import { BrowserFrame } from "./ui-bits";
 import { IMAGES } from "./data";
 
 export function DashboardMockup() {
   return (
     <BrowserFrame url="onedesk.dlu.edu.vn/tong-quan">
-      <img
+      <Image
         src={IMAGES.realDashboard}
         alt="Dashboard thực tế"
+        width={1200}
+        height={700}
         className="w-full h-auto object-cover"
         loading="lazy"
       />
@@ -17,9 +20,11 @@ export function DashboardMockup() {
 export function TicketDetailMockup() {
   return (
     <BrowserFrame url="onedesk.dlu.edu.vn/tickets">
-      <img
+      <Image
         src={IMAGES.realTickets}
         alt="Danh sách Ticket thực tế"
+        width={1200}
+        height={700}
         className="w-full h-auto object-cover"
         loading="lazy"
       />
@@ -30,9 +35,11 @@ export function TicketDetailMockup() {
 export function DevicesMockup() {
   return (
     <BrowserFrame url="onedesk.dlu.edu.vn/devices">
-      <img
+      <Image
         src={IMAGES.realDevices}
         alt="Quản lý thiết bị thực tế"
+        width={1200}
+        height={700}
         className="w-full h-auto object-cover"
         loading="lazy"
       />
@@ -43,9 +50,11 @@ export function DevicesMockup() {
 export function ChatMockup() {
   return (
     <BrowserFrame url="onedesk.dlu.edu.vn/faq">
-      <img
+      <Image
         src={IMAGES.realFaq}
         alt="Trợ lý AI & FAQ thực tế"
+        width={1200}
+        height={700}
         className="w-full h-auto object-cover"
         loading="lazy"
       />
@@ -56,9 +65,11 @@ export function ChatMockup() {
 export function KpiMockup() {
   return (
     <BrowserFrame url="onedesk.dlu.edu.vn/kpi">
-      <img
+      <Image
         src={IMAGES.realKpi}
         alt="Báo cáo KPI thực tế"
+        width={1200}
+        height={700}
         className="w-full h-auto object-cover"
         loading="lazy"
       />

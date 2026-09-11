@@ -113,7 +113,10 @@ export default async function AdminUsersPage({
             {users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-12">
-                  <EmptyState title="Không có người dùng nào" description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc." />
+                  <EmptyState
+                    title="Không có người dùng nào"
+                    description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc."
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -125,12 +128,17 @@ export default async function AdminUsersPage({
                       <div className="flex items-center gap-2">
                         {user.name}
                         {isSelf && (
-                          <Badge variant="outline" className="text-[10px] px-1.5">Bạn</Badge>
+                          <Badge variant="outline" className="text-[10px] px-1.5">
+                            Bạn
+                          </Badge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Link href={`mailto:${user.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+                      <Link
+                        href={`mailto:${user.email}`}
+                        className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+                      >
                         <Mail className="h-3.5 w-3.5" />
                         {user.email}
                       </Link>
@@ -140,7 +148,9 @@ export default async function AdminUsersPage({
                         {ROLE_LABELS[user.role]}
                       </Badge>
                       {user.deletedAt && (
-                        <Badge variant="secondary" className="ml-2">Đã vô hiệu hóa</Badge>
+                        <Badge variant="secondary" className="ml-2">
+                          Đã vô hiệu hóa
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell>

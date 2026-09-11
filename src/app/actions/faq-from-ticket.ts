@@ -34,7 +34,8 @@ export async function createFaqDraftFromTicket(ticketId: string) {
   }
 
   const solution = ticket.comments[0]?.content || ticket.internalNote;
-  if (!solution) return { success: false, error: "Ticket chưa có nội dung xử lý (bình luận/ghi chú)." };
+  if (!solution)
+    return { success: false, error: "Ticket chưa có nội dung xử lý (bình luận/ghi chú)." };
 
   const faq = await db.faq.create({
     data: {

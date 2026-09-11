@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Device } from "@prisma/client";
 
@@ -44,12 +50,18 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
 
   let initialSpecs = "";
   if (initialData?.specifications) {
-    initialSpecs = typeof initialData.specifications === 'string' 
-      ? initialData.specifications 
-      : JSON.stringify(initialData.specifications, null, 2);
+    initialSpecs =
+      typeof initialData.specifications === "string"
+        ? initialData.specifications
+        : JSON.stringify(initialData.specifications, null, 2);
   }
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<DeviceFormValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<DeviceFormValues>({
     resolver: zodResolver(deviceSchema),
     defaultValues: {
       name: initialData?.name || "",
@@ -59,8 +71,12 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
       manufacturer: initialData?.manufacturer || "",
       model: initialData?.model || "",
       serialNumber: initialData?.serialNumber || "",
-      purchaseDate: initialData?.purchaseDate ? new Date(initialData.purchaseDate).toISOString().split("T")[0] : "",
-      warrantyEnd: initialData?.warrantyEnd ? new Date(initialData.warrantyEnd).toISOString().split("T")[0] : "",
+      purchaseDate: initialData?.purchaseDate
+        ? new Date(initialData.purchaseDate).toISOString().split("T")[0]
+        : "",
+      warrantyEnd: initialData?.warrantyEnd
+        ? new Date(initialData.warrantyEnd).toISOString().split("T")[0]
+        : "",
       specifications: initialSpecs,
       notes: initialData?.notes || "",
     },
@@ -86,7 +102,10 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-card p-6 rounded-lg border">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-6 max-w-2xl bg-card p-6 rounded-lg border"
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Name */}
         <div className="space-y-2">
@@ -98,13 +117,18 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Room */}
         <div className="space-y-2">
           <Label htmlFor="roomId">Phòng máy *</Label>
-          <Select defaultValue={initialData?.roomId ?? ""} onValueChange={(val) => setValue("roomId", val ?? "", { shouldValidate: true })}>
+          <Select
+            defaultValue={initialData?.roomId ?? ""}
+            onValueChange={(val) => setValue("roomId", val ?? "", { shouldValidate: true })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Chọn phòng" />
             </SelectTrigger>
             <SelectContent>
-              {rooms.map(r => (
-                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+              {rooms.map((r) => (
+                <SelectItem key={r.id} value={r.id}>
+                  {r.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -114,13 +138,20 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Type */}
         <div className="space-y-2">
           <Label htmlFor="type">Loại thiết bị *</Label>
-          <Select defaultValue={initialData?.type || "COMPUTER"} onValueChange={(val) => setValue("type", val as DeviceFormValues["type"], { shouldValidate: true })}>
+          <Select
+            defaultValue={initialData?.type || "COMPUTER"}
+            onValueChange={(val) =>
+              setValue("type", val as DeviceFormValues["type"], { shouldValidate: true })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Chọn loại" />
             </SelectTrigger>
             <SelectContent>
-              {TYPE_OPTIONS.map(t => (
-                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+              {TYPE_OPTIONS.map((t) => (
+                <SelectItem key={t.value} value={t.value}>
+                  {t.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -130,13 +161,20 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         {/* Status */}
         <div className="space-y-2">
           <Label htmlFor="status">Trạng thái *</Label>
-          <Select defaultValue={initialData?.status || "ACTIVE"} onValueChange={(val) => setValue("status", val as DeviceFormValues["status"], { shouldValidate: true })}>
+          <Select
+            defaultValue={initialData?.status || "ACTIVE"}
+            onValueChange={(val) =>
+              setValue("status", val as DeviceFormValues["status"], { shouldValidate: true })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_OPTIONS.map(s => (
-                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+              {STATUS_OPTIONS.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -159,7 +197,9 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
         <div className="space-y-2">
           <Label htmlFor="serialNumber">Số Serial</Label>
           <Input id="serialNumber" {...register("serialNumber")} />
-          {errors.serialNumber && <p className="text-sm text-destructive">{errors.serialNumber.message}</p>}
+          {errors.serialNumber && (
+            <p className="text-sm text-destructive">{errors.serialNumber.message}</p>
+          )}
         </div>
       </div>
 
@@ -180,14 +220,16 @@ export function DeviceForm({ initialData, rooms }: DeviceFormProps) {
       {/* Specifications */}
       <div className="space-y-2">
         <Label htmlFor="specifications">Cấu hình chi tiết (định dạng JSON)</Label>
-        <Textarea 
-          id="specifications" 
-          {...register("specifications")} 
+        <Textarea
+          id="specifications"
+          {...register("specifications")}
           placeholder={`{\n  "cpu": "Intel Core i5",\n  "ram": "16GB",\n  "storage": "512GB SSD"\n}`}
           rows={5}
           className="font-mono text-sm"
         />
-        {errors.specifications && <p className="text-sm text-destructive">{errors.specifications.message}</p>}
+        {errors.specifications && (
+          <p className="text-sm text-destructive">{errors.specifications.message}</p>
+        )}
       </div>
 
       {/* Notes */}

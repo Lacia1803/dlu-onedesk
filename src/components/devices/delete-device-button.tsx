@@ -48,7 +48,9 @@ export function DeleteDeviceButton({ id }: { id: string }) {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>Hủy</Button>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            Hủy
+          </Button>
           <Button variant="destructive" onClick={handleDelete} disabled={loading}>
             {loading ? "Đang xóa..." : "Xóa"}
           </Button>

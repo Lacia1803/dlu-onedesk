@@ -17,12 +17,16 @@ interface Props {
   deviceName: string;
 }
 
-export function GuestReportForm({ deviceId, deviceName }: Props) {
+export function GuestReportForm({ deviceId }: Props) {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState("");
 
-  const { register, handleSubmit, formState: { errors } } = useForm<GuestTicketValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GuestTicketValues>({
     resolver: zodResolver(guestTicketSchema),
     defaultValues: {
       studentId: "",
@@ -94,11 +98,7 @@ export function GuestReportForm({ deviceId, deviceName }: Props) {
 
           <div className="space-y-2">
             <Label htmlFor="title">Tiêu đề sự cố *</Label>
-            <Input
-              id="title"
-              {...register("title")}
-              placeholder="VD: Máy không lên nguồn"
-            />
+            <Input id="title" {...register("title")} placeholder="VD: Máy không lên nguồn" />
             {errors.title && (
               <p className="text-sm text-destructive">{errors.title?.message as string}</p>
             )}

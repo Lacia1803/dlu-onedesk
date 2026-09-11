@@ -20,7 +20,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -79,9 +86,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">Tạo tài khoản mới</CardTitle>
-          <CardDescription>
-            Nhập thông tin bên dưới để đăng ký DLU OneDesk
-          </CardDescription>
+          <CardDescription>Nhập thông tin bên dưới để đăng ký DLU OneDesk</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -106,7 +111,12 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" type="email" disabled={isLoading} {...field} />
+                      <Input
+                        placeholder="name@example.com"
+                        type="email"
+                        disabled={isLoading}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

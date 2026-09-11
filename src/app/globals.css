@@ -78,23 +78,45 @@
   --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
 
   @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
   }
   @keyframes spin-slower {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
   @keyframes mist {
-    from { transform: translate3d(-5%, 0, 0) scale(1.06); }
-    to { transform: translate3d(5%, 0, 0) scale(1.12); }
+    from {
+      transform: translate3d(-5%, 0, 0) scale(1.06);
+    }
+    to {
+      transform: translate3d(5%, 0, 0) scale(1.12);
+    }
   }
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgb(214 174 98 / 0.5); }
-    50% { opacity: 0.75; box-shadow: 0 0 0 6px rgb(214 174 98 / 0); }
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgb(214 174 98 / 0.5);
+    }
+    50% {
+      opacity: 0.75;
+      box-shadow: 0 0 0 6px rgb(214 174 98 / 0);
+    }
   }
   --shadow-soft: 0 24px 48px -24px rgb(18 49 42 / 0.28);
   --shadow-lift: 0 40px 80px -32px rgb(18 49 42 / 0.4);

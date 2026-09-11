@@ -28,8 +28,8 @@ export default function Error({
           </p>
           <h1 className="text-3xl font-bold tracking-tight">Đã xảy ra lỗi hệ thống</h1>
           <p className="text-muted-foreground">
-            Hệ thống gặp sự cố khi xử lý yêu cầu của bạn. Vui lòng thử lại.
-            Nếu lỗi vẫn tiếp diễn, vui lòng liên hệ bộ phận IT Helpdesk.
+            Hệ thống gặp sự cố khi xử lý yêu cầu của bạn. Vui lòng thử lại. Nếu lỗi vẫn tiếp diễn,
+            vui lòng liên hệ bộ phận IT Helpdesk.
           </p>
           {error.digest && (
             <p className="text-xs font-mono text-muted-foreground/70">Mã lỗi: {error.digest}</p>

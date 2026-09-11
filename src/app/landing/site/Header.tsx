@@ -24,13 +24,13 @@ export function Header({ onLogin }: { onLogin: () => void }) {
         "fixed inset-x-0 top-0 z-[60] transition-all duration-500",
         scrolled
           ? "border-b border-pine-950/8 bg-ivory/85 shadow-[0_16px_44px_-24px_rgb(18_49_42/0.35)] backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent",
+          : "border-b border-transparent bg-transparent"
       )}
     >
       <div
         className={cn(
           "mx-auto flex max-w-7xl items-center gap-4 px-5 transition-all duration-500 sm:px-8",
-          scrolled ? "py-3" : "py-5",
+          scrolled ? "py-3" : "py-5"
         )}
       >
         <LogoLockup />
@@ -71,7 +71,7 @@ export function Header({ onLogin }: { onLogin: () => void }) {
       <div
         className={cn(
           "grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
         <div className="overflow-hidden">

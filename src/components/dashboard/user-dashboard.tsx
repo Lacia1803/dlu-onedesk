@@ -31,10 +31,13 @@ export async function UserDashboard() {
               {"// Bạn chưa tạo báo cáo sự cố nào."}
             </p>
           ) : (
-            stats.recentTickets.map(ticket => (
+            stats.recentTickets.map((ticket) => (
               <div key={ticket.id} className="py-3 flex justify-between items-start gap-4">
                 <div className="min-w-0">
-                  <Link href={`/dashboard/tickets/${ticket.id}`} className="font-mono text-sm text-primary hover:underline">
+                  <Link
+                    href={`/dashboard/tickets/${ticket.id}`}
+                    className="font-mono text-sm text-primary hover:underline"
+                  >
                     {ticket.title}
                   </Link>
                   <p className="mt-1 font-mono text-xs text-muted-foreground">

@@ -20,7 +20,7 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
     include: {
       room: true,
       software: { include: { software: true } },
-    }
+    },
   });
 
   if (!device || device.deletedAt) {
@@ -37,8 +37,14 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
   const deviceTickets = await db.ticket.findMany({
     where: { deviceId: params.id },
     select: {
-      id: true, title: true, status: true, priority: true,
-      createdAt: true, resolvedAt: true, closedAt: true, rating: true,
+      id: true,
+      title: true,
+      status: true,
+      priority: true,
+      createdAt: true,
+      resolvedAt: true,
+      closedAt: true,
+      rating: true,
       creator: { select: { name: true } },
       assignee: { select: { name: true } },
     },
@@ -49,11 +55,16 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "ACTIVE": return <Badge className="bg-green-500">Hoạt động</Badge>;
-      case "BROKEN": return <Badge variant="destructive">Hỏng</Badge>;
-      case "MAINTENANCE": return <Badge className="bg-yellow-500">Bảo trì</Badge>;
-      case "RETIRED": return <Badge variant="secondary">Thanh lý</Badge>;
-      default: return <Badge>{status}</Badge>;
+      case "ACTIVE":
+        return <Badge className="bg-green-500">Hoạt động</Badge>;
+      case "BROKEN":
+        return <Badge variant="destructive">Hỏng</Badge>;
+      case "MAINTENANCE":
+        return <Badge className="bg-yellow-500">Bảo trì</Badge>;
+      case "RETIRED":
+        return <Badge variant="secondary">Thanh lý</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
     }
   };
 
@@ -74,12 +85,12 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
           <TabsTrigger value="maintenance">Bảo trì</TabsTrigger>
           <TabsTrigger value="history">Lịch sử sự cố ({deviceTickets.length})</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="info" className="pt-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4 border rounded-lg p-4 bg-card">
               <h3 className="font-semibold text-lg border-b pb-2">Chi tiết</h3>
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+              <div className="grid grid-cols-2 gap-y-2 text-sm">
                 <span className="text-muted-foreground">Loại:</span>
                 <span>{device.type}</span>
                 <span className="text-muted-foreground">Nhà sản xuất:</span>
@@ -89,18 +100,26 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
                 <span className="text-muted-foreground">Số Serial:</span>
                 <span className="font-mono">{device.serialNumber || "-"}</span>
                 <span className="text-muted-foreground">Ngày mua:</span>
-                <span>{device.purchaseDate ? new Date(device.purchaseDate).toLocaleDateString("vi-VN") : "-"}</span>
+                <span>
+                  {device.purchaseDate
+                    ? new Date(device.purchaseDate).toLocaleDateString("vi-VN")
+                    : "-"}
+                </span>
                 <span className="text-muted-foreground">Hết bảo hành:</span>
-                <span className={
-                  device.warrantyEnd && new Date() > new Date(device.warrantyEnd)
-                    ? "text-red-600 font-medium"
-                    : ""
-                }>
-                  {device.warrantyEnd ? new Date(device.warrantyEnd).toLocaleDateString("vi-VN") : "-"}
+                <span
+                  className={
+                    device.warrantyEnd && new Date() > new Date(device.warrantyEnd)
+                      ? "text-red-600 font-medium"
+                      : ""
+                  }
+                >
+                  {device.warrantyEnd
+                    ? new Date(device.warrantyEnd).toLocaleDateString("vi-VN")
+                    : "-"}
                   {device.warrantyEnd && new Date() > new Date(device.warrantyEnd) && " (đã hết)"}
                 </span>
               </div>
-              
+
               <h3 className="font-semibold text-lg border-b pb-2 pt-4">Cấu hình</h3>
               {device.specifications ? (
                 <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto">
@@ -109,21 +128,26 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
               ) : (
                 <p className="text-sm text-muted-foreground">Không có dữ liệu cấu hình.</p>
               )}
-              
+
               <h3 className="font-semibold text-lg border-b pb-2 pt-4">Ghi chú</h3>
               <p className="text-sm">{device.notes || "-"}</p>
             </div>
-            
+
             <div className="space-y-4 flex flex-col items-center">
-              {canEdit && <DeviceTransferModal deviceId={device.id} currentRoomId={device.roomId} />}
-              <Link href={`/dashboard/tickets/new?deviceId=${device.id}`} className="w-full max-w-sm inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90">
+              {canEdit && (
+                <DeviceTransferModal deviceId={device.id} currentRoomId={device.roomId} />
+              )}
+              <Link
+                href={`/dashboard/tickets/new?deviceId=${device.id}`}
+                className="w-full max-w-sm inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
+              >
                 Báo cáo sự cố thiết bị này
               </Link>
               <QrCodeDisplay qrCode={device.qrCode} deviceName={device.name} />
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="software" className="pt-4">
           <DeviceSoftwareList
             deviceId={device.id}
@@ -132,21 +156,37 @@ export default async function DeviceDetailPage({ params }: { params: { id: strin
             canEdit={canEdit}
           />
         </TabsContent>
-        
+
         <TabsContent value="maintenance" className="pt-4">
           <MaintenanceList deviceId={device.id} logs={maintenanceLogs} canEdit={canEdit} />
         </TabsContent>
 
         <TabsContent value="history" className="pt-4">
           {deviceTickets.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Chưa có sự cố nào được ghi nhận cho thiết bị này.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">
+              Chưa có sự cố nào được ghi nhận cho thiết bị này.
+            </p>
           ) : (
             <div className="space-y-3">
               {deviceTickets.map((t) => (
-                <Link key={t.id} href={`/dashboard/tickets/${t.id}`} className="block border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors">
+                <Link
+                  key={t.id}
+                  href={`/dashboard/tickets/${t.id}`}
+                  className="block border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors"
+                >
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="font-semibold text-sm">#{t.id.slice(-6).toUpperCase()} — {t.title}</span>
-                    <Badge variant={t.status === "CLOSED" ? "secondary" : t.status === "RESOLVED" ? "default" : "destructive"}>
+                    <span className="font-semibold text-sm">
+                      #{t.id.slice(-6).toUpperCase()} — {t.title}
+                    </span>
+                    <Badge
+                      variant={
+                        t.status === "CLOSED"
+                          ? "secondary"
+                          : t.status === "RESOLVED"
+                            ? "default"
+                            : "destructive"
+                      }
+                    >
                       {t.status}
                     </Badge>
                   </div>

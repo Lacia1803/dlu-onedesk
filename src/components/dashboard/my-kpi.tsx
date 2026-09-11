@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { getTechKPI, TechKPIResult } from "@/app/actions/kpi-actions";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +21,12 @@ export function MyKPIDashboard() {
     fetchKPI();
   }, [session?.user?.id]);
 
-  if (loading) return <p className="text-center py-4 font-mono text-xs text-muted-foreground">Đang tải KPI cá nhân...</p>;
+  if (loading)
+    return (
+      <p className="text-center py-4 font-mono text-xs text-muted-foreground">
+        Đang tải KPI cá nhân...
+      </p>
+    );
   if (data.length === 0) return null;
 
   const myStat = data[0];

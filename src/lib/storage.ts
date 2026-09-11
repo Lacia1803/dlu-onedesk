@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
@@ -38,11 +39,10 @@ async function saveLocal(file: File, subdir: string): Promise<string> {
 async function saveRemote(file: File, subdir: string): Promise<string> {
   const { S3_BUCKET, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_ENDPOINT } = process.env;
   if (!S3_BUCKET || !S3_REGION || !S3_ACCESS_KEY_ID || !S3_SECRET_ACCESS_KEY) {
-    throw new Error("Thiếu cấu hình S3 (S3_BUCKET / S3_REGION / S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY).");
+    throw new Error(
+      "Thiếu cấu hình S3 (S3_BUCKET / S3_REGION / S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY)."
+    );
   }
-  // Lazy import — aws-sdk là optional dependency
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3") as typeof import("@aws-sdk/client-s3");
   const client = new S3Client({
     region: S3_REGION,
     endpoint: S3_ENDPOINT || undefined,
@@ -58,7 +58,9 @@ async function saveRemote(file: File, subdir: string): Promise<string> {
       ContentType: file.type,
     })
   );
-  const base = S3_ENDPOINT ? S3_ENDPOINT.replace(/\/$/, "") : `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
+  const base = S3_ENDPOINT
+    ? S3_ENDPOINT.replace(/\/$/, "")
+    : `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
   return `${base}/${key}`;
 }
 

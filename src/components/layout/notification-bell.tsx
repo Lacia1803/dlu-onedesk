@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUnreadNotifications, markAsRead, markAllAsRead } from "@/app/actions/notification-actions";
+import {
+  getUnreadNotifications,
+  markAsRead,
+  markAllAsRead,
+} from "@/app/actions/notification-actions";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -50,7 +54,7 @@ export function NotificationBell() {
   }
 
   useEffect(() => {
-    fetchNotifications(); // eslint-disable-line react-hooks/set-state-in-effect
+    fetchNotifications();
 
     // SSE connection cho tin nhắn realtime ngay lập tức
     let es: EventSource | null = null;
@@ -85,7 +89,7 @@ export function NotificationBell() {
 
   async function handleClick(notif: Notification) {
     await markAsRead(notif.id);
-    setNotifications(prev => prev.filter(n => n.id !== notif.id));
+    setNotifications((prev) => prev.filter((n) => n.id !== notif.id));
     setOpen(false);
     if (notif.linkUrl) {
       router.push(notif.linkUrl);
@@ -107,7 +111,12 @@ export function NotificationBell() {
         <div className="flex items-center justify-between px-2 py-1.5">
           <DropdownMenuLabel className="p-0">Thông báo mới</DropdownMenuLabel>
           {notifications.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={handleMarkAll} className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleMarkAll}
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+            >
               Đánh dấu tất cả đã đọc
             </Button>
           )}
@@ -127,7 +136,9 @@ export function NotificationBell() {
               >
                 <div className="flex justify-between w-full items-start gap-2">
                   <span className="flex items-center gap-1.5">
-                    <span className={`h-1.5 w-1.5 rounded-full ${typeStyle[notif.type ?? "GENERAL"] ?? typeStyle.GENERAL}`} />
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${typeStyle[notif.type ?? "GENERAL"] ?? typeStyle.GENERAL}`}
+                    />
                     <span className="font-semibold text-sm leading-none">{notif.title}</span>
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
@@ -140,7 +151,13 @@ export function NotificationBell() {
           )}
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => { setOpen(false); router.push("/dashboard/notifications"); }} className="justify-center text-xs text-muted-foreground">
+        <DropdownMenuItem
+          onClick={() => {
+            setOpen(false);
+            router.push("/dashboard/notifications");
+          }}
+          className="justify-center text-xs text-muted-foreground"
+        >
           Xem tất cả thông báo
         </DropdownMenuItem>
       </DropdownMenuContent>

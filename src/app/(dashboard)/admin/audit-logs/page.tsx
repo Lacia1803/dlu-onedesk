@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -57,15 +58,17 @@ export default async function AdminAuditLogsPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where: any = keyword ? { // eslint-disable-line @typescript-eslint/no-explicit-any
-    OR: [
-      { action: { contains: keyword, mode: "insensitive" as const } },
-      { entity: { contains: keyword, mode: "insensitive" as const } },
-      { entityId: { contains: keyword, mode: "insensitive" as const } },
-      { user: { name: { contains: keyword, mode: "insensitive" as const } } },
-      { user: { email: { contains: keyword, mode: "insensitive" as const } } },
-    ],
-  } : undefined;
+  const where: Prisma.AuditLogWhereInput | undefined = keyword
+    ? {
+        OR: [
+          { action: { contains: keyword, mode: "insensitive" } },
+          { entity: { contains: keyword, mode: "insensitive" } },
+          { entityId: { contains: keyword, mode: "insensitive" } },
+          { user: { is: { name: { contains: keyword, mode: "insensitive" } } } },
+          { user: { is: { email: { contains: keyword, mode: "insensitive" } } } },
+        ],
+      }
+    : undefined;
 
   const [logs, total] = await Promise.all([
     db.auditLog.findMany({
@@ -118,7 +121,10 @@ export default async function AdminAuditLogsPage({
             {logs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-12">
-                  <EmptyState title="Chưa có nhật ký hoạt động nào" description="Hệ thống chưa ghi nhận hoạt động nào trong khoảng thời gian này." />
+                  <EmptyState
+                    title="Chưa có nhật ký hoạt động nào"
+                    description="Hệ thống chưa ghi nhận hoạt động nào trong khoảng thời gian này."
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -139,7 +145,10 @@ export default async function AdminAuditLogsPage({
                   <TableCell className="font-mono text-xs">
                     {log.entity}
                     {log.entityId && (
-                      <span className="text-muted-foreground"> #{log.entityId.slice(-6).toUpperCase()}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        #{log.entityId.slice(-6).toUpperCase()}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground">

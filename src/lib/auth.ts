@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { authenticator } from "@otplib/preset-default";
@@ -7,9 +8,21 @@ import { decryptSecret } from "./crypto";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  adapter: PrismaAdapter(db) as Adapter,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session.token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        // Chỉ bật Secure khi chạy production (HTTPS)
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -22,7 +35,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await db.user.findUnique({
-          where: { email: credentials.email }
+          where: { email: credentials.email },
         });
 
         if (!user || user.deletedAt) return null;
@@ -33,7 +46,10 @@ export const authOptions: NextAuthOptions = {
         // 2-FA: chặn phiên đăng nhập cho tới khi OTP hợp lệ (verify ngay trong authorize)
         if (user.twoFactorEnabled) {
           if (!credentials.token || !user.twoFactorSecret) return null;
-          const otpValid = authenticator.check(credentials.token, decryptSecret(user.twoFactorSecret));
+          const otpValid = authenticator.check(
+            credentials.token,
+            decryptSecret(user.twoFactorSecret)
+          );
           if (!otpValid) return null;
         }
 

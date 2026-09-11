@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const { allowed } = rateLimit(`guest-ticket:${ip}`, 10, 60_000);
   if (!allowed) {
-    return NextResponse.json({ success: false, error: "Quá nhiều yêu cầu. Vui lòng thử lại sau." }, { status: 429 });
+    return NextResponse.json(
+      { success: false, error: "Quá nhiều yêu cầu. Vui lòng thử lại sau." },
+      { status: 429 }
+    );
   }
 
   let body: unknown;
@@ -31,14 +34,20 @@ export async function POST(req: NextRequest) {
   }
 
   const { studentId, title, description } = parsed.data;
-  const deviceId = (body as any).deviceId;
+  const deviceId = (body as Record<string, unknown>).deviceId as string | undefined;
 
   // Validate device exists
   if (!deviceId) {
-    return NextResponse.json({ success: false, error: "Thiếu thông tin thiết bị." }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: "Thiếu thông tin thiết bị." },
+      { status: 400 }
+    );
   }
 
-  const device = await db.device.findUnique({ where: { id: deviceId }, select: { id: true, deletedAt: true } });
+  const device = await db.device.findUnique({
+    where: { id: deviceId },
+    select: { id: true, deletedAt: true },
+  });
   if (!device || device.deletedAt) {
     return NextResponse.json({ success: false, error: "Thiết bị không tồn tại." }, { status: 404 });
   }

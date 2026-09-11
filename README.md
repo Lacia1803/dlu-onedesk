@@ -1,17 +1,70 @@
 # DLU OneDesk - Hệ thống Hỗ trợ Kỹ thuật & Quản lý Thiết bị Phòng máy
 
+> **Tác giả:** aesc (Đồ án Thực tập tốt nghiệp — Trường Đại học Đà Lạt - DLU).
+
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![CI](https://github.com/username/dlu-onedesk/actions/workflows/ci.yml/badge.svg)](https://github.com/username/dlu-onedesk/actions)
+[![Coverage](https://img.shields.io/badge/coverage-90%25-green.svg)](./coverage)
+[![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
 
 Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại học Đà Lạt (DLU), giúp tối ưu hóa quy trình tiếp nhận sự cố, quản lý thiết bị phòng máy, đo lường KPI kỹ thuật viên và tự động hóa vận hành.
+
+---
+
+## 🏗️ Kiến trúc & Sơ đồ Hệ thống
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer ["Client Layer (Trình duyệt & Thiết bị di động)"]
+        UI["React 19 / Next.js Client Components"]
+        MobileDrawer["Mobile Navigation Drawer (Sheet)"]
+        QRScanner["Camera QR Code Scanner"]
+        SSEListener["EventSource (SSE Realtime Listener)"]
+    end
+
+    subgraph ServerLayer ["Server Layer (Next.js 16 App Router)"]
+        Middleware["Proxy / Route Middleware (RBAC & Auth)"]
+        APIRoutes["Server Actions & API Endpoints (/api/*)"]
+        AuthModule["NextAuth.js (JWT, AES-256 2-FA OTP)"]
+        SSEEngine["EventEmitter Bus (In-process SSE Broadcast)"]
+        Scheduler["Cron Engine (SLA Overdue & Reminders)"]
+    end
+
+    subgraph DBLayer ["Database & Infrastructure"]
+        PrismaORM["Prisma ORM 6.19 (Indexed Models)"]
+        PostgreSQL[("PostgreSQL Database")]
+        StorageDriver["Storage Abstraction (Local / AWS S3)"]
+    end
+
+    subgraph ExternalServices ["External Integrations"]
+        SMTP["Nodemailer (Email Notification Service)"]
+        GeminiAI["Google Gemini API (AI Chatbot Engine)"]
+    end
+
+    UI --> Middleware
+    MobileDrawer --> Middleware
+    QRScanner --> Middleware
+    Middleware --> APIRoutes
+    APIRoutes --> AuthModule
+    APIRoutes --> SSEEngine
+    SSEEngine -.->|"Realtime Push"| SSEListener
+    APIRoutes --> PrismaORM
+    PrismaORM --> PostgreSQL
+    APIRoutes --> StorageDriver
+    APIRoutes --> SMTP
+    APIRoutes --> GeminiAI
+    Scheduler --> APIRoutes
+```
 
 ---
 
 ## 🎯 Tính năng nổi bật
 
 ### 📱 1. Tiếp nhận & Quản lý Ticket
+
 - **Tạo ticket sự cố**: Phân loại theo danh mục, mức độ ưu tiên, đính kèm hình ảnh và liên kết thiết bị.
 - **Mobile Navigation Drawer**: Hỗ trợ giao diện responsive tối ưu trên điện thoại di động với Hamburger menu trượt (Sheet drawer) đầy đủ phân quyền.
 - **Phân trang Server-side & URL Query State**: Phân trang chuẩn 20 mục/trang cho cả bảng Tickets và Devices, bảo toàn bộ lọc và tìm kiếm trực tiếp trên URL (`?page=1&q=...`).
@@ -23,15 +76,18 @@ Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại họ
 - **Xử lý hàng loạt (Bulk Actions)**: Chọn nhiều ticket để đổi trạng thái, mức độ ưu tiên hoặc tự động gán.
 
 ### 🤖 2. Trợ lý AI & Cẩm nang FAQ
+
 - **AI Chatbot (Gemini API)**: Trợ lý tư vấn sự cố 24/7 trực tiếp trên màn hình, tra cứu dữ liệu FAQ thực tế.
 - **Lịch sử chat AI**: Lưu vết cuộc trò chuyện cá nhân để xem lại (`/dashboard/chat-history`).
 - **Cẩm nang hỗ trợ**: Quản lý các câu hỏi thường gặp, hỗ trợ nút "Tạo ticket từ FAQ" khi thông tin chưa đủ giải quyết.
 
 ### 📅 3. Lịch Bảo trì Kéo - Thả (Drag & Drop)
+
 - Giao diện lịch bảo trì hàng tháng trực quan (`/dashboard/maintenance`).
 - **Drag & drop ticket**: Kéo ticket trực tiếp từ danh sách và thả vào ô ngày trên lịch để lên lịch sửa chữa.
 
 ### 📊 4. Đo lường KPI & Báo cáo
+
 - **Dashboard KPI Kỹ thuật viên**: Đo lường số lượng ticket xử lý, thời gian xử lý trung bình và tỷ lệ quá hạn.
 - **KPI cá nhân (`/dashboard/my-kpi`)**: Trang thống kê hiệu suất riêng cho từng kỹ thuật viên.
 - **Xuất báo cáo đa dạng**:
@@ -41,6 +97,7 @@ Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại họ
   - **Phiếu sửa chữa PDF**: In phiếu kỹ thuật chi tiết cho từng ticket kèm ô ký tên xác nhận.
 
 ### ⚙️ 5. Vận hành Tự động & Quản trị
+
 - **Tự động phân công (Auto-assign)**: Thuật toán tìm Kỹ thuật viên có số lượng ticket active ít nhất để gán việc.
 - **Cảnh báo quá hạn (Overdue Alert)**: Tự động đánh dấu badge đỏ cho ticket >3 ngày và gửi email nhắc nhở qua SMTP (`nodemailer`).
 - **Bảo mật 2 lớp (2-FA)**: Xác thực OTP qua Google Authenticator (`@otplib/preset-default` + `qrcode`).
@@ -65,10 +122,12 @@ Hệ thống hỗ trợ kỹ thuật IT Helpdesk dành cho Trường Đại họ
 ## 🚀 Hướng dẫn Cài đặt & Chạy Local
 
 ### 1. Prerequisite
+
 - Node.js version >= 20.x
 - PostgreSQL database đang chạy local hoặc cloud (Supabase, Neon, Neon.tech...)
 
 ### 2. Clone & Install Dependencies
+
 ```bash
 git clone https://github.com/username/dlu-onedesk.git
 cd dlu-onedesk
@@ -76,7 +135,9 @@ npm install --legacy-peer-deps
 ```
 
 ### 3. Cấu hình Env Variable (`.env`)
+
 Tạo file `.env` ở thư mục gốc:
+
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/dlu_onedesk?schema=public"
 NEXTAUTH_SECRET="your-super-secret-key"
@@ -94,12 +155,14 @@ SMTP_FROM="no-reply@dlu.edu.vn"
 ```
 
 ### 4. Push Database Schema & Generate Prisma Client
+
 ```bash
 npx prisma db push
 npx prisma generate
 ```
 
 ### 5. Khởi chạy ứng dụng
+
 ```bash
 # Chạy môi trường phát triển (Dev)
 npm run dev
@@ -108,6 +171,7 @@ npm run dev
 npm run build
 npm run start
 ```
+
 Truy cập ứng dụng tại: `http://localhost:3000`
 
 ### 6. Kích hoạt Bảo mật 2 lớp (2-FA)
@@ -122,6 +186,7 @@ Nhấn **Kích hoạt 2-FA** → ứng dụng sẽ hiển thị mã QR.
 
 **Bước 3 – Quét mã QR**
 Mở ứng dụng Google Authenticator (hoặc Authy) trên điện thoại → nhấn **+** → chọn **Quét mã QR** → quét mã trên màn hình.
+
 > Nếu không quét được, nhập thủ công mã bí mật (secret key) hiển thị dưới mã QR.
 
 **Bước 4 – Xác nhận**
@@ -159,4 +224,6 @@ Xem hướng dẫn sử dụng chi tiết theo từng vai trò tại [docs/Huong
 ---
 
 ## 📝 License
+
+Dự án thuộc bản quyền của tác giả **aesc**.
 Đồ án Thực tập tốt nghiệp - Trường Đại học Đà Lạt (DLU).

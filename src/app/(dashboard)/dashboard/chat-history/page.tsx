@@ -25,7 +25,10 @@ export default async function ChatHistoryPage() {
 
       {logs.length === 0 ? (
         <div className="rounded-sm border bg-card px-4">
-          <EmptyState title="Chưa có cuộc trò chuyện nào" description="Bắt đầu chat với trợ lý AI để được gợi ý khắc phục sự cố." />
+          <EmptyState
+            title="Chưa có cuộc trò chuyện nào"
+            description="Bắt đầu chat với trợ lý AI để được gợi ý khắc phục sự cố."
+          />
         </div>
       ) : (
         <div className="space-y-4">

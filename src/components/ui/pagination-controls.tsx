@@ -8,7 +8,12 @@ interface PaginationControlsProps {
   searchParams: Record<string, string | undefined>;
 }
 
-export function PaginationControls({ page, totalPages, baseUrl, searchParams }: PaginationControlsProps) {
+export function PaginationControls({
+  page,
+  totalPages,
+  baseUrl,
+  searchParams,
+}: PaginationControlsProps) {
   if (totalPages <= 1) return null;
 
   function buildUrl(targetPage: number) {

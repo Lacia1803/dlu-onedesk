@@ -3,7 +3,6 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,12 +34,16 @@ export function Header() {
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary border border-border hover:bg-secondary/80">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
-                <AvatarFallback className="font-mono">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                <AvatarFallback className="font-mono">
+                  {session?.user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
               </Avatar>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="font-mono text-xs">{session?.user?.email ?? "unknown"}</DropdownMenuLabel>
+            <DropdownMenuLabel className="font-mono text-xs">
+              {session?.user?.email ?? "unknown"}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push("/settings")}>
               <User className="mr-2 h-4 w-4" />

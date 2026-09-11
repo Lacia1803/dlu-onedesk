@@ -15,7 +15,12 @@ interface RatingWidgetProps {
   canReopen?: boolean;
 }
 
-export function RatingWidget({ ticketId, rating = 0, feedback, canReopen = false }: RatingWidgetProps) {
+export function RatingWidget({
+  ticketId,
+  rating = 0,
+  feedback,
+  canReopen = false,
+}: RatingWidgetProps) {
   const router = useRouter();
   const [hover, setHover] = useState(0);
   const [value, setValue] = useState<number>(rating || 0);
@@ -47,14 +52,18 @@ export function RatingWidget({ ticketId, rating = 0, feedback, canReopen = false
           <Star
             key={star}
             className={`h-5 w-5 cursor-pointer transition-colors ${
-              star <= (hover || value) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/50"
+              star <= (hover || value)
+                ? "fill-amber-400 text-amber-400"
+                : "text-muted-foreground/50"
             }`}
             onClick={() => setValue(star)}
             onMouseEnter={() => setHover(star)}
             onMouseLeave={() => setHover(0)}
           />
         ))}
-        <span className="text-sm font-medium">{value > 0 ? `${value}/5 sao` : "Chưa có đánh giá"}</span>
+        <span className="text-sm font-medium">
+          {value > 0 ? `${value}/5 sao` : "Chưa có đánh giá"}
+        </span>
       </div>
 
       <Textarea

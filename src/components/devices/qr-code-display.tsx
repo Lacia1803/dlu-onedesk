@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
@@ -16,7 +17,7 @@ export function QrCodeDisplay({ qrCode, deviceName }: QrCodeDisplayProps) {
   useEffect(() => {
     // Generate URL that points to the scan redirect page
     const scanUrl = `${window.location.origin}/dashboard/devices/qr/${qrCode}`;
-    
+
     QRCode.toDataURL(scanUrl, {
       width: 300,
       margin: 2,
@@ -38,17 +39,24 @@ export function QrCodeDisplay({ qrCode, deviceName }: QrCodeDisplayProps) {
   return (
     <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-card max-w-sm">
       <h3 className="font-medium text-lg text-center">{deviceName}</h3>
-      <img src={qrSrc} alt={`QR Code cho ${deviceName}`} className="w-full h-auto rounded-md border" />
+      <Image
+        src={qrSrc}
+        alt={`QR Code cho ${deviceName}`}
+        width={300}
+        height={300}
+        unoptimized
+        className="w-full h-auto rounded-md border"
+      />
       <div className="text-xs text-muted-foreground break-all bg-muted p-2 rounded w-full text-center">
         {qrCode}
       </div>
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         className="w-full"
         onClick={() => {
           const a = document.createElement("a");
           a.href = qrSrc;
-          a.download = `QR-${deviceName.replace(/\s+/g, '-')}-${qrCode}.png`;
+          a.download = `QR-${deviceName.replace(/\s+/g, "-")}-${qrCode}.png`;
           a.click();
         }}
       >

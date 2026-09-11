@@ -13,13 +13,16 @@ export default async function MaintenancePage() {
   const logs = await getAllMaintenanceLogs();
 
   // Active tickets for the logged-in technician
-  let myTickets: Awaited<ReturnType<typeof getTicketsForTechnician>> = { success: false, tickets: [] };
+  let myTickets: Awaited<ReturnType<typeof getTicketsForTechnician>> = {
+    success: false,
+    tickets: [],
+  };
   if (isTech && session?.user?.id) {
     myTickets = await getTicketsForTechnician(session.user.id);
   }
 
   // Lọc ra các ticket đã được lên lịch
-  const scheduledTickets = myTickets.tickets?.filter(t => t.scheduledAt) || [];
+  const scheduledTickets = myTickets.tickets?.filter((t) => t.scheduledAt) || [];
 
   return (
     <div className="space-y-4">

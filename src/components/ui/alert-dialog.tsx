@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,77 +8,77 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 function AlertDialog({
   open,
   onOpenChange,
   children,
 }: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  children: React.ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children}
     </Dialog>
-  )
+  );
 }
 
 function AlertDialogContent({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <DialogContent showCloseButton={false} className={className}>
       {children}
     </DialogContent>
-  )
+  );
 }
 
 function AlertDialogHeader({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
-  return <DialogHeader className={className}>{children}</DialogHeader>
+  return <DialogHeader className={className}>{children}</DialogHeader>;
 }
 
 function AlertDialogTitle({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
-  return <DialogTitle className={className}>{children}</DialogTitle>
+  return <DialogTitle className={className}>{children}</DialogTitle>;
 }
 
 function AlertDialogDescription({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
-  return <DialogDescription className={className}>{children}</DialogDescription>
+  return <DialogDescription className={className}>{children}</DialogDescription>;
 }
 
 function AlertDialogFooter({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
-  return <DialogFooter className={className}>{children}</DialogFooter>
+  return <DialogFooter className={className}>{children}</DialogFooter>;
 }
 
 function AlertDialogAction({
@@ -87,16 +87,16 @@ function AlertDialogAction({
   className,
   variant = "default",
 }: {
-  onClick?: () => void
-  children: React.ReactNode
-  className?: string
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  onClick?: () => void;
+  children: React.ReactNode;
+  className?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }) {
   return (
     <Button variant={variant} onClick={onClick} className={className}>
       {children}
     </Button>
-  )
+  );
 }
 
 function AlertDialogCancel({
@@ -104,15 +104,15 @@ function AlertDialogCancel({
   children,
   className,
 }: {
-  onClick?: () => void
-  children?: React.ReactNode
-  className?: string
+  onClick?: () => void;
+  children?: React.ReactNode;
+  className?: string;
 }) {
   return (
     <Button variant="outline" onClick={onClick} className={className}>
       {children || "Hủy bỏ"}
     </Button>
-  )
+  );
 }
 
 export {
@@ -124,4 +124,4 @@ export {
   AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
-}
+};

@@ -15,7 +15,12 @@ import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/
 export function ChangePasswordForm() {
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ChangePasswordValues>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ChangePasswordValues>({
     resolver: zodResolver(changePasswordSchema),
   });
 
@@ -43,20 +48,28 @@ export function ChangePasswordForm() {
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Mật khẩu hiện tại</Label>
             <Input id="currentPassword" type="password" {...register("currentPassword")} />
-            {errors.currentPassword && <p className="text-sm text-destructive">{errors.currentPassword.message}</p>}
+            {errors.currentPassword && (
+              <p className="text-sm text-destructive">{errors.currentPassword.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="newPassword">Mật khẩu mới</Label>
             <Input id="newPassword" type="password" {...register("newPassword")} />
-            {errors.newPassword && <p className="text-sm text-destructive">{errors.newPassword.message}</p>}
-            <p className="text-xs text-muted-foreground">Tối thiểu 8 ký tự, có ít nhất 1 chữ cái và 1 chữ số.</p>
+            {errors.newPassword && (
+              <p className="text-sm text-destructive">{errors.newPassword.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Tối thiểu 8 ký tự, có ít nhất 1 chữ cái và 1 chữ số.
+            </p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
             <Input id="confirmPassword" type="password" {...register("confirmPassword")} />
-            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+            {errors.confirmPassword && (
+              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+            )}
           </div>
 
           <Button type="submit" disabled={loading}>

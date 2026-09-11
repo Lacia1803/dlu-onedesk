@@ -63,7 +63,10 @@ export default async function RoomsPage({
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Quản lý Phòng máy</h1>
         {canEdit && (
-          <Link href="/dashboard/rooms/new" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+          <Link
+            href="/dashboard/rooms/new"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Thêm phòng máy
           </Link>
@@ -104,7 +107,10 @@ export default async function RoomsPage({
               rooms.map((room) => (
                 <TableRow key={room.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/dashboard/rooms/${room.id}`} className="hover:underline text-primary">
+                    <Link
+                      href={`/dashboard/rooms/${room.id}`}
+                      className="hover:underline text-primary"
+                    >
                       {room.name}
                     </Link>
                   </TableCell>
@@ -112,7 +118,12 @@ export default async function RoomsPage({
                   <TableCell>{room.capacity} máy</TableCell>
                   <TableCell className="text-right space-x-2">
                     {canEdit && (
-                      <Link href={`/dashboard/rooms/${room.id}/edit`} aria-label="Chỉnh sửa phòng máy" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1" title="Chỉnh sửa">
+                      <Link
+                        href={`/dashboard/rooms/${room.id}/edit`}
+                        aria-label="Chỉnh sửa phòng máy"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                        title="Chỉnh sửa"
+                      >
                         <Edit className="h-4 w-4" />
                       </Link>
                     )}

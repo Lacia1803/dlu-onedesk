@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { Prisma, TicketStatus, TicketPriority } from "@prisma/client";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -27,7 +28,7 @@ export default async function TicketsPage({
   const keyword = q?.trim();
   const page = Math.max(1, parseInt(pageParam || "1", 10));
 
-  const where: any = isUser ? { creatorId: session.user.id } : {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const where: Prisma.TicketWhereInput = isUser ? { creatorId: session.user.id } : {};
 
   if (keyword) {
     where.OR = [
@@ -36,8 +37,8 @@ export default async function TicketsPage({
       { id: { contains: keyword, mode: "insensitive" } },
     ];
   }
-  if (status) where.status = status;
-  if (priority) where.priority = priority;
+  if (status) where.status = status as TicketStatus;
+  if (priority) where.priority = priority as TicketPriority;
 
   const [tickets, total] = await Promise.all([
     db.ticket.findMany({

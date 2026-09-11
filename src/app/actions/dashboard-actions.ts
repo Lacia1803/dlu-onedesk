@@ -10,35 +10,32 @@ export async function getAdminStats() {
     throw new Error("Unauthorized");
   }
 
-  const [
-    totalDevices,
-    brokenDevices,
-    openTickets,
-    unresolvedTickets,
-    devices,
-    recentTickets
-  ] = await Promise.all([
-    db.device.count({ where: { deletedAt: null } }),
-    db.device.count({ where: { deletedAt: null, status: "BROKEN" } }),
-    db.ticket.count({ where: { status: "OPEN" } }),
-    db.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } }),
-    db.device.findMany({ where: { deletedAt: null }, select: { status: true } }),
-    db.ticket.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { creator: { select: { name: true } }, assignee: { select: { name: true } } }
-    })
-  ]);
+  const [totalDevices, brokenDevices, openTickets, unresolvedTickets, devices, recentTickets] =
+    await Promise.all([
+      db.device.count({ where: { deletedAt: null } }),
+      db.device.count({ where: { deletedAt: null, status: "BROKEN" } }),
+      db.ticket.count({ where: { status: "OPEN" } }),
+      db.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } }),
+      db.device.findMany({ where: { deletedAt: null }, select: { status: true } }),
+      db.ticket.findMany({
+        take: 5,
+        orderBy: { createdAt: "desc" },
+        include: { creator: { select: { name: true } }, assignee: { select: { name: true } } },
+      }),
+    ]);
 
   // Aggregate device statuses for pie chart
-  const statusCounts = devices.reduce((acc, curr) => {
-    acc[curr.status] = (acc[curr.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusCounts = devices.reduce(
+    (acc, curr) => {
+      acc[curr.status] = (acc[curr.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const pieData = Object.entries(statusCounts).map(([name, value]) => ({
     name,
-    value
+    value,
   }));
 
   return {
@@ -47,7 +44,7 @@ export async function getAdminStats() {
     openTickets,
     unresolvedTickets,
     pieData,
-    recentTickets
+    recentTickets,
   };
 }
 
@@ -57,21 +54,25 @@ export async function getUserStats() {
 
   const [totalMyTickets, myOpenTickets, myResolvedTickets, recentTickets] = await Promise.all([
     db.ticket.count({ where: { creatorId: session.user.id } }),
-    db.ticket.count({ where: { creatorId: session.user.id, status: { in: ["OPEN", "IN_PROGRESS"] } } }),
-    db.ticket.count({ where: { creatorId: session.user.id, status: { in: ["RESOLVED", "CLOSED"] } } }),
+    db.ticket.count({
+      where: { creatorId: session.user.id, status: { in: ["OPEN", "IN_PROGRESS"] } },
+    }),
+    db.ticket.count({
+      where: { creatorId: session.user.id, status: { in: ["RESOLVED", "CLOSED"] } },
+    }),
     db.ticket.findMany({
       where: { creatorId: session.user.id },
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: { assignee: { select: { name: true } } }
-    })
+      include: { assignee: { select: { name: true } } },
+    }),
   ]);
 
   return {
     totalMyTickets,
     myOpenTickets,
     myResolvedTickets,
-    recentTickets
+    recentTickets,
   };
 }
 
@@ -85,12 +86,16 @@ export async function getExportData() {
     db.device.findMany({
       where: { deletedAt: null },
       include: { room: true },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     }),
     db.ticket.findMany({
-      include: { creator: { select: { id: true, name: true, email: true } }, assignee: { select: { id: true, name: true, email: true } }, device: { select: { name: true, qrCode: true } } },
-      orderBy: { createdAt: "desc" }
-    })
+      include: {
+        creator: { select: { id: true, name: true, email: true } },
+        assignee: { select: { id: true, name: true, email: true } },
+        device: { select: { name: true, qrCode: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   return { devices, tickets };

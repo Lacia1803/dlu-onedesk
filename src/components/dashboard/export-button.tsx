@@ -23,10 +23,9 @@ export function ExportButton() {
       const s = String(v ?? "");
       return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     };
-    return [
-      headers.join(","),
-      ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),
-    ].join("\n");
+    return [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))].join(
+      "\n"
+    );
   }
 
   function downloadCsv(name: string, content: string) {
@@ -45,17 +44,17 @@ export function ExportButton() {
       setLoading(true);
       const data = await getExportData();
 
-      const devicesFormatted = data.devices.map(d => ({
+      const devicesFormatted = data.devices.map((d) => ({
         "Mã QR": d.qrCode,
         "Tên thiết bị": d.name,
-        "Loại": d.type,
+        Loại: d.type,
         "Trạng thái": d.status,
-        "Phòng": d.room.name,
+        Phòng: d.room.name,
         "Số Serial": d.serialNumber || "",
-        "Ngày tạo": format(new Date(d.createdAt), "dd/MM/yyyy HH:mm")
+        "Ngày tạo": format(new Date(d.createdAt), "dd/MM/yyyy HH:mm"),
       }));
 
-      const ticketsFormatted = data.tickets.map(t => ({
+      const ticketsFormatted = data.tickets.map((t) => ({
         "Mã Ticket": t.id,
         "Tiêu đề": t.title,
         "Trạng thái": t.status,

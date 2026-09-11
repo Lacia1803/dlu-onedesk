@@ -2,7 +2,13 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
@@ -35,7 +41,7 @@ export function TicketStatusFilter({
           placeholder="Tìm kiếm (tiêu đề, mô tả, ID)"
           defaultValue={keyword || ""}
           className="pl-8"
-          onKeyDown={e => {
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               const target = e.currentTarget as HTMLInputElement;
@@ -47,7 +53,7 @@ export function TicketStatusFilter({
       </div>
 
       {/* Status filter */}
-      <Select value={currentStatus || ""} onValueChange={v => update({ status: v || undefined })}>
+      <Select value={currentStatus || ""} onValueChange={(v) => update({ status: v || undefined })}>
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder="Trạng thái" />
         </SelectTrigger>
@@ -62,7 +68,10 @@ export function TicketStatusFilter({
       </Select>
 
       {/* Priority filter */}
-      <Select value={currentPriority || ""} onValueChange={v => update({ priority: v || undefined })}>
+      <Select
+        value={currentPriority || ""}
+        onValueChange={(v) => update({ priority: v || undefined })}
+      >
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder="Mức độ" />
         </SelectTrigger>
@@ -76,7 +85,10 @@ export function TicketStatusFilter({
       </Select>
 
       {/* Reset button */}
-      <Button variant="outline" onClick={() => update({ q: undefined, status: undefined, priority: undefined })}>
+      <Button
+        variant="outline"
+        onClick={() => update({ q: undefined, status: undefined, priority: undefined })}
+      >
         Reset
       </Button>
     </div>

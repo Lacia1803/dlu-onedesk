@@ -64,7 +64,10 @@ export async function GET(req: NextRequest) {
       "/dashboard/maintenance",
       "MAINTENANCE"
     );
-    await sendAlert("[DLU OneDesk] Đến hạn bảo trì định kỳ", `Phòng: ${plan.room.name}\nChu kỳ: ${period}`);
+    await sendAlert(
+      "[DLU OneDesk] Đến hạn bảo trì định kỳ",
+      `Phòng: ${plan.room.name}\nChu kỳ: ${period}`
+    );
   }
 
   // ---------- 2 & 3. Cảnh báo SLA leo thang ----------

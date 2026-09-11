@@ -76,7 +76,10 @@ export async function exportTicketPdf(ticketId: string) {
     ["Nguoi xu ly", ticket.assignee?.name || "Chua phan cong"],
     ["Thiet bi", ticket.device ? `${ticket.device.name} (${ticket.device.qrCode})` : "Khong gan"],
     ["Ngay tao", format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm")],
-    ["Ngay xu ly", ticket.resolvedAt ? format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm") : "-"],
+    [
+      "Ngay xu ly",
+      ticket.resolvedAt ? format(new Date(ticket.resolvedAt), "dd/MM/yyyy HH:mm") : "-",
+    ],
     ["Ngay dong", ticket.closedAt ? format(new Date(ticket.closedAt), "dd/MM/yyyy HH:mm") : "-"],
   ];
 

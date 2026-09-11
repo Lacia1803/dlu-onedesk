@@ -56,8 +56,9 @@ export async function mergeTickets(targetTicketId: string, duplicateTicketIds: s
   });
 
   // 3. Thêm bình luận liên kết trên Ticket gốc
-  const mergeNotice = `[HỆ THỐNG] Đã gộp ${duplicates.length} ticket trùng vào đây:\n` +
-    duplicates.map(d => `- #${d.id.slice(-6).toUpperCase()}: ${d.title}`).join("\n");
+  const mergeNotice =
+    `[HỆ THỐNG] Đã gộp ${duplicates.length} ticket trùng vào đây:\n` +
+    duplicates.map((d) => `- #${d.id.slice(-6).toUpperCase()}: ${d.title}`).join("\n");
 
   await db.ticketComment.create({
     data: {

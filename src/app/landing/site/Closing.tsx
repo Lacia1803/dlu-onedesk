@@ -41,8 +41,8 @@ export function Faq() {
                   Chưa thấy câu hỏi của bạn?
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink/60">
-                  Nhóm phát triển luôn sẵn lòng trình bày thêm về kiến trúc, cơ sở dữ liệu và
-                  quy trình nghiệp vụ trong buổi demo hoặc bảo vệ đồ án.
+                  Nhóm phát triển luôn sẵn lòng trình bày thêm về kiến trúc, cơ sở dữ liệu và quy
+                  trình nghiệp vụ trong buổi demo hoặc bảo vệ đồ án.
                 </p>
               </div>
             </div>
@@ -62,7 +62,10 @@ export function Faq() {
                     className="group flex w-full items-center justify-between gap-5 py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-600 focus-visible:ring-offset-2"
                   >
                     <span className="flex items-baseline gap-4">
-                      <span aria-hidden="true" className="hidden text-[12px] font-black text-gold-700 sm:block">
+                      <span
+                        aria-hidden="true"
+                        className="hidden text-[12px] font-black text-gold-700 sm:block"
+                      >
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <span className="text-[16px] font-extrabold tracking-tight text-pine-950 transition-colors group-hover:text-pine-700">
@@ -72,7 +75,7 @@ export function Faq() {
                     <span
                       className={cn(
                         "grid size-8 shrink-0 place-items-center rounded-full border border-pine-950/12 text-pine-900 transition-all duration-500",
-                        isOpen && "rotate-180 border-pine-800 bg-pine-800 text-gold-300",
+                        isOpen && "rotate-180 border-pine-800 bg-pine-800 text-gold-300"
                       )}
                     >
                       <ChevronDown className="size-4" />
@@ -81,7 +84,7 @@ export function Faq() {
                   <div
                     className={cn(
                       "grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                     )}
                   >
                     <div className="overflow-hidden">
@@ -129,8 +132,8 @@ export function Cta({ onLogin }: { onLogin: () => void }) {
               Một điểm truy cập cho mọi nhu cầu hỗ trợ kỹ thuật.
             </h2>
             <p className="mt-5 max-w-xl text-[15.5px] leading-relaxed text-pine-100/75">
-              Đăng nhập để báo sự cố đầu tiên của bạn — hoặc khám phá quy trình bốn bước trước
-              khi quyết định.
+              Đăng nhập để báo sự cố đầu tiên của bạn — hoặc khám phá quy trình bốn bước trước khi
+              quyết định.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <button
@@ -162,7 +165,10 @@ export function Cta({ onLogin }: { onLogin: () => void }) {
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-pine-950 pt-16 pb-8 text-pine-100">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/50 to-transparent" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/50 to-transparent"
+      />
 
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
@@ -170,8 +176,8 @@ export function Footer() {
           <div>
             <LogoLockup light />
             <p className="mt-5 max-w-xs text-[13.5px] leading-relaxed text-pine-100/60">
-              Hệ thống tiếp nhận và xử lý yêu cầu hỗ trợ kỹ thuật phòng máy — được thiết kế và
-              phát triển như một đồ án học phần tại Trường Đại học Đà Lạt.
+              Hệ thống tiếp nhận và xử lý yêu cầu hỗ trợ kỹ thuật phòng máy — được thiết kế và phát
+              triển như một đồ án học phần tại Trường Đại học Đà Lạt.
             </p>
             <p className="mt-5 inline-flex items-start gap-2 rounded-2xl border border-gold-400/25 bg-gold-400/8 px-4 py-3 text-[12px] leading-relaxed font-semibold text-gold-200">
               <ShieldCheck className="mt-0.5 size-4 shrink-0" />
@@ -258,8 +264,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col gap-3 border-t border-pine-800/60 pt-7 text-[12px] text-pine-100/45 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © 2026 DLU OneDesk · Lấy cảm hứng từ thành phố sương mù — 11.95°N, 108.44°E,
-            1.500 m.
+            © 2026 DLU OneDesk · Lấy cảm hứng từ thành phố sương mù — 11.95°N, 108.44°E, 1.500 m.
           </p>
           <p className="sm:text-right">
             Ảnh: Pexels — Tan Dao · Dongdilac · HONG SON · Thành Đỗ và cộng tác viên.

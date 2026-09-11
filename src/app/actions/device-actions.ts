@@ -1,7 +1,14 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { deviceSchema, DeviceFormValues, maintenanceSchema, MaintenanceFormValues, deviceSoftwareSchema, DeviceSoftwareFormValues } from "@/lib/validations/device";
+import {
+  deviceSchema,
+  DeviceFormValues,
+  maintenanceSchema,
+  MaintenanceFormValues,
+  deviceSoftwareSchema,
+  DeviceSoftwareFormValues,
+} from "@/lib/validations/device";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -35,7 +42,9 @@ export async function createDevice(data: DeviceFormValues) {
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
 
   if (parsed.data.serialNumber) {
-    const exists = await db.device.findFirst({ where: { serialNumber: parsed.data.serialNumber, deletedAt: null } });
+    const exists = await db.device.findFirst({
+      where: { serialNumber: parsed.data.serialNumber, deletedAt: null },
+    });
     if (exists) return { success: false, error: "Số Serial đã tồn tại." };
   }
 
@@ -71,7 +80,13 @@ export async function createDevice(data: DeviceFormValues) {
       break; // success
     } catch (err: unknown) {
       // P2002 = unique constraint violation → retry with new code
-      if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002" && attempt < 4) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2002" &&
+        attempt < 4
+      ) {
         continue;
       }
       throw err; // re-throw non-constraint errors or final attempt
@@ -90,7 +105,9 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
 
   if (parsed.data.serialNumber) {
-    const exists = await db.device.findFirst({ where: { serialNumber: parsed.data.serialNumber, deletedAt: null, id: { not: id } } });
+    const exists = await db.device.findFirst({
+      where: { serialNumber: parsed.data.serialNumber, deletedAt: null, id: { not: id } },
+    });
     if (exists) return { success: false, error: "Số Serial đã tồn tại." };
   }
 
@@ -126,14 +143,25 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
       db.room.findUnique({ where: { id: before.roomId }, select: { name: true } }),
       db.room.findUnique({ where: { id: parsed.data.roomId }, select: { name: true } }),
     ]);
-    history.push({ type: "RELOCATION", description: `Điều chuyển: ${oldRoom?.name ?? "?"} → ${newRoom?.name ?? "?"}` });
+    history.push({
+      type: "RELOCATION",
+      description: `Điều chuyển: ${oldRoom?.name ?? "?"} → ${newRoom?.name ?? "?"}`,
+    });
   }
   if (before.status !== parsed.data.status) {
-    history.push({ type: "STATUS_CHANGE", description: `Tình trạng: ${before.status} → ${parsed.data.status}` });
+    history.push({
+      type: "STATUS_CHANGE",
+      description: `Tình trạng: ${before.status} → ${parsed.data.status}`,
+    });
   }
   if (history.length > 0) {
     await db.deviceHistory.createMany({
-      data: history.map((h) => ({ deviceId: id, type: h.type, description: h.description, userId: session!.user.id })),
+      data: history.map((h) => ({
+        deviceId: id,
+        type: h.type,
+        description: h.description,
+        userId: session!.user.id,
+      })),
     });
   }
 
@@ -144,7 +172,8 @@ export async function updateDevice(id: string, data: DeviceFormValues) {
 
 export async function deleteDevice(id: string) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") return { success: false, error: "Chỉ Admin mới có quyền xóa thiết bị." };
+  if (!session || session.user.role !== "ADMIN")
+    return { success: false, error: "Chỉ Admin mới có quyền xóa thiết bị." };
 
   await db.device.update({
     where: { id },
@@ -199,7 +228,7 @@ export async function addSoftwareToDevice(deviceId: string, data: DeviceSoftware
   if (!parsed.success) return { success: false, error: "Dữ liệu không hợp lệ." };
 
   const exists = await db.deviceSoftware.findFirst({
-    where: { deviceId, softwareId: parsed.data.softwareId }
+    where: { deviceId, softwareId: parsed.data.softwareId },
   });
 
   if (exists) return { success: false, error: "Phần mềm này đã được cài đặt trên thiết bị." };

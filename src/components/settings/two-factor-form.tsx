@@ -111,24 +111,32 @@ export function TwoFactorForm({
               <DialogHeader>
                 <DialogTitle>Hướng dẫn kích hoạt Bảo mật 2 lớp</DialogTitle>
                 <DialogDescription>
-                  Bảo mật 2 lớp yêu cầu mã OTP từ ứng dụng authenticator ngoài mật khẩu, giúp tài khoản an toàn hơn.
+                  Bảo mật 2 lớp yêu cầu mã OTP từ ứng dụng authenticator ngoài mật khẩu, giúp tài
+                  khoản an toàn hơn.
                 </DialogDescription>
               </DialogHeader>
               <ol className="space-y-3 text-sm text-muted-foreground list-decimal pl-5">
                 <li>
-                  <strong className="text-foreground">Cài đặt ứng dụng authenticator</strong> — Tải Google Authenticator hoặc Authy trên điện thoại (iOS / Android).
+                  <strong className="text-foreground">Cài đặt ứng dụng authenticator</strong> — Tải
+                  Google Authenticator hoặc Authy trên điện thoại (iOS / Android).
                 </li>
                 <li>
-                  <strong className="text-foreground">Nhấn &ldquo;Kích hoạt 2-FA&rdquo;</strong> — Hệ thống sẽ hiển thị mã QR.
+                  <strong className="text-foreground">Nhấn &ldquo;Kích hoạt 2-FA&rdquo;</strong> —
+                  Hệ thống sẽ hiển thị mã QR.
                 </li>
                 <li>
-                  <strong className="text-foreground">Quét mã QR</strong> — Mở ứng dụng → nhấn <span className="font-mono text-xs bg-muted px-1 rounded">+</span> → chọn <em>Quét mã QR</em> → quét mã trên màn hình. Nếu không quét được, nhập thủ công mã bí mật (secret key) hiển thị dưới QR.
+                  <strong className="text-foreground">Quét mã QR</strong> — Mở ứng dụng → nhấn{" "}
+                  <span className="font-mono text-xs bg-muted px-1 rounded">+</span> → chọn{" "}
+                  <em>Quét mã QR</em> → quét mã trên màn hình. Nếu không quét được, nhập thủ công mã
+                  bí mật (secret key) hiển thị dưới QR.
                 </li>
                 <li>
-                  <strong className="text-foreground">Xác nhận</strong> — Nhập mã OTP 6 chữ số hiện trên ứng dụng → nhấn <em>Xác nhận &amp; Kích hoạt</em>.
+                  <strong className="text-foreground">Xác nhận</strong> — Nhập mã OTP 6 chữ số hiện
+                  trên ứng dụng → nhấn <em>Xác nhận &amp; Kích hoạt</em>.
                 </li>
                 <li>
-                  <strong className="text-foreground">Đăng nhập lần sau</strong> — Sau khi nhập email + mật khẩu, hệ thống sẽ yêu cầu mã OTP → mở ứng dụng → nhập mã 6 chữ số.
+                  <strong className="text-foreground">Đăng nhập lần sau</strong> — Sau khi nhập
+                  email + mật khẩu, hệ thống sẽ yêu cầu mã OTP → mở ứng dụng → nhập mã 6 chữ số.
                 </li>
               </ol>
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
@@ -165,13 +173,7 @@ export function TwoFactorForm({
             </div>
             {qrCodeUrl && (
               <div className="flex flex-col items-center gap-2 p-3 bg-white rounded-md w-fit mx-auto">
-                <Image
-                  src={qrCodeUrl}
-                  alt="2FA QR Code"
-                  width={180}
-                  height={180}
-                  unoptimized
-                />
+                <Image src={qrCodeUrl} alt="2FA QR Code" width={180} height={180} unoptimized />
               </div>
             )}
             {secret && (
@@ -212,12 +214,7 @@ export function TwoFactorForm({
             </div>
           </form>
         ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleStartEnable}
-            disabled={loading}
-          >
+          <Button variant="outline" size="sm" onClick={handleStartEnable} disabled={loading}>
             {loading ? "Đang tạo mã..." : "Kích hoạt 2-FA"}
           </Button>
         )}
@@ -228,14 +225,13 @@ export function TwoFactorForm({
           <AlertDialogHeader>
             <AlertDialogTitle>Tắt xác thực 2 lớp?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn tắt xác thực 2 lớp? Tài khoản của bạn sẽ giảm bớt một lớp bảo mật.
+              Bạn có chắc chắn muốn tắt xác thực 2 lớp? Tài khoản của bạn sẽ giảm bớt một lớp bảo
+              mật.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDisable}>
-              Tắt 2FA
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDisable}>Tắt 2FA</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

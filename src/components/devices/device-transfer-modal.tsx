@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-export function DeviceTransferModal({ deviceId, currentRoomId }: { deviceId: string; currentRoomId: string }) {
+export function DeviceTransferModal({
+  deviceId,
+  currentRoomId,
+}: {
+  deviceId: string;
+  currentRoomId: string;
+}) {
   const [rooms, setRooms] = useState<Array<{ id: string; name: string }>>([]);
   const [targetRoom, setTargetRoom] = useState("");
   const [loading, setLoading] = useState(false);

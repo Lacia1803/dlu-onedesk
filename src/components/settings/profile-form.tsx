@@ -30,7 +30,12 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
   const [avatar, setAvatar] = useState(initialData.avatar || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<UserSettingsValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<UserSettingsValues>({
     resolver: zodResolver(userSettingsSchema),
     values: {
       name: initialData.name,
@@ -82,52 +87,73 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
   }
 
   return (
-      <AccordionItem value="profile">
-        <AccordionTrigger className="font-mono text-sm uppercase">Thông tin cá nhân</AccordionTrigger>
-        <AccordionContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
-
-            <div className="flex items-center gap-4 mb-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={avatar || ""} />
-                <AvatarFallback>{initialData.name.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col gap-2">
-                <input ref={fileInputRef} type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} />
-                <div className="flex gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                    {uploading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-                    Thay đổi
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => { setAvatar(""); setValue("avatar", ""); }} className="text-destructive">
-                    Xóa
-                  </Button>
-                </div>
+    <AccordionItem value="profile">
+      <AccordionTrigger className="font-mono text-sm uppercase">Thông tin cá nhân</AccordionTrigger>
+      <AccordionContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
+          <div className="flex items-center gap-4 mb-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={avatar || ""} />
+              <AvatarFallback>{initialData.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleAvatarUpload}
+                disabled={uploading}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                  Thay đổi
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setAvatar("");
+                    setValue("avatar", "");
+                  }}
+                  className="text-destructive"
+                >
+                  Xóa
+                </Button>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input value={initialData.email} disabled className="bg-muted font-mono" />
-            </div>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input value={initialData.email} disabled className="bg-muted font-mono" />
+          </div>
 
-            <div className="space-y-2">
-              <Label>Tên</Label>
-              <Input {...register("name")} />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
-            </div>
+          <div className="space-y-2">
+            <Label>Tên</Label>
+            <Input {...register("name")} />
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+          </div>
 
-            <div className="space-y-2">
-              <Label>Số điện thoại</Label>
-              <Input {...register("phone")} placeholder="+84987654321" />
-              {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
-            </div>
+          <div className="space-y-2">
+            <Label>Số điện thoại</Label>
+            <Input {...register("phone")} placeholder="+84987654321" />
+            {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
+          </div>
 
-            <Button type="submit" disabled={loading} className="mt-4">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Lưu thay đổi
-            </Button>
-          </form>
-        </AccordionContent>
-      </AccordionItem>
+          <Button type="submit" disabled={loading} className="mt-4">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Lưu thay đổi
+          </Button>
+        </form>
+      </AccordionContent>
+    </AccordionItem>
   );
 }

@@ -1,14 +1,20 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { ticketSchema, TicketFormValues, ticketCommentSchema, TicketCommentFormValues, ticketUpdateSchema, TicketUpdateFormValues } from "@/lib/validations/ticket";
+import {
+  ticketSchema,
+  TicketFormValues,
+  ticketCommentSchema,
+  TicketCommentFormValues,
+  ticketUpdateSchema,
+  TicketUpdateFormValues,
+} from "@/lib/validations/ticket";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { notifyUsers, notifyAdminsAndTechs } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
 import { Prisma, TicketPriority } from "@prisma/client";
-
 
 import { computeSlaDeadline, isValidTransition, VALID_TRANSITIONS } from "@/lib/ticket-actions";
 
@@ -89,7 +95,7 @@ export async function addTicketComment(ticketId: string, data: TicketCommentForm
   if (ticket.assigneeId && session.user.id !== ticket.assigneeId) {
     notifyList.push(ticket.assigneeId);
   }
-  
+
   if (notifyList.length > 0) {
     await notifyUsers(
       notifyList,
@@ -123,7 +129,11 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
 
   // Users can only close or cancel their own tickets, Techs/Admins can do anything
   if (!isTech) {
-    if (parsed.data.status !== undefined && parsed.data.status !== "CLOSED" && parsed.data.status !== "CANCELLED") {
+    if (
+      parsed.data.status !== undefined &&
+      parsed.data.status !== "CLOSED" &&
+      parsed.data.status !== "CANCELLED"
+    ) {
       return { success: false, error: "Bạn chỉ có quyền đóng hoặc hủy ticket." };
     }
     // Only creator can cancel
@@ -152,7 +162,10 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     }
     if (!isAdmin && !isValidTransition(ticket.status, parsed.data.status)) {
       const allowed = VALID_TRANSITIONS[ticket.status].join(", ") || "không có";
-      return { success: false, error: `Không thể chuyển ${ticket.status} → ${parsed.data.status}. Trạng thái hợp lệ: ${allowed}` };
+      return {
+        success: false,
+        error: `Không thể chuyển ${ticket.status} → ${parsed.data.status}. Trạng thái hợp lệ: ${allowed}`,
+      };
     }
     if (parsed.data.status === "CLOSED" && ticket.status !== "RESOLVED" && !isAdmin) {
       return { success: false, error: "Phải chuyển sang RESOLVED trước khi đóng." };
@@ -168,11 +181,20 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   }
 
   // SLA pause: vào WAITING_PARTS → tạm dừng; ra khỏi WAITING_PARTS → cộng dồn thời gian chờ
-  if (parsed.data.status === "WAITING_PARTS" && ticket.status !== "WAITING_PARTS" && !ticket.slaPausedAt) {
+  if (
+    parsed.data.status === "WAITING_PARTS" &&
+    ticket.status !== "WAITING_PARTS" &&
+    !ticket.slaPausedAt
+  ) {
     updateData.slaPausedAt = now;
   }
-  if (ticket.status === "WAITING_PARTS" && parsed.data.status && parsed.data.status !== "WAITING_PARTS"
-      && ticket.slaPausedAt && ticket.slaDeadline) {
+  if (
+    ticket.status === "WAITING_PARTS" &&
+    parsed.data.status &&
+    parsed.data.status !== "WAITING_PARTS" &&
+    ticket.slaPausedAt &&
+    ticket.slaDeadline
+  ) {
     const { extendSlaDeadline } = await import("@/lib/ticket-actions");
     updateData.slaDeadline = extendSlaDeadline(ticket.slaDeadline, ticket.slaPausedAt, now);
     updateData.slaPausedAt = null;
@@ -207,7 +229,10 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
   if (parsed.data.priority && parsed.data.priority !== ticket.priority) {
     auditDetails.priority = { from: ticket.priority, to: parsed.data.priority };
   }
-  if (parsed.data.assigneeId !== undefined && parsed.data.assigneeId !== (ticket.assigneeId || "")) {
+  if (
+    parsed.data.assigneeId !== undefined &&
+    parsed.data.assigneeId !== (ticket.assigneeId || "")
+  ) {
     auditDetails.assignee = parsed.data.assigneeId || null;
   }
   if (Object.keys(auditDetails).length > 0) {
@@ -230,7 +255,7 @@ export async function updateTicket(id: string, data: TicketUpdateFormValues) {
     if (session.user.id !== ticket.creatorId) notifyList.push(String(ticket.creatorId));
     message = `Ticket #${ticket.id.slice(-6).toUpperCase()} chuyển sang trạng thái: ${parsed.data.status}.`;
   }
-  
+
   // Assignee changed
   if (updateData.assigneeId && updateData.assigneeId !== ticket.assigneeId) {
     if (session.user.id !== updateData.assigneeId) notifyList.push(String(updateData.assigneeId));
@@ -319,18 +344,33 @@ export async function reopenTicket(ticketId: string) {
   if (ticket.status !== "CLOSED") return { success: false, error: "Ticket chưa đóng." };
 
   // Chỉ được mở lại trong 7 ngày (trừ ADMIN)
-  if (session.user.role !== "ADMIN" && (!ticket.closedAt || Date.now() - new Date(ticket.closedAt).getTime() > 7 * 24 * 3600 * 1000)) {
+  if (
+    session.user.role !== "ADMIN" &&
+    (!ticket.closedAt || Date.now() - new Date(ticket.closedAt).getTime() > 7 * 24 * 3600 * 1000)
+  ) {
     return { success: false, error: "Quá 7 ngày từ lúc đóng, không thể mở lại." };
   }
 
   const now = new Date();
   await db.ticket.update({
     where: { id: ticketId },
-    data: { status: "OPEN", reopenedAt: now, resolvedAt: null, closedAt: null, slaDeadline: computeSlaDeadline(ticket.priority, now) },
+    data: {
+      status: "OPEN",
+      reopenedAt: now,
+      resolvedAt: null,
+      closedAt: null,
+      slaDeadline: computeSlaDeadline(ticket.priority, now),
+    },
   });
 
   await db.ticketTransition.create({
-    data: { ticketId, fromStatus: ticket.status, toStatus: "OPEN", reason: "Reopen", userId: session.user.id },
+    data: {
+      ticketId,
+      fromStatus: ticket.status,
+      toStatus: "OPEN",
+      reason: "Reopen",
+      userId: session.user.id,
+    },
   });
 
   await logAudit({
@@ -344,7 +384,6 @@ export async function reopenTicket(ticketId: string) {
   revalidatePath(`/dashboard/tickets/${ticketId}`);
   return { success: true };
 }
-
 
 export async function assignTicketToMe(id: string) {
   const session = await getServerSession(authOptions);
@@ -402,12 +441,15 @@ export async function bulkUpdateTickets(ids: string[], data: Partial<TicketUpdat
     for (const t of affectedTickets) {
       await db.ticket.update({
         where: { id: t.id },
-        data: { priority: data.priority, slaDeadline: computeSlaDeadline(data.priority as TicketPriority, t.createdAt) },
+        data: {
+          priority: data.priority,
+          slaDeadline: computeSlaDeadline(data.priority as TicketPriority, t.createdAt),
+        },
       });
     }
     // Remove priority from the bulk updateMany since we handled it per-ticket
-    const { priority, ...restData } = data;
-    await db.ticket.updateMany({ where: { id: { in: ids } }, data: restData });
+    delete data.priority;
+    await db.ticket.updateMany({ where: { id: { in: ids } }, data });
   } else {
     await db.ticket.updateMany({ where: { id: { in: ids } }, data });
   }
@@ -458,7 +500,11 @@ export async function autoAssignTicket(ticketId: string) {
     select: {
       id: true,
       name: true,
-      _count: { select: { ticketsAssigned: { where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } } } },
+      _count: {
+        select: {
+          ticketsAssigned: { where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_PARTS"] } } },
+        },
+      },
     },
   });
 

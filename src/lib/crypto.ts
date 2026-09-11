@@ -11,7 +11,9 @@ const PREFIX = "enc:";
 function getKey(): Buffer {
   const keyHex = process.env.ENCRYPTION_KEY;
   if (!keyHex || keyHex.length !== 64) {
-    throw new Error("ENCRYPTION_KEY chưa được cấu hình (cần 64 ký tự hex). Chạy: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"");
+    throw new Error(
+      "ENCRYPTION_KEY chưa được cấu hình (cần 64 ký tự hex). Chạy: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+    );
   }
   return Buffer.from(keyHex, "hex");
 }
@@ -35,5 +37,7 @@ export function decryptSecret(stored: string): string {
   const key = getKey();
   const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(ivHex, "hex"));
   decipher.setAuthTag(Buffer.from(tagHex, "hex"));
-  return Buffer.concat([decipher.update(Buffer.from(dataHex, "hex")), decipher.final()]).toString("utf8");
+  return Buffer.concat([decipher.update(Buffer.from(dataHex, "hex")), decipher.final()]).toString(
+    "utf8"
+  );
 }

@@ -15,7 +15,8 @@ export function FirstLoginBanner({ mustChange }: { mustChange: boolean }) {
         <div>
           <h4 className="font-semibold text-sm">Cảnh báo bảo mật tài khoản</h4>
           <p className="text-xs opacity-90">
-            Tài khoản của bạn đang sử dụng mật khẩu mặc định (được import hoặc do Admin cấp lại). Vui lòng đổi mật khẩu ngay tại trang Cài đặt để đảm bảo an toàn.
+            Tài khoản của bạn đang sử dụng mật khẩu mặc định (được import hoặc do Admin cấp lại).
+            Vui lòng đổi mật khẩu ngay tại trang Cài đặt để đảm bảo an toàn.
           </p>
         </div>
       </div>

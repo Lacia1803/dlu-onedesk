@@ -6,11 +6,11 @@ import { rateLimit } from "@/lib/cache";
 
 export async function POST(req: Request) {
   try {
-    const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
+    const ip = req.headers.get("x-forwarded-for") ?? "unknown";
     const { allowed } = rateLimit(`register:${ip}`, 5, 60_000);
     if (!allowed) {
       return NextResponse.json(
-        { success: false, error: 'Quá nhiều yêu cầu. Thử lại sau.' },
+        { success: false, error: "Quá nhiều yêu cầu. Thử lại sau." },
         { status: 429 }
       );
     }
@@ -18,9 +18,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, email, password } = registerSchema.parse(body);
 
-    if (!email.endsWith('@dlu.edu.vn')) {
+    if (!email.endsWith("@dlu.edu.vn")) {
       return NextResponse.json(
-        { success: false, error: 'Chỉ email @dlu.edu.vn mới được đăng ký.' },
+        { success: false, error: "Chỉ email @dlu.edu.vn mới được đăng ký." },
         { status: 403 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
-        role: "USER"
+        role: "USER",
       },
       select: { id: true, name: true, email: true, role: true },
     });
